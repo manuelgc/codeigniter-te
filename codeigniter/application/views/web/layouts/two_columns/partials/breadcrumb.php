@@ -22,6 +22,16 @@ $(document).ready(function(){
 			$("#element_2").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
 		}	
 	});
+	$("form").submit(function() {
+		if(($("#element_1").val() == '') && ($("#element_2").val() == '') && ($("#element_3").val() == '') &&($("#element_4").val() == '')){
+
+			$('#error_combos_vacios').empty().append('Debe seleccionar al menos 1 criterio de busqueda').show();	
+			return false;	
+		}else{
+			$('#error_combos_vacios').empty();
+			return true;
+		}	
+	});
 });
 
 //-->
@@ -37,35 +47,36 @@ $(document).ready(function(){
 	<li id="li_1"><?php echo lang('busqueda_ciudad','element_1','description');?>
 	<div>
 		<?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],NULL,'id=element_1 class="element text medium"'); ?>
+		<small class="guidelines" id="guide_1">Seleciona la ciudad donde te en cuentras</small>	
 	</div>
+	
 	</li>
 	<li id="li_2"><?php echo lang('busqueda_zona','element_2','description');?>
 	<div>
 		<?php echo form_dropdown('zona',array(),NULL,'id=element_2 class="element text medium" disabled="disabled"');?>
-
+		<small class="guidelines" id="guide_2">Seleciona la zona donde te en cuentras</small>	
 	</div>
+	
 	</li>
 	<li id="li_3"><?php echo lang('busqueda_categoria','element_3','description');?>
 	<div><?php echo form_dropdown('categoria',$opcion_combos['categoria'],NULL,'id=element_3 class="element text medium"'); ?>
-
+	<small class="guidelines" id="guide_3">Seleciona el tipo de comida</small>
 	</div>
 	</li>
 	<li id="li_4"><?php echo lang('busqueda_tipo_orden','element_4','description');?>
 	<div><?php echo form_dropdown('tipo_orden',$opcion_combos['orden'],NULL,'id=element_4 class="element text medium"'); ?>
-
+	<small class="guidelines" id="guide_4">Seleciona el tipo de orden</small>
 	</div>
 	</li>
 
 	<li class="buttons">
-<!--	<input id="campo_busqueda" name="campo_busqueda" type="hidden" value="1" />-->
-	<?php //echo validation_errors('<div class="error">', '</div>'); 
-		echo (isset($error)) ? $error : '' ;
-	?>
+	<input id="campo_busqueda" name="campo_busqueda" type="hidden" value="1" />
+	<p class="error" style="display: none;" id="error_combos_vacios"></p>
 	<input id="btn_buscar",
 			class="button_text art-button" type="submit" name="btn_buscar"
 			value="<?php echo lang('busqueda_boton_buscar');?>" />
 		</li>
-		<span class="error" style="display: none;" id="error_combos_vacios"></span>	
+			
 </ul>
 </form>
 
