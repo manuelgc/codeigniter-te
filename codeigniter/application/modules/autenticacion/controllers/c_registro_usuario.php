@@ -75,11 +75,21 @@ class C_registro_usuario extends MX_Controller {
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip();	
 		
-		$this->ejecutarValidacion();
+		$this->procesarRegistro();
 	}
 	
-	function ejecutarValidacion() {
+	function procesarRegistro() {
 		$this->form_validation->set_rules($this->config);
+		
+		if ($this->input->post('usuario')) {
+			$usuario = new Usuario();
+			$usuario->nombreusuario = $this->input->post('usuario');
+			$usuario->password = $this->input->post('password');
+			$usuario->nombre = $this->input->post('nombre');
+			$usuario->apellidos = $this->input->post('apellidos');
+			$usuario->telefonoCel = $this->input->post('celular_1').$this->input->post('celular_2').$this->input->post('celular_3');
+			$usuario->correo = $this->input->post('correo');
+		}
 		if ($this->form_validation->run($this) == FALSE) {												
 			$this->template->build('v_registro_cliente');
 		}else {
@@ -87,9 +97,14 @@ class C_registro_usuario extends MX_Controller {
 		}
 	}			
 
-	function comprobarNombreUsuario() {
-		$data['nombre_usuario'] = $this->input->post('usuario');		
-		//$this->template->set('usuario',$data);		
+	function comprobarNombreUsuario() {	
+		$nombre = $this->input->post('usuario');
+		$u = new Usuario();
+		if ($u->buscarPorNombreUsuario($nombre)) {
+			$data['nombre_usuario'] = $nombre;
+		}else {
+			$data['nombre_usuario'] = '0';
+		}
 		echo json_encode($data);
 	}
 	

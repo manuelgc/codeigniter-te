@@ -14,9 +14,10 @@ class Usuario extends DataMapper {
 		parent::__construct($id);
 	}
 	
-	function getUsuarioPorParam($arregloParam) {
+	function buscarPorNombreUsuario($nombre_usuario) {
 		$usuario = new Usuario();
-		
+		$usuario->get_by_nombreusuario($nombre_usuario);
+		return $usuario->exists();
 	}
 }
 ?>
