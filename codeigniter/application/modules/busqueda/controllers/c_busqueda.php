@@ -1,55 +1,67 @@
 <?php
 class c_busqueda extends MX_Controller{
+	private $config= array(
+	array(
+		'field'=>'ciudad',
+		'label'=>'lang:busqueda_ciudad',
+		'rules'=>'callback_validar_campos_vacios')
+	);
 	function __construct() {
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->helper('language');
+		$this->load->library('form_validation');
+		//$this->load->module('home/c_home');
+		$this->form_validation->CI =& $this;
 
 	}
 	function index() {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
-		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
-		$arrCombo= array('ciudad'  => $this->cargarCiudad(),
+		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));		
+		$arrCombo = array('ciudad'  => $this->cargarCiudad(),
                   		'categoria'    => $this->cargarTipoComida(),
                   		'orden'   => $this->cargarTipoOrden());
 		
+		$this->form_validation->set_rules($this->config);
+
 		if ($this->input->post('campo_busqueda')) {
-//			$this->buscar();
-			$this->buscar2();
+			if ($this->form_validation->run($this) == FALSE) {												
+	//			$this->template->build();
+				//$this->c_home->index();
+				$data['error'] = validation_errors('<div class="error">', '</div>');
+				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);			
+				redirect('home/c_home');	
+			}else {
+	//			$this->template->build('');
+				/*if ($this->input->post('campo_busqueda')) {
+					$this->buscarTiendaSql();
+				}*/
+				//$data['error'] = 'una vista';
+			}
 		}
 		return $arrCombo;
 	}
 	
-	function  buscar2(){
-		/*
-		SELECT tienda.* FROM tiendascomida AS tienda, direccionesentrega AS dir, 
-		tiendascomida_tipotiendascomida AS tipoC, tiendascomida_tiposventa AS tipoV
-		WHERE tienda.id = dir.tiendascomida_id
-		AND dir.ciudades_id =1
-		AND dir.zonas_id =2
-		AND tienda.id = tipoC.tiendacomida_id
-		AND tipoC.tipotiendacomida_id =12
-		AND tienda.id = tipoV.tiendascomida_id
-		AND tipoV.tiposventa_id =1
-		*/
+	function  buscarTiendaSql(){
+
 		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
-		$where=" WHERE tienda.estatus=1 ";	
+		$where=" WHERE tienda.estatus=1 ";
 		$sw=false;
-		$tiendas = new Tiendascomida();	
+		$tiendas = new Tiendascomida();
 		//Busqueda por ciudad
 		if($this->input->post('ciudad')!=''){
 			$sql .=", direccionesentrega AS dir";
 			$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$this->input->post('ciudad')." ";
-//			$where .="AND dir.estatus=1 ";
+			$where .="AND dir.estatus=1 ";
 
 			//Busqueda por zona
 			if($this->input->post('zona')!=''){
 				$where .="AND dir.zonas_id =".$this->input->post('zona')." ";
 			}
 			$sw=true;
-				
+
 		}
-		
+
 		//Busqueda por Tipo de Comida
 		if($this->input->post('categoria')!=''){
 			$sql .=", tiendascomida_tipotiendascomida AS tipoC";
@@ -58,7 +70,7 @@ class c_busqueda extends MX_Controller{
 
 			$sw=true;
 		}
-		
+
 		//Busqueda por Tipo de Venta
 		if($this->input->post('tipo_orden')!=''){
 			$sql .=", tiendascomida_tiposventa AS tipoV";
@@ -67,7 +79,7 @@ class c_busqueda extends MX_Controller{
 
 			$sw=true;
 		}
-		
+
 		if ($sw){
 			$sql.=$where."GROUP BY tienda.id ORDER BY tienda.nombre";
 			$tiendas->query($sql);
@@ -83,7 +95,7 @@ class c_busqueda extends MX_Controller{
 			echo '<h3>Debe seleccionar al menos 1 criterio de busqueda</h3>';
 		}
 	}
-	
+
 	function buscar(){
 
 		$tiendas = new Tiendascomida();
@@ -96,7 +108,7 @@ class c_busqueda extends MX_Controller{
 		//Busqueda por ciudad
 		if($this->input->post('ciudad')!=''){
 			$dirEntrega->where('ciudades_id',$this->input->post('ciudad'));
-			//$dirEntrega->where('estatus','1');
+			$dirEntrega->where('estatus','1');
 				
 			//Busqueda por zona
 			if($this->input->post('zona')!=''){
@@ -204,7 +216,7 @@ class c_busqueda extends MX_Controller{
 	
 	function cargarTipoOrden(){
 		$tipoOrden= new Tiposventa();
-//		$tipoOrden->where('estatus','1');
+		$tipoOrden->where('estatus','1');
 		$tipoOrden->order_by('nombre','ASD')->get_iterated();
 		$options= array();
 		if (!$tipoOrden->exists()) {
@@ -236,6 +248,15 @@ class c_busqueda extends MX_Controller{
 			
 		}
 
+	}
+	function validar_campos_vacios($ciudad){	
+		
+		if(($ciudad=='') && ($this->input->post('zona')=='') && ($this->input->post('categoria')=='') && ($this->input->post('tipo_orden')=='')){
+			$this->form_validation->set_message('validar_campos_vacios','Debe seleccionar al menos 1 criterio de busqueda');
+			return false;
+		}else {
+			return true;
+		}	
 	}
 		
 }
