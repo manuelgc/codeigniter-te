@@ -57,11 +57,15 @@ $(document).ready(function(){
 	</li>
 
 	<li class="buttons">
-	<input id="campo_busqueda" name="campo_busqueda" type="hidden" value="1" />
+<!--	<input id="campo_busqueda" name="campo_busqueda" type="hidden" value="1" />-->
+	<?php //echo validation_errors('<div class="error">', '</div>'); 
+		echo (isset($error)) ? $error : '' ;
+	?>
 	<input id="btn_buscar",
 			class="button_text art-button" type="submit" name="btn_buscar"
 			value="<?php echo lang('busqueda_boton_buscar');?>" />
-		</li>	
+		</li>
+		<span class="error" style="display: none;" id="error_combos_vacios"></span>	
 </ul>
 </form>
 
