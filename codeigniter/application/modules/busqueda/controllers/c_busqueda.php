@@ -14,11 +14,76 @@ class c_busqueda extends MX_Controller{
                   		'orden'   => $this->cargarTipoOrden());
 		
 		if ($this->input->post('campo_busqueda')) {
-			$this->buscar();
+//			$this->buscar();
+			$this->buscar2();
 		}
 		return $arrCombo;
 	}
+	
+	function  buscar2(){
+		/*
+		SELECT tienda.* FROM tiendascomida AS tienda, direccionesentrega AS dir, 
+		tiendascomida_tipotiendascomida AS tipoC, tiendascomida_tiposventa AS tipoV
+		WHERE tienda.id = dir.tiendascomida_id
+		AND dir.ciudades_id =1
+		AND dir.zonas_id =2
+		AND tienda.id = tipoC.tiendacomida_id
+		AND tipoC.tipotiendacomida_id =12
+		AND tienda.id = tipoV.tiendascomida_id
+		AND tipoV.tiposventa_id =1
+		*/
+		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
+		$where=" WHERE tienda.estatus=1 ";	
+		$sw=false;
+		$tiendas = new Tiendascomida();	
+		//Busqueda por ciudad
+		if($this->input->post('ciudad')!=''){
+			$sql .=", direccionesentrega AS dir";
+			$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$this->input->post('ciudad')." ";
+//			$where .="AND dir.estatus=1 ";
 
+			//Busqueda por zona
+			if($this->input->post('zona')!=''){
+				$where .="AND dir.zonas_id =".$this->input->post('zona')." ";
+			}
+			$sw=true;
+				
+		}
+		
+		//Busqueda por Tipo de Comida
+		if($this->input->post('categoria')!=''){
+			$sql .=", tiendascomida_tipotiendascomida AS tipoC";
+			$where .="AND tienda.id = tipoC.tiendacomida_id	AND tipoC.tipotiendacomida_id =".$this->input->post('categoria')." ";
+			$where .="AND tipoC.estatus=1 ";
+
+			$sw=true;
+		}
+		
+		//Busqueda por Tipo de Venta
+		if($this->input->post('tipo_orden')!=''){
+			$sql .=", tiendascomida_tiposventa AS tipoV";
+			$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$this->input->post('tipo_orden')." ";
+			$where .="AND tipoV.estatus=1 ";
+
+			$sw=true;
+		}
+		
+		if ($sw){
+			$sql.=$where."GROUP BY tienda.id ORDER BY tienda.nombre";
+			$tiendas->query($sql);
+			$tiendas->check_last_query();
+			if($tiendas->exists()){
+				foreach ($tiendas as $ti) {
+					echo '<h3>id:'.$ti->id.' nombre:'.$ti->nombre.'</h3>';
+				}
+			}else {
+				echo '<h3>No hay resultados</h3>';
+			}
+		}else{
+			echo '<h3>Debe seleccionar al menos 1 criterio de busqueda</h3>';
+		}
+	}
+	
 	function buscar(){
 
 		$tiendas = new Tiendascomida();
@@ -101,6 +166,7 @@ class c_busqueda extends MX_Controller{
 		}
 	}
 	
+		
 	function cargarCiudad(){
 		$ciudad = new Ciudad();
 		$ciudad->where('estatus','1');
