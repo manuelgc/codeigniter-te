@@ -12,7 +12,7 @@ $(document).ready(function(){
 					if(data.zona!='0'){
 					$("#element_2").empty().append(data.zona).attr("disabled",false);
 					}else{
-						$("#element_2").empty().append('<option value="" >Seleccione</option>;').attr("disabled",false);
+						$("#element_2").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
 						alert("La ciudad seleccionada no tiene zonas registtradas");
 						}
 				},
@@ -41,7 +41,7 @@ $(document).ready(function(){
 	</li>
 	<li id="li_2"><?php echo lang('busqueda_zona','element_2','description');?>
 	<div>
-		<?php echo form_dropdown('zona',array(''=>''),NULL,'id=element_2 class="element text medium" disabled="disabled"');?>
+		<?php echo form_dropdown('zona',array(),NULL,'id=element_2 class="element text medium" disabled="disabled"');?>
 
 	</div>
 	</li>
