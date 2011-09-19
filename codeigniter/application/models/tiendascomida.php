@@ -13,7 +13,8 @@ class Tiendascomida extends DataMapper{
 	'horariosdespacho',
 	'tiendascomida_tipotiendascomida',
 	'direccionesentrega',
-	'pedido');
+	'pedido',
+	'Tiendascomida_tiposventa');
 	
 	function __construct($id = NULL) {
 		parent::__construct($id);
