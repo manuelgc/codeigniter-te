@@ -4,7 +4,7 @@ class Qtip2 {
 	private $_options = array();
 	private $_ci;
 	
-	function __construct($tagContent = 'p') {
+	function __construct($tagContent = 'small') {
 		$this->_selector = 'li';
 		$this->_ci =& get_instance();
 		$this->_options['content'] = "text: $(this).find('".$tagContent."')";

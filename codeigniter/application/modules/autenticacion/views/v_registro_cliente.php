@@ -9,7 +9,13 @@ $(document).ready(function(){
 		$.post("<?php echo base_url();?>index.php/autenticacion/c_registro_usuario/comprobarNombreUsuario",
 				{'usuario':txt_usuario},
 				function(data){
-					alert('Se hizo el ajax ' + data.nombre_usuario);
+					var nombre = data.nombre_usuario;
+					if(nombre == '0'){
+						//alert('puedes usar ese');
+						$('span#error_nombre_usuario').removeClass('error').append('Puedes usar el nombre seleccionado');
+					}else{
+						$('span#error_nombre_usuario').css('display','block').append('Puedes usar el nombre seleccionado');
+					}
 				},
 				'json'
 			);
@@ -20,8 +26,7 @@ $(document).ready(function(){
 });
 //-->
 </script>
-<div id="form_container">
-	<!--<form id="form_237480" class="appnitro"  method="post" action="">-->
+<div id="form_container">	
 <?php echo form_open('autenticacion/c_registro_usuario');?>
 	<div class="form_description">
 		<h2>Registro de clientes todoexpress</h2>
@@ -45,20 +50,18 @@ $(document).ready(function(){
 					value="<?php echo lang('regcliente_comprobar_usuario');?>" />		
 					<span class="error" style="display: none;" id="error_nombre_usuario"></span>								
 			</div>
-			<p class="guidelines" id="guide_1">
-				<small>Ingresa un nombre de usuario con el cual podras identificarte
+			
+				<small class="guidelines" id="guide_1">Ingresa un nombre de usuario con el cual podras identificarte
 					dentro de Todoexpress.com</small>
-			</p>
+			
 		</li>
 		<li id="li_7"><?php echo lang('regcliente_contrasena','element_7','description');?>
 			<div>
 				<input id="element_7" name="password" class="element text medium"
 					type="password" maxlength="255" value="" />
 					<?php echo form_error('password','<p class="error">','</p>');?>
-			</div>
-			<p class="guidelines" id="guide_7">
-				<small>Su contraseña debe poseer minimo 8 caracteres</small>
-			</p>
+			</div>			
+				<small class="guidelines" id="guide_7">Su contraseña debe poseer minimo 8 caracteres</small>			
 		</li>
 		<li id="li_8"><?php echo lang('regcliente_contrasena_confirm','element_8','description');?>
 			<div>
@@ -66,10 +69,8 @@ $(document).ready(function(){
 					class="element text medium" type="password" maxlength="255"
 					value="" />
 					<?php echo form_error('passwordConfirm','<p class="error">','</p>');?>
-			</div>
-			<p class="guidelines" id="guide_8">
-				<small>Repita la contraseña</small>
-			</p>
+			</div>			
+				<small class="guidelines" id="guide_8">Repita la contraseña</small>			
 		</li>
 		<li class="section_break">
 			<h3>
@@ -84,9 +85,9 @@ $(document).ready(function(){
 					value="<?php echo set_value('nombre');?>" />
 					<?php echo form_error('nombre','<p class="error">','</p>');?>
 			</div>
-			<p class="guidelines" id="guide_2">
-				<small>Ingresa tu nombre</small>
-			</p>
+			
+				<small class="guidelines" id="guide_2">Ingresa tu nombre</small>
+			
 		</li>
 		<li id="li_3"><?php echo lang('regcliente_apellidos','element_3','description');?>
 			<div>
@@ -95,9 +96,9 @@ $(document).ready(function(){
 					value="<?php echo set_value('apellidos');?>" />
 					<?php echo form_error('apellidos','<p class="error">','</p>');?>
 			</div>
-			<p class="guidelines" id="guide_3">
-				<small>Ingresa tus apellidos</small>
-			</p>
+			
+				<small class="guidelines" id="guide_3">Ingresa tus apellidos</small>
+			
 		</li>
 		<li id="li_5"><?php echo lang('regcliente_email','element_5','description');?>
 			<div>
@@ -106,11 +107,11 @@ $(document).ready(function(){
 					value="<?php echo set_value('correo');?>" />
 					<?php echo form_error('correo','<p class="error">','</p>');?>
 			</div>
-			<p class="guidelines" id="guide_5">
-				<small>Es importante que ingreses una direccion de correo
+			
+				<small class="guidelines" id="guide_5">Es importante que ingreses una direccion de correo
 					electronico valida ya que a traves de esta te enviaremos
 					informacion de tus pedidos.</small>
-			</p>
+			
 		</li>
 		<li id="li_4"><?php echo lang('regcliente_celular','element_4','description');?>
 			<span> <input id="element_4_1" name="celular_1" class="element text"
@@ -123,9 +124,9 @@ $(document).ready(function(){
 				maxlength="4" value="<?php echo set_value('celular_3');?>"
 				type="text"> <label for="element_4_3">####</label> </span>
 				<?php echo form_error('celular_1','<p class="error">','</p>');?>
-			<p class="guidelines" id="guide_4">
-				<small>Ingresa tu numero de telefono celular tal como se te indica.</small>
-			</p>
+			
+				<small class="guidelines" id="guide_4">Ingresa tu numero de telefono celular tal como se te indica.</small>
+			
 		</li>
 		<li class="section_break">
 			<h3>
@@ -145,9 +146,9 @@ $(document).ready(function(){
 
 				</select>
 			</div>
-			<p class="guidelines" id="guide_16">
-				<small>Seleccione la zona donde se encuentra ubicado</small>
-			</p>
+			
+				<small class="guidelines" id="guide_16">Seleccione la zona donde se encuentra ubicado</small>
+			
 		</li>
 		<li id="li_11"><?php echo lang('regcliente_calle_carr','element_11','description');?>
 			<div>
@@ -155,10 +156,8 @@ $(document).ready(function(){
 					class="element text medium" type="text" maxlength="255"
 					value="<?php echo set_value('calle_carrera');?>" />
 					<?php echo form_error('calle_carrera','<p class="error">','</p>');?>
-			</div>
-			<p class="guidelines" id="guide_11">
-				<small>Ingrese la calle/carrera/vereda de ubicacion</small>
-			</p>
+			</div>			
+				<small class="guidelines" id="guide_11">Ingrese la calle/carrera/vereda de ubicacion</small>			
 		</li>
 		<li id="li_12"><?php echo lang('regcliente_urb_edif','element_12','description');?>
 			<div>
@@ -166,10 +165,8 @@ $(document).ready(function(){
 					type="text" maxlength="255"
 					value="<?php echo set_value('urb_edif');?>" />
 					<?php echo form_error('urb_edif','<p class="error">','</p>');?>
-			</div>
-			<p class="guidelines" id="guide_12">
-				<small>Seleccione la urbanizacion o edificio de ubicacion</small>
-			</p>
+			</div>			
+				<small class="guidelines" id="guide_12">Seleccione la urbanizacion o edificio de ubicacion</small>			
 		</li>
 		<li id="li_13"><?php echo lang('regcliente_numcasa_apto','element_13','description');?>
 			<div>
@@ -177,16 +174,15 @@ $(document).ready(function(){
 					class="element text medium" type="text" maxlength="255"
 					value="<?php echo set_value('nroCasa_apt');?>" />
 					<?php echo form_error('nroCasa_apt','<p class="error">','</p>');?>
-			</div>
-			<p class="guidelines" id="guide_13">
-				<small>Ingrese el numero de casa o apartamento</small>
-			</p>
+			</div>			
+				<small id="guide_13" class="guidelines">Ingrese el numero de casa o apartamento</small>			
 		</li>
 
 		<li class="buttons"><input id="saveForm"
 			class="button_text art-button" type="submit" name="submit"
 			value="<?php echo lang('regcliente_boton');?>" />
 		</li>
+		
 	</ul>
 	</form>
 </div>
