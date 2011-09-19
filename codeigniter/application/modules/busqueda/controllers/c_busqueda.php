@@ -1,47 +1,31 @@
 <?php
 class c_busqueda extends MX_Controller{
-	private $config= array(
-	array(
-		'field'=>'ciudad',
-		'label'=>'lang:busqueda_ciudad',
-		'rules'=>'callback_validar_campos_vacios')
-	);
+	
 	function __construct() {
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->helper('language');
 		$this->load->library('form_validation');
-		//$this->load->module('home/c_home');
+		$this->load->library('qtip2');	
 		$this->form_validation->CI =& $this;
 
 	}
 	function index() {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
-		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));		
+		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
+		$this->qtip2->addCssJs();
+		$this->qtip2->putCustomTip('li','select');
 		$arrCombo = array('ciudad'  => $this->cargarCiudad(),
                   		'categoria'    => $this->cargarTipoComida(),
                   		'orden'   => $this->cargarTipoOrden());
-		
-		$this->form_validation->set_rules($this->config);
 
 		if ($this->input->post('campo_busqueda')) {
-			if ($this->form_validation->run($this) == FALSE) {												
-	//			$this->template->build();
-				//$this->c_home->index();
-				$data['error'] = validation_errors('<div class="error">', '</div>');
-				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);			
-				redirect('home/c_home');	
-			}else {
-	//			$this->template->build('');
-				/*if ($this->input->post('campo_busqueda')) {
-					$this->buscarTiendaSql();
-				}*/
-				//$data['error'] = 'una vista';
-			}
+			$this->buscarTiendaSql();
 		}
-		return $arrCombo;
-	}
 	
+	return $arrCombo;
+	}
+
 	function  buscarTiendaSql(){
 
 		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
@@ -96,89 +80,7 @@ class c_busqueda extends MX_Controller{
 		}
 	}
 
-	function buscar(){
-
-		$tiendas = new Tiendascomida();
-		$dirEntrega = new Direccionesentrega();
-		$tipoVenta = new Tiposventa();
-		$tipoComida = new Tipotiendascomida();
-		$tipoComidaTiendas = new Tiendascomida_tipotiendascomida();
-		$tipoVentasTiendas =new Tiendascomida_tiposventa();
-		
-		//Busqueda por ciudad
-		if($this->input->post('ciudad')!=''){
-			$dirEntrega->where('ciudades_id',$this->input->post('ciudad'));
-			$dirEntrega->where('estatus','1');
-				
-			//Busqueda por zona
-			if($this->input->post('zona')!=''){
-				$dirEntrega->where('zonas_id',$this->input->post('zona'));
-			}
-			
-				$dirEntrega->group_by('tiendascomida_id')->get_iterated();
-				echo $dirEntrega->check_last_query();
-				if($dirEntrega->exists()){
-				foreach ($dirEntrega as $dir) {
-					$tiendas->clear();
-					$tiendas->where('estatus','1');
-					$tiendas->get_by_id($dir->tiendascomida_id);
-					//falta ordenar Alfabeticamente las tiendas
-					//echo $dirEntrega->check_last_query();
-					echo '<h3>id:'.$tiendas->id.' nombre:'.$tiendas->nombre.'</h3>';
-				}
-			}else{
-				echo '<h3>No hay resultados</h3>';
-			}
-		}elseif ($this->input->post('categoria')!='') {
-//			$tipoComida->where('id',$this->input->post('categoria'))->get();
-//			echo $tipoComida->check_last_query();
-//			$tipoComidaTiendas->where('tipotiendacomida_id',$this->input->post('categoria'))->get();
-//			echo $tipoComidaTiendas->check_last_query();
-//			$tipoComidaTiendas->tiendascomida->get();
-//			echo  $tipoComida->check_last_query();
-//			$tiendas->where_related_tiendascomida_tipotiendascomida('tipotiendascomida_id', $this->input->post('categoria'))->get();
-//			$tiendas->check_last_query();
-			$tipoComidaTiendas->where('tipotiendacomida_id',$this->input->post('categoria'));
-			$tipoComidaTiendas->where('estatus','1');
-			$tipoComidaTiendas->group_by('tiendacomida_id')->get_iterated();
-			echo $tipoComidaTiendas->check_last_query();
-			if($tipoComidaTiendas->exists()){
-				foreach ($tipoComidaTiendas as $tipo) {
-					$tiendas->clear();
-					$tiendas->where('estatus','1');
-					$tiendas->get_by_id($tipo->tiendacomida_id);
-					//falta ordenar Alfabeticamente las tiendas
-					//echo $dirEntrega->check_last_query();
-					echo '<h3>id:'.$tiendas->id.' nombre:'.$tiendas->nombre.'</h3>';
-				}
-			}else{
-				echo '<h3>No hay resultados</h3>';
-			} 
-		}elseif ($this->input->post('tipo_orden')!=''){
-//			$tipoVenta->where('id',$this->input->post('tipo_orden'))->get();
-//			$tiendas->where_related($tipoVenta)->get();
-//			$tiendas->where_related($tipoVenta,'id',$this->input->post('tipo_orden'))->get();
-//			$tiendas->where_related('tiendascomida_tiposventa/tiposventa','id',$this->input->post('tipo_orden'))->get();			
-			$tipoVentasTiendas->where('tiposventa_id',$this->input->post('tipo_orden'));
-			$tipoVentasTiendas->where('estatus','1');
-			$tipoVentasTiendas->group_by('tiendascomida_id')->get_iterated();
-			echo $tipoVentasTiendas->check_last_query();
-			if($tipoVentasTiendas->exists()){
-				foreach ($tipoVentasTiendas as $tipoV) {
-					$tiendas->clear();
-					$tiendas->where('estatus','1');
-					$tiendas->get_by_id($tipoV->tiendascomida_id);
-					//falta ordenar Alfabeticamente las tiendas
-					//echo $dirEntrega->check_last_query();
-					echo '<h3>id:'.$tiendas->id.' nombre:'.$tiendas->nombre.'</h3>';
-				}
-			}else{
-				echo '<h3>No hay resultados</h3>';
-			}
-		}
-	}
 	
-		
 	function cargarCiudad(){
 		$ciudad = new Ciudad();
 		$ciudad->where('estatus','1');
@@ -249,15 +151,7 @@ class c_busqueda extends MX_Controller{
 		}
 
 	}
-	function validar_campos_vacios($ciudad){	
-		
-		if(($ciudad=='') && ($this->input->post('zona')=='') && ($this->input->post('categoria')=='') && ($this->input->post('tipo_orden')=='')){
-			$this->form_validation->set_message('validar_campos_vacios','Debe seleccionar al menos 1 criterio de busqueda');
-			return false;
-		}else {
-			return true;
-		}	
-	}
+	
 		
 }
 ?>
