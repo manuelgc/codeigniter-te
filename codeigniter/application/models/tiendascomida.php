@@ -11,10 +11,22 @@ class Tiendascomida extends DataMapper{
 	'imagen',
 	'extrasplato',
 	'horariosdespacho',
-	'tiendascomida_tipotiendascomida',
 	'direccionesentrega',
 	'pedido',
-	'Tiendascomida_tiposventa');
+	'tipotiendascomida'=> array(
+						'class'=>'tipotiendascomida',
+						'other_field' => 'tiendascomida',		
+			            'join_self_as' => 'tiendascomida',		
+			            'join_other_as' => 'tipotiendascomida',	
+			            'join_table' => 'tiendascomida_tipotiendascomida'),
+	'tiposventa'=> array(
+						'class'=>'tiposventa',
+						'other_field' => 'tiendascomida',		
+			            'join_self_as' => 'tiendascomida',		
+			            'join_other_as' => 'tiposventa',	
+			            'join_table' => 'tiendascomida_tiposventa')
+	
+	);
 	
 	function __construct($id = NULL) {
 		parent::__construct($id);
