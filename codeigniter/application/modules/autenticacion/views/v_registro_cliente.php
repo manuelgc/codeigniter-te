@@ -27,7 +27,8 @@ $(document).ready(function(){
 //-->
 </script>
 <div id="form_container">	
-<?php echo form_open('autenticacion/c_registro_usuario');?>
+<?php $oculto = array('oculto_registro'=>'1'); 
+echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 	<div class="form_description">
 		<h2>Registro de clientes todoexpress</h2>
 		<p>Crea tu cuenta para poder disfrutar de nuestros servicios.</p>
