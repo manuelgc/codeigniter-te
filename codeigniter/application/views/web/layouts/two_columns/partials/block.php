@@ -5,7 +5,8 @@
 		</div>
 		<div class="art-blockcontent">
 			<div class="art-blockcontent-body">
-				Contenido de bloque
+				<?php echo Modules::run('autenticacion/c_login/index');?>
+				
 				<div class="cleared"></div>
 			</div>
 		</div>

@@ -96,7 +96,7 @@ $autoload['config'] = array();
 |
 */
 
-$autoload['language'] = array('registro_cliente','busqueda');
+$autoload['language'] = array('registro_cliente','busqueda','login');
 
 
 /*

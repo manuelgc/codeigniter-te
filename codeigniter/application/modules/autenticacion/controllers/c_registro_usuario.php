@@ -61,7 +61,8 @@ class C_registro_usuario extends MX_Controller {
 	function __construct() {
 		parent::__construct();
 		$partials = array(0,1,2,4,5,6,7,8);
-		cargarPartials($partials);				
+		cargarPartials($partials);	
+		$this->template->set_partial('block','web/layouts/two_columns/partials/block');				
 		$this->load->helper('form');
 		$this->load->library('qtip2');		
 		$this->load->library('form_validation');

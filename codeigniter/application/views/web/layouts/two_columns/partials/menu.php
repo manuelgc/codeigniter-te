@@ -16,7 +16,7 @@
             <div class="art-vmenublockcontent-cr"></div>
             <div class="art-vmenublockcontent-cc"></div>
             <div class="art-vmenublockcontent-body">
-            	<!-- <ul class="art-vmenu">
+            	<ul class="art-vmenu">
             		<li>
             			<a href="#">
             				<span class="l"></span>
@@ -27,8 +27,8 @@
             		<li class="art-vmenu-separator">
             			<span class="art-vmenu-separator-span"> </span>
             		</li>
-            	</ul> -->
-            	<?php echo Modules::run('banner_principal/C_banner_principal/index');?>
+            	</ul>
+            	
             	<div class="cleared"></div>
             </div>
 		</div>
