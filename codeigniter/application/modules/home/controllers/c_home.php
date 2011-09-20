@@ -4,7 +4,7 @@ class C_home extends MX_Controller {
 		parent::__construct();		
 		$this->load->module('banner_principal/c_banner_principal');
 		$this->load->module('busqueda/c_busqueda');
-		$this->load->module('autenticacion/c_login');
+		//$this->load->module('autenticacion/c_login');
 	}
 	
 	function index() {		

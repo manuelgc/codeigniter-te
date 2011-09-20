@@ -2,7 +2,7 @@
 class C_login extends MX_Controller {
 	private $config = array(
 		array(
-			'field'=>'usuario',
+			'field'=>'nombre_usuario',
 			'label'=>'lang:logincliente_usuario',
 			'rules'=>'trim|required|xss_clean'
 		),
@@ -21,10 +21,14 @@ class C_login extends MX_Controller {
 	}
 	
 	function index() {
-		if ($this->input->post('usuario')) {
+		//log(1,'entro al index del c_login');
+		if ($this->input->post('oculto')) {
+			log_message('debug','EN EL IF DEL POST');			
 			$this->ejecutarLogin();
-		}else {						
-			$this->template->build('v_login');
+		}else {							
+			log_message('debug','EN EL ELSE DEL POST');
+			$data['error'] = 'primera vez';
+			$this->load->view('v_login',$data);
 		}		
 	}
 	
@@ -32,7 +36,9 @@ class C_login extends MX_Controller {
 		$this->form_validation->set_rules($this->config);
 		
 		if ($this->form_validation->run($this) == FALSE) {
-			$this->template->build('v_login');
+			$data['error'] = 'un error';
+			$this->load->view('v_login',$data);
+			redirect('autenticacion/c_registro_usuario');
 		}else {
 			$this->template->build('v_registro_exitoso');
 		}

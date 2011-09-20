@@ -59,10 +59,16 @@ class C_registro_usuario extends MX_Controller {
 		);
 	
 	function __construct() {
-		parent::__construct();
-		$partials = array(0,1,2,4,5,6,7,8);
-		cargarPartials($partials);	
-		$this->template->set_partial('block','web/layouts/two_columns/partials/block');				
+		parent::__construct();		
+		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
+		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
+		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
+		//$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb');
+		$this->template->set_partial('post','web/layouts/two_columns/partials/post');
+		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
+		$this->template->set_partial('block','web/layouts/two_columns/partials/block');
+		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
+		$this->template->set_layout('two_columns/theme');				
 		$this->load->helper('form');
 		$this->load->library('qtip2');		
 		$this->load->library('form_validation');
@@ -82,7 +88,7 @@ class C_registro_usuario extends MX_Controller {
 	function procesarRegistro() {
 		$this->form_validation->set_rules($this->config);
 		
-		if ($this->input->post('usuario')) {
+		if ($this->input->post('oculto_registro')) {
 			$usuario = new Usuario();
 			$usuario->nombreusuario = $this->input->post('usuario');
 			$usuario->password = $this->input->post('password');
@@ -90,11 +96,15 @@ class C_registro_usuario extends MX_Controller {
 			$usuario->apellidos = $this->input->post('apellidos');
 			$usuario->telefonoCel = $this->input->post('celular_1').$this->input->post('celular_2').$this->input->post('celular_3');
 			$usuario->correo = $this->input->post('correo');
-		}
-		if ($this->form_validation->run($this) == FALSE) {												
-			$this->template->build('v_registro_cliente');
+		
+		
+			if ($this->form_validation->run($this) == FALSE) {												
+				$this->template->build('v_registro_cliente');
+			}else {
+				$this->template->build('v_registro_exitoso');
+			}
 		}else {
-			$this->template->build('v_registro_exitoso');
+			$this->template->build('v_registro_cliente');
 		}
 	}			
 
