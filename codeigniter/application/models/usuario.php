@@ -4,11 +4,18 @@ class Usuario extends DataMapper {
 	var $has_one = array('estadosusuario',
 	'tipousuario');
 	var $has_many = array(
-	'usuarios_direccionesenvio',
 	'pedido',
 	'favoritosusuario',
 	'calificacionesproducto',
-	'calificacionestienda');
+	'calificacionestienda',
+	'direccionesenvio'=> array(
+						'class'=>'direccionesenvio',
+						'other_field' => 'usuario',		
+			            'join_self_as' => 'usuario',		
+			            'join_other_as' => 'direccionesenvio',	
+			            'join_table' => 'usuarios_direccionesenvio')
+	
+	);
 	
 	function __construct($id = NULL) {
 		parent::__construct($id);
