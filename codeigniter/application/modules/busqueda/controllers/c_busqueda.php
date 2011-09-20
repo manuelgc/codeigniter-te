@@ -20,7 +20,9 @@ class c_busqueda extends MX_Controller{
                   		'orden'   => $this->cargarTipoOrden());
 
 		if ($this->input->post('campo_busqueda')) {
-			$this->buscarTiendaSql();
+			$data['restaurantes']=$this->buscarTiendaSql();
+//			$this->template->build('v_resultado_busqueda',$data);
+			$this->load->view('v_resultado_busqueda',$data);
 		}
 	
 	return $arrCombo;
@@ -32,6 +34,8 @@ class c_busqueda extends MX_Controller{
 		$where=" WHERE tienda.estatus=1 ";
 		$sw=false;
 		$tiendas = new Tiendascomida();
+		
+		$respuesta='';
 		//Busqueda por ciudad
 		if($this->input->post('ciudad')!=''){
 			$sql .=", direccionesentrega AS dir";
@@ -60,23 +64,73 @@ class c_busqueda extends MX_Controller{
 			$sql .=", tiendascomida_tiposventa AS tipoV";
 			$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$this->input->post('tipo_orden')." ";
 			$where .="AND tipoV.estatus=1 ";
-
 			$sw=true;
+			
 		}
 
 		if ($sw){
 			$sql.=$where."GROUP BY tienda.id ORDER BY tienda.nombre";
 			$tiendas->query($sql);
-			$tiendas->check_last_query();
+//			$tiendas->check_last_query();
 			if($tiendas->exists()){
+				$img= new Imagen() ;
+				$tipoComida = new Tipotiendascomida();
+				$tipoComidaTiendas = new Tiendascomida_tipotiendascomida();
 				foreach ($tiendas as $ti) {
-					echo '<h3>id:'.$ti->id.' nombre:'.$ti->nombre.'</h3>';
+//				echo '<h3>id:'.$ti->id.' nombre:'.$ti->nombre.'</h3>';
+				$img->clear();
+				$respuesta.=
+				'<div class="" name"restaurant">
+					<p><a name="'.$ti->id.'"></a>
+				    <a onclick="" rel="" href=""> 
+				        <span class="">'.$ti->nombre.'</span>
+				    </a>
+					</p>';
+				
+				$img->where('tiendascomida_id',$ti->id);
+				$img->where('estatus','1')->get();               
+				$respuesta.='<div class="" name="Informacion_restaurant">
+				                    <div class="" name="imagen_restaurant">
+				                        <a data-tracking-label="" rel="" href="">
+				                           <img src="';
+				if($img->exists()){
+				$respuesta.=base_url().$img->rutaImagen.'" alt="" class="" style=""></a></div>';
+				}else{
+				$respuesta.='" alt="" class="" style=""></a></div>';	
 				}
+				$respuesta.='<div class="datos_restaurant"><p class="">';
+//				$tipoComidaTiendas->clear();
+//				$tipoComidaTiendas->where('tiendacomida_id',$ti->id);
+//				$tipoComidaTiendas->where('estatus','1')->get_iterated();
+				$tipoComida->clear();
+				$tipoComida=$ti->tipotiendascomida;
+				$tipoComida->where('estatus','1');
+				$tipoComida->get();
+				if($tipoComida->exists()){
+					$i=1;
+					foreach ($tipoComida as $tip){
+						if($i==1){
+							$respuesta.=$tip->nombre;	
+						}else{
+							$respuesta.=','.$tip->nombre;
+						}						
+						$i++;
+					}
+				}
+			    $respuesta.='</p>';                     
+				$respuesta.='<p>Pedido minimo</p>
+							<p>Horario dia</p>
+							<p>tipos venta</p>
+							<p>abierto o cerrado</p>
+				            </div>
+				            </div>
+				</div>';
+					
+				}
+				return $respuesta;
 			}else {
-				echo '<h3>No hay resultados</h3>';
+				return '<h3>No hay resultados</h3>';
 			}
-		}else{
-			echo '<h3>Debe seleccionar al menos 1 criterio de busqueda</h3>';
 		}
 	}
 
