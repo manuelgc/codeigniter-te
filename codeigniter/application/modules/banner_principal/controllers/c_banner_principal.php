@@ -7,8 +7,7 @@ class C_banner_principal extends MX_Controller {
 		//carga de librerias/helpers
 		$this->load->helper('html');		
 		$this->load->library('nivoslider');
-		//elementos de plantilla
-		$this->template->set_layout('two_columns/theme');													
+		//elementos de plantilla												
 	}
 	
 	function index() {
