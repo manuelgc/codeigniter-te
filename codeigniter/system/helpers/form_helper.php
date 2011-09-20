@@ -905,9 +905,11 @@ if ( ! function_exists('validation_errors'))
 	{
 		if (FALSE === ($OBJ =& _get_validation_object()))
 		{
+			echo ' entro al if del validation errors ';
 			return '';
 		}
 
+		echo ' no entro al if del validation errors ';
 		return $OBJ->error_string($prefix, $suffix);
 	}
 }
