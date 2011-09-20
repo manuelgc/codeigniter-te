@@ -69,8 +69,8 @@ if (! function_exists('cargarPartials')) {
 		);
 		
 		if (empty($data)) {			
-			for ($i = 0; $i < count($arregloPartials); $i++) {				
-				if ($arregloPartials[$i] == $i) {
+			for ($i = 0; $i < count($arregloPartials); $i++) {								
+				if ($arregloPartials[$i] == $i) {				
 					$CI->template->set_partial($posicion[$i],$ruta[$i]);
 				}				
 			}			
