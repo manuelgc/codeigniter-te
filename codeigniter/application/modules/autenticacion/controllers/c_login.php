@@ -18,6 +18,7 @@ class C_login extends MX_Controller {
 		parent::__construct();
 		$this->load->helper('language');	
 		$this->load->library('form_validation');
+		$this->load->library('encrypt');		
 		$this->form_validation->CI =& $this;	
 	}
 	
@@ -35,12 +36,19 @@ class C_login extends MX_Controller {
 		return $this->load->view('v_login');
 	}		
 	
+	function respuestaLogin($resultado) {
+		$view_caller = $this->session->userdata('caller_login');
+		$this->session->unset_userdata('caller_login');
+		$msn = $this->encrypt->decode($view_caller);		
+		Modules::run($msn,$resultado);			
+	}
+	
 	function ejecutarLogin() {
 		$this->form_validation->set_rules($this->config);
 		
 		if ($this->form_validation->run($this) == FALSE) {									
 			$resultado = $this->load->view('v_login',null,true);
-			Modules::run('autenticacion/c_registro_usuario/loadFromModule',$resultado);			
+			$this->respuestaLogin($resultado);				
 		}else {
 			$this->template->build('v_registro_exitoso');
 		}
