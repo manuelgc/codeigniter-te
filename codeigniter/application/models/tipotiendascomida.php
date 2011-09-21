@@ -2,7 +2,6 @@
 class Tipotiendascomida extends DataMapper{ 	
 var $table = 'tipotiendascomida';
 	var $has_many = array(
-//	'Tiendascomida_tipotiendascomida'
 	'tiendascomida'=> array(
 						'class'=>'tiendascomida',
 						'other_field' => 'tipotiendascomida',	

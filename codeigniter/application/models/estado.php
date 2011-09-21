@@ -2,10 +2,18 @@
 class Estado extends DataMapper {
 	var $table = 'estados';
 	var $has_many = array(
-	'ciudad',
-	'direccionesenvio',
-	'tiendascomida',
-	'direccionesentrega');
+	'ciudad'=> array(
+            'class' => 'ciudad',
+            'other_field' => 'estado'),
+	'direccionesenvio'=> array(
+            'class' => 'direccionesenvio',
+            'other_field' => 'estado'),
+	'tiendascomida'=> array(
+            'class' => 'tiendascomida',
+            'other_field' => 'estado'),
+	'direccionesentrega'=> array(
+            'class' => 'direccionesentrega',
+            'other_field' => 'estado'));
 	
 	function __construct($id = NULL){
 		parent::__construct($id);

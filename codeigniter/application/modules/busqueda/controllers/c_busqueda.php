@@ -5,8 +5,9 @@ class c_busqueda extends MX_Controller{
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->helper('language');
+		$this->load->helper('date');
 		$this->load->library('form_validation');
-		$this->load->library('qtip2');	
+		$this->load->library('qtip2');			
 		$this->form_validation->CI =& $this;
 
 	}
@@ -75,10 +76,10 @@ class c_busqueda extends MX_Controller{
 			if($tiendas->exists()){
 				$img= new Imagen() ;
 				$tipoComida = new Tipotiendascomida();
-				$tipoComidaTiendas = new Tiendascomida_tipotiendascomida();
+				$horario= new Horariosdespacho();
 				foreach ($tiendas as $ti) {
 //				echo '<h3>id:'.$ti->id.' nombre:'.$ti->nombre.'</h3>';
-				$img->clear();
+				
 				$respuesta.=
 				'<div class="" name"restaurant">
 					<p><a name="'.$ti->id.'"></a>
@@ -87,8 +88,11 @@ class c_busqueda extends MX_Controller{
 				    </a>
 					</p>';
 				
-				$img->where('tiendascomida_id',$ti->id);
-				$img->where('estatus','1')->get();               
+//				$img->where('tiendascomida_id',$ti->id);
+				$img->clear();
+				$img=$ti->imagen;
+				$img->where('estatus','1')->get();
+//				$img->check_last_query();              
 				$respuesta.='<div class="" name="Informacion_restaurant">
 				                    <div class="" name="imagen_restaurant">
 				                        <a data-tracking-label="" rel="" href="">
@@ -99,27 +103,39 @@ class c_busqueda extends MX_Controller{
 				$respuesta.='" alt="" class="" style=""></a></div>';	
 				}
 				$respuesta.='<div class="datos_restaurant"><p class="">';
-//				$tipoComidaTiendas->clear();
-//				$tipoComidaTiendas->where('tiendacomida_id',$ti->id);
-//				$tipoComidaTiendas->where('estatus','1')->get_iterated();
 				$tipoComida->clear();
 				$tipoComida=$ti->tipotiendascomida;
-				$tipoComida->where('estatus','1');
-				$tipoComida->get();
+				$tipoComida->where('estatus','1')->get();
 				if($tipoComida->exists()){
 					$i=1;
 					foreach ($tipoComida as $tip){
 						if($i==1){
 							$respuesta.=$tip->nombre;	
 						}else{
-							$respuesta.=','.$tip->nombre;
+							$respuesta.=', '.$tip->nombre;
 						}						
 						$i++;
 					}
 				}
 			    $respuesta.='</p>';                     
-				$respuesta.='<p>Pedido minimo</p>
-							<p>Horario dia</p>
+				if($ti->minimoordencant!=null){
+			    	$respuesta.='<p>Cant. Minima: '.$ti->minimoordencant.'</p>';
+				}
+				if($ti->minimoordenprecio!=null){
+			    	$respuesta.='<p>Gasto Minimo: '.$ti->minimoordenprecio.'Bs.</p>';
+				}
+				$horario->clear();
+				$horario=$ti->horariosdespacho;
+				$hoy = mdate('%W',now());
+				echo 'dia sistema '.$hoy;
+				
+				
+				$horario->func('DATE_FORMAT',array('@dia','%W'));
+				$horario->where('dia !=','null');
+				$horario->where('estatus','1')->get();
+				echo 'dia bd '.$horario->dia;
+				$horario->check_last_query();
+				$respuesta.='<p>Horario dia</p>
 							<p>tipos venta</p>
 							<p>abierto o cerrado</p>
 				            </div>
