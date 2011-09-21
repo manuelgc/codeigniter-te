@@ -11,7 +11,8 @@ class C_login extends MX_Controller {
 			'label'=>'lang:logincliente_pass',
 			'rules'=>'trim|required|xss_clean'
 		)
-	);
+	);	
+	private $uri_request;
 	
 	function __construct() {
 		parent::__construct();
@@ -22,23 +23,24 @@ class C_login extends MX_Controller {
 	
 	function index() {
 		//log(1,'entro al index del c_login');
-		if ($this->input->post('oculto')) {
-			log_message('debug','EN EL IF DEL POST');			
+		if ($this->input->post('oculto')) {				
 			$this->ejecutarLogin();
-		}else {							
-			log_message('debug','EN EL ELSE DEL POST');
+		}else {										
 			$data['error'] = 'primera vez';
-			$this->load->view('v_login',$data);
+			return $this->load->view('v_login',$data,true);
 		}		
 	}
+	
+	function cargarView() {				
+		return $this->load->view('v_login');
+	}		
 	
 	function ejecutarLogin() {
 		$this->form_validation->set_rules($this->config);
 		
-		if ($this->form_validation->run($this) == FALSE) {
-			$data['error'] = 'un error';
-			$this->load->view('v_login',$data);
-			redirect('autenticacion/c_registro_usuario');
+		if ($this->form_validation->run($this) == FALSE) {									
+			$resultado = $this->load->view('v_login',null,true);
+			Modules::run('autenticacion/c_registro_usuario/loadFromModule',$resultado);			
 		}else {
 			$this->template->build('v_registro_exitoso');
 		}

@@ -1,7 +1,6 @@
 <div id="form_container">
 
 <?php 
-echo $error;
 $oculto = array('oculto'=>'1');
 echo form_open('autenticacion/c_login','id="form-login"',$oculto);?>
 	<div class="form_description">
