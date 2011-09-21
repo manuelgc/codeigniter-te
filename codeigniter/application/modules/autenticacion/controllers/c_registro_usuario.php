@@ -64,10 +64,16 @@ class C_registro_usuario extends MX_Controller {
 		$this->load->library('qtip2');		
 		$this->load->library('form_validation');
 		$this->load->helper('language');
+		$this->load->library('encrypt');
 		$this->form_validation->CI =& $this;
 	}
 	
 	function index() {		
+		//caller_"sufijo" es la variable que guardara el metodo 'respuesta' del view 'solicitud'
+		//se pasa encriptado para mayor seguridad
+		$msg = $this->encrypt->encode('autenticacion/c_registro_usuario/loadFromLogin');
+		$this->session->set_userdata('caller_login',$msg);
+		
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
 
@@ -90,7 +96,7 @@ class C_registro_usuario extends MX_Controller {
 		$this->procesarRegistro();
 	}
 	
-	function loadFromModule($param) {		
+	function loadFromLogin($param) {		
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
 
