@@ -36,7 +36,8 @@ $(document).ready(function(){
 
 //-->
 </script>
-<div id="form_container"><!--<form id="form_248918" class="appnitro" method="post" action="">-->
+<div
+	id="form_container"><!--<form id="form_248918" class="appnitro" method="post" action="">-->
 <?php echo form_open('busqueda/c_busqueda');?>
 <div class="form_description">
 <h2>Busqueda</h2>
@@ -45,18 +46,16 @@ $(document).ready(function(){
 <ul>
 
 	<li id="li_1"><?php echo lang('busqueda_ciudad','element_1','description');?>
-	<div>
-		<?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],NULL,'id=element_1 class="element text medium"'); ?>
-		<small class="guidelines" id="guide_1">Seleciona la ciudad donde te en cuentras</small>	
-	</div>
-	
+	<div><?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],NULL,'id=element_1 class="element text medium"'); ?>
+	<small class="guidelines" id="guide_1">Seleciona la ciudad donde te en
+	cuentras</small></div>
+
 	</li>
 	<li id="li_2"><?php echo lang('busqueda_zona','element_2','description');?>
-	<div>
-		<?php echo form_dropdown('zona',array(),NULL,'id=element_2 class="element text medium" disabled="disabled"');?>
-		<small class="guidelines" id="guide_2">Seleciona la zona donde te en cuentras</small>	
-	</div>
-	
+	<div><?php echo form_dropdown('zona',array(),NULL,'id=element_2 class="element text medium" disabled="disabled"');?>
+	<small class="guidelines" id="guide_2">Seleciona la zona donde te en
+	cuentras</small></div>
+
 	</li>
 	<li id="li_3"><?php echo lang('busqueda_categoria','element_3','description');?>
 	<div><?php echo form_dropdown('categoria',$opcion_combos['categoria'],NULL,'id=element_3 class="element text medium"'); ?>
@@ -69,14 +68,14 @@ $(document).ready(function(){
 	</div>
 	</li>
 
-	<li class="buttons">
-	<input id="campo_busqueda" name="campo_busqueda" type="hidden" value="1" />
+	<li class="buttons"><input id="campo_busqueda" name="campo_busqueda"
+		type="hidden" value="1" />
 	<p class="error" style="display: none;" id="error_combos_vacios"></p>
-	<input id="btn_buscar",
-			class="button_text art-button" type="submit" name="btn_buscar"
-			value="<?php echo lang('busqueda_boton_buscar');?>" />
-		</li>
-			
+	<input id="btn_buscar" ,
+			class="button_text art-button"
+		type="submit" name="btn_buscar"
+		value="<?php echo lang('busqueda_boton_buscar');?>" /></li>
+
 </ul>
 </form>
 
