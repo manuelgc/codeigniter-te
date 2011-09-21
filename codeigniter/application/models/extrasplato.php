@@ -12,7 +12,7 @@ class Extrasplato extends DataMapper{
             'other_field' => 'extrasplato'),
 	'pedido'=> array(
             'class' => 'pedido',
-            'other_field' => 'extrasplato'
+            'other_field' => 'extrasplato',
 			'join_self_as' => 'extrasplato',		
 			'join_other_as' => 'pedido',	
 			'join_table' => 'extrasplato_pedido'));
