@@ -1,8 +1,14 @@
 <?php
 class Promocion extends DataMapper {
 	var $table = 'promociones';
-	var $has_one = array('plato');
-	var $has_many = array('imagen');
+	var $has_one = array(
+	'plato'=> array(
+            'class' => 'plato',
+            'other_field' => 'promocion'));
+	var $has_many = array(
+	'imagen'=> array(
+            'class' => 'imagen',
+            'other_field' => 'promocion'));
 	function __construct($id = NULL){
 		parent::__construct($id);
 		$this->load->helper('date');
