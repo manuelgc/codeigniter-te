@@ -57,22 +57,25 @@ class C_registro_usuario extends MX_Controller {
 				'rules'=>'trim|required|max_length[255]|xss_clean'
 			)
 		);
+	private $view_respuesta;
+	private $partial_respuesta;
 	
 	function __construct() {
-		parent::__construct();			
+		parent::__construct();
+		$this->view_respuesta = NULL;	
+		$this->partial_respuesta == FALSE;		
 		$this->load->helper('form');
 		$this->load->library('qtip2');		
 		$this->load->library('form_validation');
-		$this->load->helper('language');
-		$this->load->library('encrypt');
+		$this->load->helper('language');		
 		$this->form_validation->CI =& $this;
 	}
 	
 	function index() {		
 		//caller_"sufijo" es la variable que guardara el metodo 'respuesta' del view 'solicitud'
 		//se pasa encriptado para mayor seguridad
-		$msg = $this->encrypt->encode('autenticacion/c_registro_usuario/loadFromLogin');
-		$this->session->set_userdata('caller_login',$msg);
+		$msg = $this->encrypt->encode('autenticacion/c_registro_usuario');
+		$this->session->set_userdata('caller_block',$msg);
 		
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
@@ -84,7 +87,32 @@ class C_registro_usuario extends MX_Controller {
 		$this->template->set_partial('post','web/layouts/two_columns/partials/post');
 		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
 		
-		$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
+		switch ($this->partial_respuesta) {
+			//el breadcrumb no se esta usando aun porque hay que cambiar algunas cosas de sergio
+			//se mantiene como estaba antes
+			/*case 'breadcrumb':
+				if ($this->view_respuesta == NULL) {
+					$data['output_header'] = Modules::run('banner_principal/c_banner_principal/index');
+				}else {
+					$data['output_header'] = $this->view_respuesta;
+				}
+			break;*/
+			case 'block':{
+				if ($this->view_respuesta == NULL) {
+					log_message('debug','EN EL IF DE VIEW_RESPUESTA');
+					$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
+				}else {
+					log_message('debug','EN EL ELSE DE VIEW_RESPUESTA');
+					log_message('debug',$this->view_respuesta);
+					$data['output_block'] = $this->view_respuesta;
+				}
+			}
+			break;
+			case FALSE:{								
+				$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
+			}
+			break;
+		}
 		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
@@ -96,27 +124,14 @@ class C_registro_usuario extends MX_Controller {
 		$this->procesarRegistro();
 	}
 	
-	function loadFromLogin($param) {		
-		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
-		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
-
-		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
-		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
-		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');		
-		$this->template->set_partial('post','web/layouts/two_columns/partials/post');
-		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
-		
-		$data['output_block'] = $param;
-		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
-		
-		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
-		$this->template->set_layout('two_columns/theme');
-		$this->template->build('v_registro_cliente');		
-		
-		$this->qtip2->addCssJs();
-		$this->qtip2->putCustomTip();
+	function setViewRespuesta($param) {
+		$this->view_respuesta = $param;
 	}
 	
+	function setPartialRespuesta($param) {
+		$this->partial_respuesta = $param;
+	}
+			
 	function procesarRegistro() {
 		$this->form_validation->set_rules($this->config);
 		
