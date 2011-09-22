@@ -22,8 +22,7 @@ class c_busqueda extends MX_Controller{
 
 		if ($this->input->post('campo_busqueda')) {
 			$data['restaurantes']=$this->buscarTiendaSql();
-//			$this->template->build('v_resultado_busqueda',$data);
-			$this->load->view('v_resultado_busqueda',$data);
+			$this->template->build('v_resultado_busqueda',$data);
 		}
 	
 	return $arrCombo;
@@ -35,8 +34,8 @@ class c_busqueda extends MX_Controller{
 		$where=" WHERE tienda.estatus=1 ";
 		$sw=false;
 		$tiendas = new Tiendascomida();
-		
-		$respuesta='';
+		$arrtienda = array();
+		$respuesta = array();
 		//Busqueda por ciudad
 		if($this->input->post('ciudad')!=''){
 			$sql .=", direccionesentrega AS dir";
@@ -72,78 +71,83 @@ class c_busqueda extends MX_Controller{
 		if ($sw){
 			$sql.=$where."GROUP BY tienda.id ORDER BY tienda.nombre";
 			$tiendas->query($sql);
-//			$tiendas->check_last_query();
 			if($tiendas->exists()){
 				$img= new Imagen() ;
 				$tipoComida = new Tipotiendascomida();
 				$horario= new Horariosdespacho();
+				$tipoVenta = new Tiposventa();
 				foreach ($tiendas as $ti) {
-//				echo '<h3>id:'.$ti->id.' nombre:'.$ti->nombre.'</h3>';
-				
-				$respuesta.=
-				'<div class="" name"restaurant">
-					<p><a name="'.$ti->id.'"></a>
-				    <a onclick="" rel="" href=""> 
-				        <span class="">'.$ti->nombre.'</span>
-				    </a>
-					</p>';
-				
-//				$img->where('tiendascomida_id',$ti->id);
-				$img->clear();
-				$img=$ti->imagen;
-				$img->where('estatus','1')->get();
-//				$img->check_last_query();              
-				$respuesta.='<div class="" name="Informacion_restaurant">
-				                    <div class="" name="imagen_restaurant">
-				                        <a data-tracking-label="" rel="" href="">
-				                           <img src="';
-				if($img->exists()){
-				$respuesta.=base_url().$img->rutaImagen.'" alt="" class="" style=""></a></div>';
-				}else{
-				$respuesta.='" alt="" class="" style=""></a></div>';	
-				}
-				$respuesta.='<div class="datos_restaurant"><p class="">';
-				$tipoComida->clear();
-				$tipoComida=$ti->tipotiendascomida;
-				$tipoComida->where('estatus','1')->get();
-				if($tipoComida->exists()){
-					$i=1;
-					foreach ($tipoComida as $tip){
-						if($i==1){
-							$respuesta.=$tip->nombre;	
-						}else{
-							$respuesta.=', '.$tip->nombre;
-						}						
-						$i++;
+					$respuesta['tienda_id']=$ti->id;
+					$respuesta['nombre_tienda']=$ti->nombre;
+					$img->clear();
+					$img=$ti->imagen;
+					$img->where('estatus','1')->get();
+					if($img->exists()){
+						$respuesta['ruta_imagen']=base_url().$img->rutaImagen;
+					}else{
+						$respuesta['ruta_imagen']='';
 					}
+					$tipoComida->clear();
+					$tipoComida=$ti->tipotiendascomida;
+					$tipoComida->where('estatus','1')->get();
+					if($tipoComida->exists()){
+						$i=1;
+						foreach ($tipoComida as $tip){
+							if($i==1){
+								$respuesta['tipo_comida']=$tip->nombre;
+							}else{
+								$respuesta['tipo_comida']=', '.$tip->nombre;
+							}
+							$i++;
+						}
+					}
+					if($ti->minimoordencant!=null){
+						$respuesta['min_cant']=$ti->minimoordencant;
+					}
+					if($ti->minimoordenprecio!=null){
+						$respuesta['min_pre']=$ti->minimoordenprecio.'Bs';
+					}
+
+					$horario->clear();
+					$horario=$ti->horariosdespacho;
+					$hoy = mdate('%w',now());
+					$formato='%h:%i %p';
+					$sql_hora='SELECT *,DATE_FORMAT(horainicio1,"%h:%i %p") AS h1,
+					DATE_FORMAT(horainicio1,"%h:%i %p") AS hi1,
+					DATE_FORMAT(horacierre1,"%h:%i %p") AS hc1,
+					DATE_FORMAT(horainicio2,"%h:%i %p") AS hi2,
+					DATE_FORMAT(horacierre2,"%h:%i %p") AS hc2 
+					FROM horariosdespacho 
+					WHERE (dia='.$hoy.') AND (tiendascomida_id = '.$ti->id.')';
+					$horario->query($sql_hora);
+
+					if($horario->exists()){
+						if($horario->tipohorario==0){
+							$respuesta['horario']=$horario->hi1.'-'.$horario->hc1;
+						}elseif($horario->tipohorario==1){
+							$respuesta['horario']=$horario->hi1.'-'.$horario->hc1;
+							$respuesta['horario'].=$horario->hi2.'-'.$horario->hc2;
+						}else{
+							$respuesta['horario']='Cerrado';
+						}
+					}
+					$tipoVenta->clear;
+					$tipoVenta= $ti->tiposventa;
+					$tipoVenta->where('estatus','1')->get();
+					if($tipoVenta->exists()){
+						$i=1;
+						foreach ($tipoVenta as $ven){
+							if($i==1){
+								$respuesta['tipo_venta']=$ven->nombre;
+							}else{
+								$respuesta['tipo_venta']=', '.$ven->nombre;
+							}
+							$i++;
+						}
+					}
+				$arrtienda[]=$respuesta;		
 				}
-			    $respuesta.='</p>';                     
-				if($ti->minimoordencant!=null){
-			    	$respuesta.='<p>Cant. Minima: '.$ti->minimoordencant.'</p>';
-				}
-				if($ti->minimoordenprecio!=null){
-			    	$respuesta.='<p>Gasto Minimo: '.$ti->minimoordenprecio.'Bs.</p>';
-				}
-				$horario->clear();
-				$horario=$ti->horariosdespacho;
-				$hoy = mdate('%W',now());
-				echo 'dia sistema '.$hoy;
-				
-				
-				$horario->func('DATE_FORMAT',array('@dia','%W'));
-				$horario->where('dia !=','null');
-				$horario->where('estatus','1')->get();
-				echo 'dia bd '.$horario->dia;
-				$horario->check_last_query();
-				$respuesta.='<p>Horario dia</p>
-							<p>tipos venta</p>
-							<p>abierto o cerrado</p>
-				            </div>
-				            </div>
-				</div>';
-					
-				}
-				return $respuesta;
+				return $arrtienda;
 			}else {
 				return '<h3>No hay resultados</h3>';
 			}
