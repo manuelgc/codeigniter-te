@@ -22,7 +22,7 @@ $(document).ready(function(){
 			$("#element_2").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
 		}	
 	});
-	$("form").submit(function() {
+	$("#frm_busqueda").submit(function() {
 		if(($("#element_1").val() == '') && ($("#element_2").val() == '') && ($("#element_3").val() == '') &&($("#element_4").val() == '')){
 
 			$('#error_combos_vacios').empty().append('Debe seleccionar al menos 1 criterio de busqueda').show();	
@@ -38,7 +38,7 @@ $(document).ready(function(){
 </script>
 <div
 	id="form_container"><!--<form id="form_248918" class="appnitro" method="post" action="">-->
-<?php echo form_open('busqueda/c_busqueda');?>
+<?php echo form_open('busqueda/c_busqueda',array('id' => 'frm_busqueda'));?>
 <div class="form_description">
 <h2>Busqueda</h2>
 <p>Busqueda de restaurantes.</p>
