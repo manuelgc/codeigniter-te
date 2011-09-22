@@ -5,7 +5,7 @@
 		</div>
 		<div class="art-blockcontent">
 			<div class="art-blockcontent-body">
-				<?php echo $output_block;?>				
+				<?php echo (isset($output_block)) ? $output_block : '' ;?>				
 				<div class="cleared"></div>
 			</div>
 		</div>

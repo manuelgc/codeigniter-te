@@ -17,17 +17,14 @@ class C_login extends MX_Controller {
 	function __construct() {
 		parent::__construct();
 		$this->load->helper('language');	
-		$this->load->library('form_validation');
-		$this->load->library('encrypt');		
+		$this->load->library('form_validation');		
 		$this->form_validation->CI =& $this;	
 	}
 	
 	function index() {
-		//log(1,'entro al index del c_login');
 		if ($this->input->post('oculto')) {				
 			$this->ejecutarLogin();
-		}else {										
-			$data['error'] = 'primera vez';
+		}else {													
 			return $this->load->view('v_login',$data,true);
 		}		
 	}
@@ -37,14 +34,12 @@ class C_login extends MX_Controller {
 	}		
 	
 	function respuestaLogin($resultado) {
-		$view_caller = $this->session->userdata('caller_login');
-		$this->session->unset_userdata('caller_login');
-		$msn = $this->encrypt->decode($view_caller);		
-		Modules::run($msn,$resultado);			
+		$this->session->set_userdata('respuesta_block','1');			
+		Modules::run('respuesta_modulos/c_procesar_respuesta/redirectRespuesta',$resultado);
 	}
 	
 	function ejecutarLogin() {
-		$this->form_validation->set_rules($this->config);
+		$this->form_validation->set_rules($this->config);		
 		
 		if ($this->form_validation->run($this) == FALSE) {									
 			$resultado = $this->load->view('v_login',null,true);
