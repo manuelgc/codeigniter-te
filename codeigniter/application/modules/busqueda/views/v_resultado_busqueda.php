@@ -1,6 +1,7 @@
-<ul class="restaurantes">	
-	<?php foreach ($restaurantes as $value):?>
-		<li class="bloque-restaurante" id="<?php echo $value['tienda_id']?>">
+<ul class="restaurantes">
+	<p><?php if(isset($mensaje_error)){echo $mensaje_error;}?></p>	
+	<?php foreach ($restaurantes as $value):?>¨
+		<li class="bloque-restaurante" id="<?php echo $value['tienda_id'];?>">
 			<div class="" name="titulo_restaurant" width="100%">
 					<p>
 						<a name="<?php echo $value['tienda_id'];?>" onclick="" href=""></a>
@@ -10,7 +11,7 @@
 			<div width="80%">
 				<div class="" name="cont_imagen" height="80%">
 					<a rel="" href="">
-						<img src="<?php echo $value['ruta_imagen']?>" alt="" class="">
+						<img src="<?php echo $value['ruta_imagen'];?>" class="">
 					</a>
 				</div>
 				<div class="" name="cont_boton" height="20%">
@@ -20,20 +21,21 @@
 			</div>	
 			<div class="descrip_restaurant">
 				<div>
-<!--					<img src="<?php echo $value['imagen_abierto']?>" alt="" class="">-->
-						<p class="">abierto o cerrado</p>
+					<img src="<?php echo $value['imagen_horario'];?>" class="">
+					
+<!--						<p class="">abierto o cerrado</p>-->
 				</div>
 				<div>
-					<p class=""><?php echo $value['tipo_comida']?></p>
+					<p class=""><?php echo $value['tipo_comida'];?></p>
 				</div>
 				<div>
-					<p>Cant. Minima:<?php echo $value['min_cant']?></p>
+					<p>Cant. Minima:<?php echo $value['min_cant'];?></p>
 				</div>
 				<div>
-					<p>Gasto Minimo:<?php echo $value['min_pre']?></p>
+					<p>Gasto Minimo:<?php echo $value['min_pre'];?></p>
 				</div>
 				<div>
-					<p class=""><?php echo $value['tipo_venta']?></p>
+					<p class=""><?php echo $value['tipo_venta'];?></p>
 				</div>
 			</div>                           
 		</li>
