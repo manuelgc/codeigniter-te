@@ -10,6 +10,7 @@ $lang['regcliente_datos_generales'] = 'Datos generales';
 $lang['regcliente_nombre'] = 'Nombre';
 $lang['regcliente_apellidos'] = 'Apellidos';
 $lang['regcliente_email'] = 'Correo Electronico';
+$lang['regcliente_tlf_fijo'] = 'Telefono fijo';
 $lang['regcliente_celular'] = 'Telefono Celular';
 
 $lang['regcliente_datos_envio'] = 'Direccion principal de envio';
@@ -20,6 +21,7 @@ $lang['regcliente_zona'] = 'Zona';
 $lang['regcliente_calle_carr'] = 'Calle/Carrera';
 $lang['regcliente_urb_edif'] = 'Urbanizacion/Edificio';
 $lang['regcliente_numcasa_apto'] = 'Numero casa/Apartamento';
+$lang['regcliente_lugar_referencia'] = 'Lugar de referencia';
 
 $lang['regcliente_boton'] = 'Enviar';
 ?>

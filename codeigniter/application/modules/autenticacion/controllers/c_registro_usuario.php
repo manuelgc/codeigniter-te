@@ -24,7 +24,7 @@ class C_registro_usuario extends MX_Controller {
 			array(
 				'field'=>'apellidos',
 				'label'=>'lang:regcliente_apellidos',
-				'rules'=>'trim|required|alpha_whitespace|max_length[40]|xss_clean'
+				'rules'=>'trim|required|max_length[40]|xss_clean'
 			),
 			array(
 				'field'=>'correo',
@@ -32,13 +32,18 @@ class C_registro_usuario extends MX_Controller {
 				'rules'=>'trim|required|valid_email|xss_clean'
 			),
 			array(
-				'field'=>'celular_1',
-				'label'=>'lang:regcliente_celular',
-				'rules'=>'trim|required|numeric|max_length[3]|callback_validar_celular|xss_clean'
+				'field'=>'tlf_fijo_1',
+				'label'=>'lang:regcliente_tlf_fijo',
+				'rules'=>'trim|max_length[3]|required'
 			),
 			array(
-				'field'=>'estado',
-				'label'=>'lang:regcliente_estado',
+				'field'=>'celular_1',
+				'label'=>'lang:regcliente_celular',
+				'rules'=>'trim|required|max_length[3]'
+			),
+			array(
+				'field'=>'ciudad',
+				'label'=>'lang:regcliente_ciudad',
 				'rules'=>'required'
 			),
 			array(
@@ -55,16 +60,58 @@ class C_registro_usuario extends MX_Controller {
 				'field'=>'nroCasa_apt',
 				'label'=>'lang:regcliente_numcasa_apto',
 				'rules'=>'trim|required|max_length[255]|xss_clean'
+			),
+			array(
+				'field'=>'lugar_referencia',
+				'label'=>'lang:regcliente_lugar_referencia',
+				'rules'=>'trim|required|max_length[255]|xss_clean'
 			)
 		);
 	private $view_respuesta;
-	private $partial_respuesta;
+	private $partial_respuesta;		
+	
+	function validar_celular($campo1_celular) {
+		echo 'llamo a validar_celular';
+		$campo2_celular = $this->input->post('celular_2');
+		$campo3_celular = $this->input->post('celular_3');
+		$this->form_validation->set_message('validar_celular','Algo aqui...');
+		return false;
+		if ((empty($campo1_celular)) || (empty($campo2_celular)) || (empty($campo3_celular))) {
+			echo 'entro en validar_celular if';
+			$this->form_validation->set_message('validar_celular','Debe ingresar un numero de telefono valido');
+			return FALSE;
+		}else {
+			if ((!$this->form_validator->numeric($campo2_celular)) || (!$this->form_validator->numeric($campo3_celular))) {
+				$this->form_validation->set_message('validar_celular','Solo se permiten numeros para este campo');
+				return FALSE;
+			}else {
+				return TRUE;
+			}			
+		}
+	}
+	
+	function validar_fijo($campo1_fijo) {
+		$campo2_tlf = $this->input->post('tlf_fijo_2');
+		$campo3_tlf = $this->input->post('tlf_fijo_3');
+		if (empty($campo2_tlf) && empty($campo3_tlf)) {
+			$this->form_validation->set_message('validar_fijo','Debe ingresar un numero de telefono valido');
+			return FALSE;
+		}else {
+			if (!$this->form_validator->numeric($campo2_tlf) && !$this->form_validator->numeric($campo3_tlf)) {
+				$this->form_validation->set_message('validar_fijo','Solo se permiten numeros para este campo');
+				return FALSE;
+			}else {
+				return TRUE;
+			}			
+		}
+	}
 	
 	function __construct() {
 		parent::__construct();
 		$this->view_respuesta = NULL;	
 		$this->partial_respuesta == FALSE;		
 		$this->load->helper('form');
+		$this->load->helper('captcha');
 		$this->load->library('qtip2');		
 		$this->load->library('form_validation');
 		$this->load->helper('language');		
@@ -87,6 +134,7 @@ class C_registro_usuario extends MX_Controller {
 		$this->template->set_partial('post','web/layouts/two_columns/partials/post');
 		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
 		
+		//en este switch van los partial que tengan respuesta en el mismo modulo llamador
 		switch ($this->partial_respuesta) {
 			//el breadcrumb no se esta usando aun porque hay que cambiar algunas cosas de sergio
 			//se mantiene como estaba antes
@@ -96,24 +144,12 @@ class C_registro_usuario extends MX_Controller {
 				}else {
 					$data['output_header'] = $this->view_respuesta;
 				}
-			break;*/
-			case 'block':{
-				if ($this->view_respuesta == NULL) {
-					log_message('debug','EN EL IF DE VIEW_RESPUESTA');
-					$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
-				}else {
-					log_message('debug','EN EL ELSE DE VIEW_RESPUESTA');
-					log_message('debug',$this->view_respuesta);
-					$data['output_block'] = $this->view_respuesta;
-				}
-			}
-			break;
+			break;*/			
 			case FALSE:{								
 				$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
 			}
 			break;
 		}
-		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
@@ -132,6 +168,12 @@ class C_registro_usuario extends MX_Controller {
 		$this->partial_respuesta = $param;
 	}
 			
+	function crearCaptcha() {
+		$valores = array(
+			'img_path' => './'
+		);
+	}
+	
 	function procesarRegistro() {
 		$this->form_validation->set_rules($this->config);
 		
@@ -145,13 +187,15 @@ class C_registro_usuario extends MX_Controller {
 			$usuario->correo = $this->input->post('correo');
 		
 		
-			if ($this->form_validation->run($this) == FALSE) {												
-				$this->template->build('v_registro_cliente');
+			if ($this->form_validation->run($this) == FALSE) {	
+				$data['ciudad'] = $this->cargarCiudad();											
+				$this->template->build('v_registro_cliente',$data);
 			}else {
 				$this->template->build('v_registro_exitoso');
 			}
 		}else {
-			$this->template->build('v_registro_cliente');
+			$data['ciudad'] = $this->cargarCiudad();
+			$this->template->build('v_registro_cliente',$data);
 		}
 	}			
 
@@ -166,14 +210,41 @@ class C_registro_usuario extends MX_Controller {
 		echo json_encode($data);
 	}
 	
-	function validar_usuario($usuario) {
-		if ($usuario == 'prueba') {
-			$this->form_validation->set_message('validar_usuario','el campo %s no puede ser "prueba"');
-			return FALSE;
-		}else {
-			return TRUE;
+	function cargarCiudad(){
+		$ciudad = new Ciudad();
+		$ciudad->where('estatus','1');
+		$ciudad->where('estados_id','7');
+		$ciudad->order_by('nombreCiudad','ASD')->get_iterated();
+		$options= array();
+		if (!$ciudad->exists()) {
+			return '';
+		}else{				
+			foreach ($ciudad as $ci) {
+				$options[$ci->id] = $ci->nombreCiudad;
+			}
+			return $options;
 		}
+
 	}
+	
+	function cargarZona(){
+		$zona = new Zona();
+		$zona->where('estatus','1');
+		$zona->where('ciudades_id',$this->input->post('id_ciudad'));
+		$zona->order_by('nombreZona','ASD')->get_iterated();
+		$salida='<option value="" >Seleccione</option>;';
+		if (!$zona->exists()) {
+			$salida='0';
+		}else{				
+			foreach ($zona as $zon) {
+				$salida .= '<option value="'.$zon->id.'">'.$zon->nombreZona.'</option>';
+			}			
+			$data['zona']= $salida;
+			echo json_encode($data);
+			
+		}
+
+	}	
 		
 }
 ?>
