@@ -10,11 +10,9 @@ class C_home extends MX_Controller {
 		$this->load->module('busqueda/c_busqueda');		
 	}
 		
-	function index() {		
-		log_message('debug','PASO POR INDEX HOME');
+	function index() {				
 		$msg = $this->encrypt->encode('home/c_home');
-		$this->session->set_userdata('caller_block',$msg);
-		log_message('debug','PARTIALRESPUESTA: '.$this->partial_respuesta);		
+		$this->session->set_userdata('caller_block',$msg);			
 		switch ($this->partial_respuesta) {
 			//el breadcrumb no se esta usando aun porque hay que cambiar algunas cosas de sergio
 			//se mantiene como estaba antes
@@ -42,10 +40,8 @@ class C_home extends MX_Controller {
 			break;
 		}
 		$data['output_header'] = Modules::run('banner_principal/c_banner_principal/index');
-		
-		//$data['imagenes'] = $this->c_banner_principal->index();				
+						
 		$data['opcion_combos'] = $this->c_busqueda->index();			
-		//cargarTemplateDefault($data);
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
@@ -55,10 +51,8 @@ class C_home extends MX_Controller {
 		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
 		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
-		$this->template->set_layout('two_columns/theme');	
-		log_message('debug','-------- antes del build(home)');			
-		$this->template->build('home/home');		
-		log_message('debug','-------- despues del build(home)');
+		$this->template->set_layout('two_columns/theme');					
+		$this->template->build('home/home');				
 	}
 	
 	function setViewRespuesta($param) {
