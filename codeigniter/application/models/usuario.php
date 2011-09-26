@@ -22,10 +22,8 @@ class Usuario extends DataMapper {
             'other_field' => 'usuario'),
 	'direccionesenvio'=> array(
 						'class'=>'direccionesenvio',
-						'other_field' => 'usuario',		
-			            'join_self_as' => 'usuario',		
-			            'join_other_as' => 'direccionesenvio',	
-			            'join_table' => 'usuarios_direccionesenvio')
+						'other_field' => 'usuario',				
+			            'join_other_as' => 'direccionesenvio')
 	
 	);
 	

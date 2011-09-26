@@ -10,17 +10,15 @@ class Direccionesenvio extends DataMapper {
             'other_field' => 'direccionesenvio'),
 	'estado'=> array(
             'class' => 'estado',
-            'other_field' => 'direccionesenvio')); 
-	var $has_many = array(
-	'pedido'=> array(
-            'class' => 'pedido',
             'other_field' => 'direccionesenvio'),
 	'usuario'=> array(
 						'class'=>'usuario',
 						'other_field' => 'direccionesenvio',		
-			            'join_self_as' => 'direccionesenvio',		
-			            'join_other_as' => 'usuario',	
-			            'join_table' => 'usuarios_direccionesenvio')
+			            'join_other_as' => 'usuario')); 
+	var $has_many = array(
+	'pedido'=> array(
+            'class' => 'pedido',
+            'other_field' => 'direccionesenvio')	
 	);
 	
 	function __construct($id = NULL) {
