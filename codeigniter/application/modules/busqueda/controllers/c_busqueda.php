@@ -26,7 +26,7 @@ class c_busqueda extends MX_Controller{
 				$data['restaurantes']=$this->buscarTiendaSql();
 				$this->template->build('v_resultado_busqueda',$data);
 			}else{
-				$data['mensaje_error']='Lo sentimos la búsqueda no obtuvo ningún resultado.';
+				$data['mensaje_error']='Lo sentimos la busqueda no obtuvo ningun resultado.';
 				$this->template->build('v_resultado_busqueda',$data);
 			}
 		}
@@ -43,22 +43,24 @@ class c_busqueda extends MX_Controller{
 		$tipoVenta = new Tiposventa();
 		$arrtienda = array();
 		$respuesta = array();
+		$sw=false;
 		$bool_ciudad=false;
 		$bool_zona=false;
 		$bool_categoria=false;
 		$bool_venta=false;
+		
 		//Busqueda por ciudad
 		if($this->input->post('ciudad')!=''){
 			$tiendas->clear();		
 			$tiendas->where('ciudades_id',$this->input->post('ciudad'));
 			$tiendas->where('estatus','1')->get();
 			if($tiendas->exists()){
-			$sql .=", direccionesentrega AS dir";
-			$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$this->input->post('ciudad')." ";
-			$where .="AND dir.estatus=1 ";	
-			$bool_ciudad=true;
+				$sql .=", direccionesentrega AS dir";
+				$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$this->input->post('ciudad')." ";
+				$where .="AND dir.estatus=1 ";
+				$bool_ciudad=true;
 			}else{
-				$arrtienda['mesaje']='Lo sentimos la búsqueda no obtuvo ningún resultado';
+				$arrtienda['mesaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 			}
 			
 
@@ -70,9 +72,11 @@ class c_busqueda extends MX_Controller{
 				if($tiendas->exists()){
 					$where .="AND dir.zonas_id =".$this->input->post('zona')." ";
 					$bool_zona=true;
+				}else{
+				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 				}	
 			}
-			
+			$sw=true;
 			
 		}
 
@@ -88,8 +92,10 @@ class c_busqueda extends MX_Controller{
 				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$this->input->post('categoria')." ";
 				$where .="AND tipoC.estatus=1 ";
 				$bool_categoria=true;
+			}else{
+				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 			}
-			
+			$sw=true;
 		}
 
 		//Busqueda por Tipo de Venta
@@ -104,12 +110,14 @@ class c_busqueda extends MX_Controller{
 				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$this->input->post('tipo_orden')." ";
 				$where .="AND tipoV.estatus=1 ";
 				$bool_venta=true;
+			}else{
+				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 			}
-		
+			$sw=true;
 				
 		}
 
-		if ($bool_ciudad || $bool_zona || $bool_venta || $bool_categoria){
+		if (($bool_ciudad || $bool_zona || $bool_venta || $bool_categoria) && $sw){
 			$tiendas->clear();
 			$sql.=$where."GROUP BY tienda.id ORDER BY tienda.nombre";
 			$tiendas->query($sql);
@@ -194,13 +202,12 @@ class c_busqueda extends MX_Controller{
 					$arrtienda[]=$respuesta;
 				}
 				
-//				if(!$bool_ciudad && !$bool_zona && !$bool_venta && !$bool_categoria){
-//					$arrtienda['mesaje']='Los sentimos';
-//				}
+
 				return $arrtienda;
 			}else {
 				return null;
 			}
+
 		}else{
 			return null;
 		}
