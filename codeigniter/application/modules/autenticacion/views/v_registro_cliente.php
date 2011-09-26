@@ -175,7 +175,7 @@ echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 			echo form_dropdown('ciudad',$ciudad,NULL,'class="element select medium" id="element_16"');
 			echo form_error('ciudad','<p class="error">','</p>');
 			?>
-			</div> <small class="guidelines" id="guide_16">Seleccione la zona
+			</div> <small class="guidelines" id="guide_16">Seleccione la ciudad
 				donde se encuentra ubicado</small>
 		</li>
 

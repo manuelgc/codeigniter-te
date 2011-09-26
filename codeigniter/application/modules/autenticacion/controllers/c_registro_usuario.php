@@ -235,6 +235,11 @@ class C_registro_usuario extends MX_Controller {
 							$this->template->build('v_registro_cliente',$data);
 						}else {
 							$usuario = new Usuario();
+							$estado = new Estado();
+							$ciudad = new Ciudad();
+							$zona = new Zona();
+							$direccion_envio = new Direccionesenvio();
+							
 							$usuario->nombreusuario = $this->input->post('usuario');
 							$usuario->password = $this->input->post('password');
 							$usuario->nombre = $this->input->post('nombre');
@@ -246,8 +251,23 @@ class C_registro_usuario extends MX_Controller {
 
 							$tipo_usuario = new Tipousuario();
 							$tipo_usuario->where('id',3)->get();
+														
+							$estado_id = 7; //para cuando funcione en otros estados
+							$ciudad_id = $this->input->post('ciudad');
+							$zona_id = $this->input->post('zona');
+							
+							$estado->get_by_id($estado_id);
+							$ciudad->get_by_id($ciudad_id);
+							$zona->get_by_id($zona_id);
 							
 							$usuario->save($tipo_usuario);
+							
+							$direccion_envio->calle_carrera = $this->input->post('calle_carrera');
+							$direccion_envio->casa_urb = $this->input->post('urb_edif');
+							$direccion_envio->numeroCasaApto = $this->input->post('nroCasa_apt');
+							$direccion_envio->lugarreferencia = $this->input->post('lugar_referencia');
+							
+							$direccion_envio->save(array($estado,$ciudad,$zona,$usuario));
 							$this->template->build('v_registro_exitoso');
 						}
 					}else {
