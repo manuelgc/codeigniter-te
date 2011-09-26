@@ -1,6 +1,10 @@
+
+<?php if(isset($mensaje_error)){ echo '<p>'.$mensaje_error.'</p>';}else{?>
 <ul class="restaurantes">
-	<p><?php if(isset($mensaje_error)){echo $mensaje_error;}?></p>	
-	<?php foreach ($restaurantes as $value):?>¨
+	<?php 
+	if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}
+	foreach ($restaurantes as $value):
+	 if(is_array($value)){?>
 		<li class="bloque-restaurante" id="<?php echo $value['tienda_id'];?>">
 			<div class="" name="titulo_restaurant" width="100%">
 					<p>
@@ -22,22 +26,21 @@
 			<div class="descrip_restaurant">
 				<div>
 					<img src="<?php echo $value['imagen_horario'];?>" class="">
-					
-<!--						<p class="">abierto o cerrado</p>-->
 				</div>
 				<div>
 					<p class=""><?php echo $value['tipo_comida'];?></p>
 				</div>
 				<div>
-					<p>Cant. Minima:<?php echo $value['min_cant'];?></p>
+					<p>Cant. Minima: <?php echo $value['min_cant'];?></p>
 				</div>
 				<div>
-					<p>Gasto Minimo:<?php echo $value['min_pre'];?></p>
+					<p>Gasto Minimo: <?php echo $value['min_pre'];?></p>
 				</div>
 				<div>
 					<p class=""><?php echo $value['tipo_venta'];?></p>
 				</div>
 			</div>                           
 		</li>
-	<?php endforeach;?>	
+	<?php }//end if interno
+	endforeach;}//end else externo?>	
 </ul>
