@@ -22,6 +22,7 @@ $lang['regcliente_calle_carr'] = 'Calle/Carrera';
 $lang['regcliente_urb_edif'] = 'Urbanizacion/Edificio';
 $lang['regcliente_numcasa_apto'] = 'Numero casa/Apartamento';
 $lang['regcliente_lugar_referencia'] = 'Lugar de referencia';
+$lang['regcliente_cod_captcha'] = 'Codigo de seguridad captcha';
 
 $lang['regcliente_boton'] = 'Enviar';
 ?>
