@@ -48,5 +48,36 @@ class C_login extends MX_Controller {
 			$this->template->build('v_registro_exitoso');
 		}
 	}
+	
+	function verificarDatosUsuario($usuario_email,$contrasena) {
+		$campo_busqueda = '';
+		if ($this->form_validation->valid_email($usuario_email)) {
+			$campo_busqueda = 'correo';
+		}else {
+			$campo_busqueda = 'nombreusuario'; 
+		}
+		
+		$u = new Usuario();
+		$u->where($campo_busqueda,$usuario_email);
+		$u->where('password',md5($contrasena));
+		$u->where('estatus',1);
+		$u->get();
+		
+		if ($u->exists()) {
+			$this->crearSesion($u);
+		}else{
+			return FALSE;
+		}
+	}
+	
+	function crearSesion($usuario) {
+		$usuario_logueado = array(
+			'nombreusuario' => $usuario->nombreusuario,
+			'logeado' => TRUE
+		);
+		
+		$this->session->set_userdata($usuario_logueado);
+	}
+		
 }
 ?>

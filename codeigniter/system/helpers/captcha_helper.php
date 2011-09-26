@@ -58,23 +58,23 @@ if ( ! function_exists('create_captcha'))
 			}
 		}
 
-		if ($img_path == '' OR $img_url == '')
-		{
+		if ($img_path == '' OR $img_url == '')		
+		{			
 			return FALSE;
 		}
 
-		if ( ! @is_dir($img_path))
-		{
+		if ( ! @is_dir($img_path))		
+		{				
 			return FALSE;
 		}
 
 		if ( ! is_writable($img_path))
-		{
+		{					
 			return FALSE;
 		}
 
-		if ( ! extension_loaded('gd'))
-		{
+		if ( ! extension_loaded('gd'))		
+		{					
 			return FALSE;
 		}
 
@@ -229,10 +229,10 @@ if ( ! function_exists('create_captcha'))
 		// -----------------------------------
 
 		$img_name = $now.'.jpg';
-
+				
 		ImageJPEG($im, $img_path.$img_name);
 
-		$img = "<img src=\"$img_url$img_name\" width=\"$img_width\" height=\"$img_height\" style=\"border:0;\" alt=\" \" />";
+		$img = "<img class=\"img-captcha\" src=\"$img_url$img_name\" width=\"$img_width\" height=\"$img_height\" style=\"border:0;\" alt=\" \" />";
 
 		ImageDestroy($im);
 

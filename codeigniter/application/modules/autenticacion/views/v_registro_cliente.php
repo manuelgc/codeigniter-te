@@ -10,17 +10,16 @@ $(document).ready(function(){
 				{'usuario':txt_usuario},
 				function(data){
 					var nombre = data.nombre_usuario;
-					if(nombre == '0'){
-						//alert('puedes usar ese');
-						$('span#error_nombre_usuario').removeClass('error').append('Puedes usar el nombre seleccionado');
+					if(nombre == '0'){						
+						$('span#error_nombre_usuario').slideToggle().html('Puedes usar el nombre seleccionado');
 					}else{
-						$('span#error_nombre_usuario').css('display','block').append('Puedes usar el nombre seleccionado');
+						$('span#error_nombre_usuario').addClass('error').slideToggle().html('El nombre de usuario '+nombre+' ya se esta usando, selecciona otro nombre de usuario').css('display','block');
 					}
 				},
 				'json'
 			);
 		}else{
-			$('#error_nombre_usuario').fadeToggle().append('Debe ingresar un nombre de usuario');
+			$('#error_nombre_usuario').addClass('error').fadeToggle().append('Debe ingresar un nombre de usuario');
 		}	
 	});
 	$("#element_16").change(	
@@ -44,6 +43,15 @@ $(document).ready(function(){
 				$("#element_17").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
 			}	
 		});
+	$("div img.cambiar-captcha").click(					
+			function(){					
+				$("div img.img-captcha").slideUp('fast');				
+				$.post("<?php echo base_url();?>index.php/autenticacion/c_registro_usuario/crearCaptcha",
+						function(data){							
+							$('img.img-captcha').replaceWith(data);													
+					});				
+				$("div img.img-captcha").slideDown('fast');
+	});
 });
 //-->
 </script>
@@ -128,13 +136,13 @@ echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 		<li id="li_9"><?php echo lang('regcliente_tlf_fijo','element_9','description');?>
 			<span> <input id="element_9_1" name="tlf_fijo_1" class="element text"
 				size="3" maxlength="3" value="<?php echo set_value('tlf_fijo_1');?>"
-				type="text"> - <label for="element_9_1">(###)</label> </span> <span>
+				type="text"> - <label for="element_9_1">(251)</label> </span> <span>
 				<input id="element_9_2" name="tlf_fijo_2" class="element text"
 				size="3" maxlength="3" value="<?php echo set_value('tlf_fijo_2');?>"
-				type="text"> - <label for="element_9_2">###</label> </span> <span> <input
+				type="text"> - <label for="element_9_2">255</label> </span> <span> <input
 				id="element_9_3" name="tlf_fijo_3" class="element text" size="4"
 				maxlength="4" value="<?php echo set_value('tlf_fijo_3');?>"
-				type="text"> <label for="element_9_3">####</label> </span> <?php echo form_error('tlf_fijo_1','<p class="error">','</p>');?>
+				type="text"> <label for="element_9_3">5555</label> </span> <?php echo form_error('tlf_fijo_1','<p class="error">','</p>');?>
 
 			<small class="guidelines" id="guide_4">Ingresa tu numero de telefono
 				fijo tal como se te indica.</small>
@@ -142,13 +150,13 @@ echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 		<li id="li_4"><?php echo lang('regcliente_celular','element_4','description');?>
 			<span> <input id="element_4_1" name="celular_1" class="element text"
 				size="3" maxlength="3" value="<?php echo set_value('celular_1');?>"
-				type="text"> - <label for="element_4_1">(###)</label> </span> <span>
+				type="text"> - <label for="element_4_1">(416)</label> </span> <span>
 				<input id="element_4_2" name="celular_2" class="element text"
 				size="3" maxlength="3" value="<?php echo set_value('celular_2');?>"
-				type="text"> - <label for="element_4_2">###</label> </span> <span> <input
+				type="text"> - <label for="element_4_2">555</label> </span> <span> <input
 				id="element_4_3" name="celular_3" class="element text" size="4"
 				maxlength="4" value="<?php echo set_value('celular_3');?>"
-				type="text"> <label for="element_4_3">####</label> </span> <?php echo form_error('celular_1','<p class="error">','</p>');?>
+				type="text"> <label for="element_4_3">5555</label> </span> <?php echo form_error('celular_1','<p class="error">','</p>');?>
 
 			<small class="guidelines" id="guide_4">Ingresa tu numero de telefono
 				celular tal como se te indica.</small>
@@ -163,9 +171,9 @@ echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 		</li>
 		<li id="li_16"><?php echo lang('regcliente_ciudad','element_16','description');?>
 			<div>
-			<?php 			
+			<?php
 			echo form_dropdown('ciudad',$ciudad,NULL,'class="element select medium" id="element_16"');
-			echo form_error('ciudad','<p class="error">','</p>');			
+			echo form_error('ciudad','<p class="error">','</p>');
 			?>
 			</div> <small class="guidelines" id="guide_16">Seleccione la zona
 				donde se encuentra ubicado</small>
@@ -173,9 +181,9 @@ echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 
 		<li id="li_17"><?php echo lang('regcliente_zona','element_17','description');?>
 			<div>
-			<?php 
+			<?php
 			echo form_dropdown('zona',array(),NULL,'class="element select medium" id="element_17"');
-			echo form_error('zona','<p class="error">','</p>');			
+			echo form_error('zona','<p class="error">','</p>');
 			?>
 			</div> <small class="guidelines" id="guide_17">Seleccione la zona
 				donde se encuentra ubicado</small>
@@ -215,6 +223,20 @@ echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 					<?php echo form_error('lugar_referencia','<p class="error">','</p>');?>
 			</div> <small id="guide_13" class="guidelines">Ingrese el numero de
 				casa o apartamento</small>
+		</li>
+		<li id="li_21">
+			<div style="width:200px;float:left" id="content-captcha">
+			<?php echo (isset($captcha)) ? $captcha : '';?>
+			</div>
+			<img alt="Cambiar Codigo" class="cambiar-captcha" src="<?php echo base_url();?>application/img/arrow_double.png" style="float:left;cursor: pointer;">
+		</li>
+		<li id="li_22"><?php echo lang('regcliente_cod_captcha','element_22','description');?>
+			<div>
+				<input id="element_22" name="cod_captcha"
+					class="element text medium" type="text" maxlength="255" value="" />
+					<?php echo form_error('cod_captcha','<p class="error">','</p>');?>
+			</div> <small id="guide_22" class="guidelines">Ingrese el codigo tal
+				como se indica en la imagen</small>
 		</li>
 		<li class="buttons"><input id="saveForm"
 			class="button_text art-button" type="submit" name="submit"

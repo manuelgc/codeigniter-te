@@ -4,7 +4,8 @@ class Usuario extends DataMapper {
 	var $has_one = array(
 	'tipousuario'=> array(
             'class' => 'tipousuario',
-            'other_field' => 'usuario')
+            'other_field' => 'usuario',
+			'join_other_as' => 'tipousuarios')
 	);
 	var $has_many = array(
 	'pedido'=> array(
@@ -34,7 +35,7 @@ class Usuario extends DataMapper {
 	
 	function buscarPorNombreUsuario($nombre_usuario) {
 		$usuario = new Usuario();
-		$usuario->get_by_nombreusuario($nombre_usuario);
+		$usuario->where('nombreusuario',$nombre_usuario)->get();			
 		return $usuario->exists();
 	}
 }
