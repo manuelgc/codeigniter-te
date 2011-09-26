@@ -1,14 +1,21 @@
 <?php
 class c_busqueda extends MX_Controller{
-	
+//	private	$config=array('base_url' => '',
+// 	'total_rows' => 3,
+//	'per_page' => 1);
 	function __construct() {
 		parent::__construct();
 		$this->load->helper('form');
 		$this->load->helper('language');
 		$this->load->helper('date');
 		$this->load->library('form_validation');
-		$this->load->library('qtip2');			
+		$this->load->library('qtip2');
+		$this->load->helper('url');
+		$this->load->library('pagination');		
+		$this->load->library('table');	
 		$this->form_validation->CI =& $this;
+		
+		
 
 	}
 	function index() {
@@ -16,17 +23,65 @@ class c_busqueda extends MX_Controller{
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip('li','select');
+		$config['base_url'] = base_url().'/busqueda/c_busqueda/';
+ 		$config['total_rows'] = 3;
+		$config['per_page'] = 1;
+//		$config['num_links'] = 20;
+		
 		$arrCombo = array('ciudad'  => $this->cargarCiudad(),
                   		'categoria'    => $this->cargarTipoComida(),
                   		'orden'   => $this->cargarTipoOrden());
 
 		if ($this->input->post('campo_busqueda')) {
-			
+
 			if($this->buscarTiendaSql()!=null){
-				$data['restaurantes']=$this->buscarTiendaSql();
+				
+//				$data['restaurantes']=$this->buscarTiendaSql();
+				$data['opcion_combos']=$arrCombo;
+				
+				$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
+				$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
+				$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
+				//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
+				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
+				//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
+				//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
+				//$this->template->set_partial('block','web/layouts/two_columns/partials/block');
+				$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
+				$this->template->set_layout('two_columns/theme');					
+				$this->pagination->initialize($config);
+				$tienda= new Tiendascomida();
+				$tienda->where('estatus','1');
+//				echo ' segmente(0)'.$this->uri->segment(0,'nada');
+//				echo ' segmente(1)'.$this->uri->segment(1,'nada');
+//				echo ' segmente(2)'.$this->uri->segment(2,'nada');
+//				echo ' segmente(3)'.$this->uri->segment(3,'nada');
+//				echo ' segmente(4)'.$this->uri->segment(4,'nada');
+//				echo ' segmente(5)'.$this->uri->segment(5,'nada');
+//				echo ' segmente(6)'.$this->uri->segment(6,'nada');
+//				echo ' segmente(7)'.$this->uri->segment(7,'nada');
+				$tienda->get($config['per_page'],$this->uri->segment(3));
+//				$tienda->get($config['per_page'],1);
+				$tienda->check_last_query();
+				$data['restaurantes']=$tienda;
+				
+				$data['paginas_link']= $this->pagination->create_links();
 				$this->template->build('v_resultado_busqueda',$data);
 			}else{
 				$data['mensaje_error']='Lo sentimos la busqueda no obtuvo ningun resultado.';
+				$data['restaurantes']=$this->buscarTiendaSql();
+				$data['opcion_combos']=$arrCombo;
+				$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
+				$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
+				$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
+				//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
+				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
+				//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
+				//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
+				//$this->template->set_partial('block','web/layouts/two_columns/partials/block');
+				$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
+				$this->template->set_layout('two_columns/theme');	
+				
 				$this->template->build('v_resultado_busqueda',$data);
 			}
 		}
@@ -121,7 +176,9 @@ class c_busqueda extends MX_Controller{
 			$tiendas->clear();
 			$sql.=$where."GROUP BY tienda.id ORDER BY tienda.nombre";
 			$tiendas->query($sql);
-
+			echo $this->uri->segment(3);
+//			$tiendas->get(3,$this->uri->segment(3));
+//			$tiendas->check_last_query();
 			if($tiendas->exists()){
 				$img= new Imagen() ;
 				

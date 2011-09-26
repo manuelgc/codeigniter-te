@@ -330,7 +330,7 @@ h2.art-logo-text {
 
 .art-content-layout .art-layout-cell,.art-content-layout .art-layout-cell .art-content-layout .art-layout-cell
 	{
-	display: table-cell;
+	display: block;
 }
 
 .art-layout-cell .art-layout-cell {
@@ -1974,5 +1974,7 @@ li.bloque-restaurante{
 	height: auto;
 	border-style: solid;
 	border-width: 2px;
+	margin: 10px;
+	float: left;
 }
 /* fin breadcumb */
