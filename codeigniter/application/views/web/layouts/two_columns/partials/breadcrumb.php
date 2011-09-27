@@ -6,7 +6,7 @@ $(document).ready(function(){
 		event.preventDefault();
 		var id_ciudad = $(this).val();
 		if(id_ciudad != ''){
-		$.post("<?php echo base_url();?>index.php/busqueda/c_busqueda/cargarZona",
+		$.post("<?php echo base_url();?>index.php/busqueda/c_busqueda/cargarZonaAjax",
 				{'id_ciudad':id_ciudad},
 				function(data){
 					if(data.zona!='0'){
@@ -46,24 +46,24 @@ $(document).ready(function(){
 <ul>
 
 	<li id="li_1"><?php echo lang('busqueda_ciudad','element_1','description');?>
-	<div><?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],NULL,'id=element_1 class="element text medium"'); ?>
+	<div><?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],$opcion_combos['select_ciudad'],'id=element_1 class="element text medium"'); ?>
 	<small class="guidelines" id="guide_1">Seleciona la ciudad donde te en
 	cuentras</small></div>
 
 	</li>
 	<li id="li_2"><?php echo lang('busqueda_zona','element_2','description');?>
-	<div><?php echo form_dropdown('zona',array(),NULL,'id=element_2 class="element text medium" disabled="disabled"');?>
+	<div><?php echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=element_2 class="element text medium" disabled="disabled"');?>
 	<small class="guidelines" id="guide_2">Seleciona la zona donde te en
 	cuentras</small></div>
 
 	</li>
 	<li id="li_3"><?php echo lang('busqueda_categoria','element_3','description');?>
-	<div><?php echo form_dropdown('categoria',$opcion_combos['categoria'],NULL,'id=element_3 class="element text medium"'); ?>
+	<div><?php echo form_dropdown('categoria',$opcion_combos['categoria'],$opcion_combos['select_categoria'],'id=element_3 class="element text medium"'); ?>
 	<small class="guidelines" id="guide_3">Seleciona el tipo de comida</small>
 	</div>
 	</li>
 	<li id="li_4"><?php echo lang('busqueda_tipo_orden','element_4','description');?>
-	<div><?php echo form_dropdown('tipo_orden',$opcion_combos['orden'],NULL,'id=element_4 class="element text medium"'); ?>
+	<div><?php echo form_dropdown('tipo_orden',$opcion_combos['orden'],$opcion_combos['select_orden'],'id=element_4 class="element text medium"'); ?>
 	<small class="guidelines" id="guide_4">Seleciona el tipo de orden</small>
 	</div>
 	</li>
