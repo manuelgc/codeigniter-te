@@ -1,8 +1,8 @@
 
 <?php if(isset($mensaje_error)){ echo '<p>'.$mensaje_error.'</p>';}else{?>
 <ul class="restaurantes">
-	<!--<?php 
-//	if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}
+	<?php 
+	if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}
 	foreach ($restaurantes as $value):
 	 if(is_array($value)){?>
 		<li class="bloque-restaurante" id="<?php echo $value['tienda_id'];?>">
@@ -41,12 +41,10 @@
 				</div>
 			</div>                           
 		</li>
-	-->
+	
 	
 	<?php }//end if interno
 	endforeach;
-	
-	 echo $this->table->generate($restaurantes); 
 		
 	if(isset($paginas_link)){echo $paginas_link;}
 	}//end else externo

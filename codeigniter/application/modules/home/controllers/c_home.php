@@ -7,7 +7,13 @@ class C_home extends MX_Controller {
 		$this->view_respuesta == NULL;
 		$this->partial_respuesta == FALSE;
 		//$this->load->module('banner_principal/c_banner_principal');
-		$this->load->module('busqueda/c_busqueda');		
+		$this->load->module('busqueda/c_busqueda');	
+			
+		$this->session->unset_userdata('ciudad',$this->input->post('ciudad'));
+		$this->session->unset_userdata('zona',$this->input->post('zona'));
+		$this->session->unset_userdata('categoria',$this->input->post('categoria'));
+		$this->session->unset_userdata('orden',$this->input->post('tipo_orden'));
+	
 	}
 		
 	function index() {				
