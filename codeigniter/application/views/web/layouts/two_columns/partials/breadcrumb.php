@@ -52,7 +52,9 @@ $(document).ready(function(){
 
 	</li>
 	<li id="li_2"><?php echo lang('busqueda_zona','element_2','description');?>
-	<div><?php echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=element_2 class="element text medium" disabled="disabled"');?>
+	<div><?php 
+	$disb=(sizeof($opcion_combos['zona'])==0)?'disabled="disabled"':'';
+	echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=element_2 class="element text medium" '.$disb);?>
 	<small class="guidelines" id="guide_2">Seleciona la zona donde te en
 	cuentras</small></div>
 
