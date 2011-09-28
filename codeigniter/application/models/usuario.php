@@ -36,5 +36,37 @@ class Usuario extends DataMapper {
 		$usuario->where('nombreusuario',$nombre_usuario)->get();			
 		return $usuario->exists();
 	}
+	
+	function getUsuarioById($id_usuario) {
+		$usuario = new Usuario();
+		$usuario->where('id',$id_usuario);
+		$usuario->where('estatus',1);
+		$usuario->get();
+		if (!$usuario->exists()) {
+			return FALSE;
+		}else {
+			return $usuario;
+		}
+	}
+	
+	function getDireccionesEnvio($id_usuario) {
+		$u = new Usuario();
+		$u->where('id',$id_usuario);
+		$u->where('estatus',1);
+		$u->get();		
+		$u->direccionesenvio->where('estatus',1)->get();
+		$u->check_last_query();
+				
+			$u->direccionesenvio->estado->where('estatus',1)->get();
+			$u->check_last_query();		
+			//$u->direccionesenvio->ciudad->where('estatus',1)->get();
+			$u->direccionesenvio->zona->where('estatus',1)->get();
+			$u->check_last_query();						
+		if (!$u->exists()) {
+			return FALSE;
+		}else {
+			return $u;
+		}
+	}
 }
 ?>
