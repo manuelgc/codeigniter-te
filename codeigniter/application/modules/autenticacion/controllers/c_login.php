@@ -73,7 +73,7 @@ class C_login extends MX_Controller {
 	function crearSesion($usuario) {
 		$usuario_logueado = array(
 			'nombreusuario' => $usuario->nombreusuario,
-			'logeado' => TRUE
+			'id' => $usuario->id
 		);
 		
 		$this->session->set_userdata($usuario_logueado);
@@ -82,6 +82,8 @@ class C_login extends MX_Controller {
 	function verificarExisteSesion() {
 		if ($this->session->userdata('nombreusuario') === FALSE) {
 			return FALSE;
+		}else {
+			return $this->session->userdata('id');
 		}		
 	}
 		
