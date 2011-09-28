@@ -23,7 +23,8 @@ class Usuario extends DataMapper {
 	'direccionesenvio'=> array(
 						'class'=>'direccionesenvio',
 						'other_field' => 'usuario',				
-			            'join_other_as' => 'direccionesenvio')
+			            'join_other_as' => 'direccionesenvio',
+						'join_self_as' => 'usuarios')
 	
 	);
 	
@@ -51,22 +52,24 @@ class Usuario extends DataMapper {
 	
 	function getDireccionesEnvio($id_usuario) {
 		$u = new Usuario();
+		$resultadoDireccion = array();
+		$contador = 0;
 		$u->where('id',$id_usuario);
 		$u->where('estatus',1);
 		$u->get();		
-		$u->direccionesenvio->where('estatus',1)->get();
-		$u->check_last_query();
-				
-			$u->direccionesenvio->estado->where('estatus',1)->get();
-			$u->check_last_query();		
-			//$u->direccionesenvio->ciudad->where('estatus',1)->get();
-			$u->direccionesenvio->zona->where('estatus',1)->get();
-			$u->check_last_query();						
-		if (!$u->exists()) {
-			return FALSE;
-		}else {
-			return $u;
-		}
+		$u->direccionesenvio->where('estatus',1)->get();		
+		foreach ($u->direccionesenvio->get() as $valor) {
+			$resultadoDireccion[$contador]['calle_carrera'] = $valor->calle_carrera;
+			$resultadoDireccion[$contador]['casa_urb'] = $valor->casa_urb;
+			$resultadoDireccion[$contador]['numeroCasaApto'] = $valor->numeroCasaApto;
+			$resultadoDireccion[$contador]['lugarreferencia'] = $valor->lugarreferencia;
+			$resultadoDireccion[$contador]['estado'] = $valor->estado->where('estatus',1)->get()->nombreEstado;
+			$resultadoDireccion[$contador]['ciudad'] = $valor->ciudad->where('estatus',1)->get()->nombreCiudad;
+			$resultadoDireccion[$contador]['zona'] = $valor->zona->where('estatus',1)->get()->nombreZona;
+			$resultadoDireccion[$contador]['id'] = $valor->id;
+			$contador++;									
+		}									
+		return $resultadoDireccion;
 	}
 }
 ?>

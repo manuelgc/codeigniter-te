@@ -12,6 +12,4 @@ class Categoriaplato extends Datamapper{
 		parent::__construct($id);
 	}	
 }
-	
-}
 ?>

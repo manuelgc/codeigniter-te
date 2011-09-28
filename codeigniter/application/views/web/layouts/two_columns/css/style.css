@@ -1170,7 +1170,7 @@ h2.art-postheader a:hover,h2.art-postheader a.hovered {
 
 /* end PostHeaderIcon */ /* begin PostBullets */
 .art-post ol,.art-post ul {
-	margin: 1em 0 1em 2em;
+	/*margin: 1em 0 1em 2em;*/
 	padding: 0;
 }
 

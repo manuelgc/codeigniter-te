@@ -17,5 +17,21 @@ class Tiposventa extends DataMapper{
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}
+	
+	function getTipoVenta() {
+		$tipo_venta = new Tiposventa();
+		$options = array();
+		$tipo_venta->where('estatus',1);
+		$tipo_venta->order_by('nombre','ASC');
+		$iterador = $tipo_venta->get_iterated();
+		if (!$iterador->exists()) {
+			return FALSE;
+		}else {
+			foreach ($iterador as $value) {
+				$options[$value->id] = $value->nombre;
+			}
+			return $options;
+		}	
+	}
 }	
 ?>
