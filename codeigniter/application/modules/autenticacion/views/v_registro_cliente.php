@@ -56,6 +56,9 @@ $(document).ready(function(){
 //-->
 </script>
 <div id="form_container">
+<?php if (isset($error_bd)) {?>
+	<div id="error-bd" class="error"><?php echo $error_bd;?></div>
+<?php }?>
 <?php $oculto = array('oculto_registro'=>'1');
 echo form_open('autenticacion/c_registro_usuario','',$oculto);?>
 	<div class="form_description">
