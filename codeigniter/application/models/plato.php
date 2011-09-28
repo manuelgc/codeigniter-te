@@ -4,7 +4,11 @@ class Plato extends DataMapper {
 	var $has_one= array(
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
-            'other_field' => 'plato')); 
+            'other_field' => 'plato'),
+	'categoriaplato'=> array(
+            'class' => 'categoriaplato',
+            'other_field' => 'plato')
+	); 
 	var $has_many = array(
 	'promocion'=> array(
             'class' => 'promocion',
