@@ -11,7 +11,7 @@ class C_datos_usuario extends MX_Controller {
 	
 	function index() {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
-		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
+		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));		
 
 		$data['output_header'] = $this->getDataPartial('header');		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');		
@@ -26,6 +26,9 @@ class C_datos_usuario extends MX_Controller {
 		
 		$data['datos_usuario'] = $this->getDatosUsuario();
 		$data['dir_usuario'] = $this->getDireccionesUsuario();
+		$data['estados_pedido'] = $this->cargarEstadosPedido();
+		$data['tipo_ped'] = $this->cargarTipoPedido();
+		$data['ped_fecha'] = $this->cargarPedidosFecha();
 		$this->template->build('v_datos_cliente',$data);
 	}
 	
@@ -56,20 +59,38 @@ class C_datos_usuario extends MX_Controller {
 	}
 	
 	function getDireccionesUsuario() {
-		/*$u = new Usuario();
+		$u = new Usuario();
 		$usuario_actual = $u->getDireccionesEnvio(9); //$this->id_usuario
 		if ($usuario_actual === FALSE) {
 			return NULL;
 		}else {
 			return $usuario_actual;
-		}*/
-		$de = new Direccionesenvio();
-		$usuario_actual = $de->getDireccionesEnvioUsuario(9); //$this->id_usuario
-		if ($usuario_actual === FALSE) {
-			return NULL;
-		}else{
-			return $usuario_actual;
-		}
+		}		
+	}
+	
+	function cargarEstadosPedido() {
+		$estadoPed = new Estadospedido();
+		$resultado = $estadoPed->getEstadosPedido();
+		return $resultado;
+	}
+	
+	function cargarTipoPedido() {
+		$tipo_ped = new Tiposventa();
+		$resultado = $tipo_ped->getTipoVenta();
+		return $resultado;
+	}
+	
+	function cargarPedidosFecha() {
+		$options = array(
+			'1' => 'Pedidos Recientes',
+			'2' => 'Pedidos Anteriores'			
+		);
+		
+		return $options;
+	}
+	
+	function get($param) {
+		;
 	}
 }
 ?>

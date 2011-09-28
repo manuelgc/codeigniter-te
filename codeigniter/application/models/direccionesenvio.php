@@ -27,20 +27,6 @@ class Direccionesenvio extends DataMapper {
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}	
-
-	function getDireccionesEnvioUsuario($id_usuario) {
-		$de = new Direccionesenvio();
-		$de->where('estatus',1);
-		$de->get();
-		$de->check_last_query();
-		$de->usuario->where('id',$id_usuario)->get();
-		$de->usuario->where('estatus',1)->get();		
-		$de->check_last_query();
-		if (!$de->exists()) {
-			return FALSE;
-		}else {
-			return $de;
-		}
-	}
+	
 }
 ?>
