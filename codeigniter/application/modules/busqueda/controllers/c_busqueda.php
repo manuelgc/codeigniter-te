@@ -18,7 +18,7 @@ class c_busqueda extends MX_Controller{
 		$this->config['uri_segment'] = 4;
 //		$this->config['first_link'] = '<<';
 //		$this->config['last_link'] = '>>';
-
+		
 	}
 	function index() {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
@@ -47,68 +47,80 @@ class c_busqueda extends MX_Controller{
 			if($this->buscarTiendaSql()!=null){
 				
 				$data['restaurantes']=$this->buscarTiendaSql();
+				
+				if($this->input->post('ciudad')!=''){
+					$arrCombo['zona']=$this->cargarZona($this->input->post('ciudad'));
+				}
+				$arrCombo['select_ciudad']= $this->input->post('ciudad');
+				$arrCombo['select_zona']  = $this->input->post('zona');
+				$arrCombo['select_categoria']= $this->input->post('categoria');
+				$arrCombo['select_orden']= $this->input->post('tipo_orden');
+			
 				$data['opcion_combos']=$arrCombo;
-				
-				$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
-				$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
-				$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
-				//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
-				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
-				//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
-				//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
-				//$this->template->set_partial('block','web/layouts/two_columns/partials/block');
-				$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
-				$this->template->set_layout('two_columns/theme');					
-				
+						
 				$this->pagination->initialize($this->config);
 				$data['paginas_link']= $this->pagination->create_links();
-				$this->template->build('v_resultado_busqueda',$data);
+				$this->cargarVistaResulados($data);
+
 			}else{
-				$this->session->unset_userdata('ciudad',$this->input->post('ciudad'));
-				$this->session->unset_userdata('zona',$this->input->post('zona'));
-				$this->session->unset_userdata('categoria',$this->input->post('categoria'));
-				$this->session->unset_userdata('orden',$this->input->post('tipo_orden'));
-			
+				$this->session->unset_userdata('ciudad');
+				$this->session->unset_userdata('zona');
+				$this->session->unset_userdata('categoria');
+				$this->session->unset_userdata('orden');
+				
 				$data['mensaje_error']='Lo sentimos la busqueda no obtuvo ningun resultado.';
+				
+				if($this->input->post('ciudad')!=''){
+					$arrCombo['zona']=$this->cargarZona($this->input->post('ciudad'));
+				}
+				$arrCombo['select_ciudad']= $this->input->post('ciudad');
+				$arrCombo['select_zona']  = $this->input->post('zona');
+				$arrCombo['select_categoria']= $this->input->post('categoria');
+				$arrCombo['select_orden']= $this->input->post('tipo_orden');
+				
 				$data['opcion_combos']=$arrCombo;
 				
-				$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
-				$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
-				$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
-				//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
-				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
-				//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
-				//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
-				//$this->template->set_partial('block','web/layouts/two_columns/partials/block');
-				$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
-				$this->template->set_layout('two_columns/theme');			
-				
-				$this->template->build('v_resultado_busqueda',$data);
+				$this->cargarVistaResulados($data);
 			}
 		}elseif ($this->session->userdata('ciudad')!=false || $this->session->userdata('zona')!=false || $this->session->userdata('categoria')!=false || $this->session->userdata('orden')!=false ){
 				
 				$data['restaurantes']=$this->buscarTiendaPagina($this->session->userdata('ciudad'),$this->session->userdata('zona'),$this->session->userdata('categoria'),$this->session->userdata('orden'),$this->uri->segment(4));
+				
+				if($this->session->userdata('ciudad')!=''){
+					$arrCombo['zona']=$this->cargarZona($this->session->userdata('ciudad'));
+				}
+				$arrCombo['select_ciudad']= $this->session->userdata('ciudad');
+				$arrCombo['select_zona']  = $this->session->userdata('zona');
+				$arrCombo['select_categoria']= $this->session->userdata('categoria');
+				$arrCombo['select_orden']= $this->session->userdata('orden');
+				
 				$data['opcion_combos']=$arrCombo;
-				
-				$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
-				$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
-				$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
-				//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
-				$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
-				//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
-				//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
-				//$this->template->set_partial('block','web/layouts/two_columns/partials/block');
-				$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
-				$this->template->set_layout('two_columns/theme');					
-				
+											
 				$this->pagination->initialize($this->config);
 				$data['paginas_link']= $this->pagination->create_links();
-				$this->template->build('v_resultado_busqueda',$data);
+				
+				$this->cargarVistaResulados($data);
+
 		}
 
 		return $arrCombo;
 	}
+	
+	function  cargarVistaResulados($data){
+		
+		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
+		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
+		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
+		//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
+		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
+		//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
+		//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
+		//$this->template->set_partial('block','web/layouts/two_columns/partials/block');
+		$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
+		$this->template->set_layout('two_columns/theme');
 
+		$this->template->build('v_resultado_busqueda',$data);
+	}
 	function  buscarTiendaSql(){
 
 		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
@@ -535,20 +547,20 @@ class c_busqueda extends MX_Controller{
 		}
 
 	}
-	function cargarZona(){
+	function cargarZona($id_zona){
 		$zona = new Zona();
 		$zona->where('estatus','1');
-		$zona->where('ciudades_id',$this->input->post('id_ciudad'));
+		$zona->where('ciudades_id',$id_zona);
 		$zona->order_by('nombreZona','ASD')->get_iterated();
-		$salida='<option value="" >Seleccione</option>;';
+		$option=array();
 		if (!$zona->exists()) {
-			$salida='0';
+			return array();
 		}else{
 			foreach ($zona as $zon) {
-				$salida .= '<option value="'.$zon->id.'">'.$zon->nombreZona.'</option>';
+				$option[$zon->id] = $zon->nombreZona;
 			}
-			$data['zona']= $salida;
-			echo json_encode($data);
+
+		return $option;
 				
 		}
 
