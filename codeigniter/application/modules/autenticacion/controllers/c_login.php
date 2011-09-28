@@ -78,6 +78,12 @@ class C_login extends MX_Controller {
 		
 		$this->session->set_userdata($usuario_logueado);
 	}
+	
+	function verificarExisteSesion() {
+		if ($this->session->userdata('nombreusuario') === FALSE) {
+			return FALSE;
+		}		
+	}
 		
 }
 ?>

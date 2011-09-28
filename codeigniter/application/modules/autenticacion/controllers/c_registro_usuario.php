@@ -260,15 +260,37 @@ class C_registro_usuario extends MX_Controller {
 							$ciudad->get_by_id($ciudad_id);
 							$zona->get_by_id($zona_id);
 							
+							$usuario->trans_begin();
 							$usuario->save($tipo_usuario);
 							
-							$direccion_envio->calle_carrera = $this->input->post('calle_carrera');
-							$direccion_envio->casa_urb = $this->input->post('urb_edif');
-							$direccion_envio->numeroCasaApto = $this->input->post('nroCasa_apt');
-							$direccion_envio->lugarreferencia = $this->input->post('lugar_referencia');
-							
-							$direccion_envio->save(array($estado,$ciudad,$zona,$usuario));
-							$this->template->build('v_registro_exitoso');
+							if ($usuario->trans_status() === FALSE) {								
+								$usuario->trans_rollback();
+								$data['ciudad'] = $this->cargarCiudad();
+								$data['captcha'] = $this->crearCaptcha();
+								$data['error_bd'] = $usuario->error->string;								
+								$this->template->build('v_registro_cliente',$data);
+							}else {
+								$direccion_envio->calle_carrera = $this->input->post('calle_carrera');
+								$direccion_envio->casa_urb = $this->input->post('urb_edif');
+								$direccion_envio->numeroCasaApto = $this->input->post('nroCasa_apt');
+								$direccion_envio->lugarreferencia = $this->input->post('lugar_referencia');
+								$direccion_envio->estatus = (int)1;
+								
+								$direccion_envio->save(array($estado,$ciudad,$zona,$usuario));
+								$direccion_envio->trans_begin();
+								if ($direccion_envio->trans_status() === FALSE) {
+									$direccion_envio->trans_rollback();
+									$data['ciudad'] = $this->cargarCiudad();
+									$data['captcha'] = $this->crearCaptcha();
+									$data['error_bd'] = $usuario->error->string;								
+									$this->template->build('v_registro_cliente',$data);
+								}else {
+									$usuario->trans_commit();
+									$direccion_envio->trans_commit();
+									Modules::run('autenticacion/c_login/crearSesion',$usuario);
+									$this->template->build('v_registro_exitoso');
+								}
+							}																					
 						}
 					}else {
 						$data['ciudad'] = $this->cargarCiudad();
