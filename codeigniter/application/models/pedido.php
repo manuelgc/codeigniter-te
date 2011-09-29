@@ -48,8 +48,9 @@ class Pedido extends DataMapper{
 		$u->where('estatus',1);
 		$u->where('id',$id_usuario);
 		$u->get();		
-		$u->pedido->where('estatus',1)->get();		
-		foreach ($u->pedido->get() as $fila_pedid_user) {			
+		$u->pedido->where('estatus',1)->get();
+		//$u->pedido->order_by('horaPedido','asc');						
+		foreach ($u->pedido->get() as $fila_pedid_user) {					
 			$arr_pedidos[$contador]['ruta_img'] = img(base_url().$fila_pedid_user->tiendascomida->get()->imagen->get()->rutaImagen);
 			$arr_pedidos[$contador]['cant'] = $fila_pedid_user->cantidad;
 			$arr_pedidos[$contador]['nombre'] = $fila_pedid_user->estadospedido->get()->nombre;						

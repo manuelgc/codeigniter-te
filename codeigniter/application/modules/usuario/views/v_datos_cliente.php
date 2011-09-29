@@ -1,6 +1,17 @@
 <script>
 	$(function() {
 		$( "#tabs" ).tabs();
+
+		$("#form-filtro-pedidos").submit(function(){
+			if($("#estados_ped").val() == '' && $("#tipo_ped").val() == '' && $("#ped_fecha").val() == ''){
+				$('p#error-filtro').empty().append('Debes seleccionar algun valor para filtrar tu busqueda').show('fast');
+				return false;
+			}else{
+				if ($('#estados_ped').val() != '') {
+					var estado_ped = $('#estados_ped').val();					
+				}
+			}
+		});
 	});
 	</script>
 
@@ -13,8 +24,7 @@
 </p>
 	<?php
 }else {?>
-<div class="demo">
-
+<div class="demo">	
 	<div id="tabs">
 		<ul>
 			<li><a href="#datos">Tus Datos</a></li>
@@ -55,19 +65,19 @@
 				<li id="li-estados_ped" class="item-pedido-usuario"><label class="description"
 					for="estados_ped">Estado del Pedido </label>
 					<div>
-					<?php echo form_dropdown('estados_ped',$estados_pedido,'','class="element select medium"');?>
+					<?php echo form_dropdown('estados_ped',$estados_pedido,'','class="element select medium" id="estados_ped"');?>
 					</div>
 				</li>
 				<li id="li-tipo_ped" class="item-pedido-usuario"><label class="description"
 					for="tipo_ped">Tipo de Pedido </label>
 					<div>
-					<?php echo form_dropdown('tipo_ped',$tipo_ped,'','class="element select medium"');?>
+					<?php echo form_dropdown('tipo_ped',$tipo_ped,'','class="element select medium" id="tipo_ped"');?>
 					</div>
 				</li>
 				<li id="li-ped_fecha" class="item-pedido-usuario"><label class="description"
 					for="ped_fecha">Fecha de Pedido </label>
 					<div>
-					<?php echo form_dropdown('ped_fecha',$ped_fecha,'','class="element select medium"');?>
+					<?php echo form_dropdown('ped_fecha',$ped_fecha,'','class="element select medium" id="ped_fecha"');?>
 					</div>
 				</li>
 
@@ -78,6 +88,7 @@
 					</div>
 				</li>
 			</ul>
+			<p class="error" id="error-filtro"></p>
 			<?php echo form_close();?>
 			<?php echo $lista_ped;?>
 		</div>
