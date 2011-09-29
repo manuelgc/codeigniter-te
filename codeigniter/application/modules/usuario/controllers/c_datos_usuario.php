@@ -31,7 +31,7 @@ class C_datos_usuario extends MX_Controller {
 		$data['tipo_ped'] = $this->cargarTipoPedido();
 		$data['ped_fecha'] = $this->cargarPedidosFecha();
 		$pedidos = $this->cargarPedidos();
-		$this->table->set_heading('Tienda de Comida', 'Cantidad', 'Estado del Pedido','Precio Total');
+		$this->table->set_heading('Tienda de Comida', 'Cantidad Total del Pedido', 'Estado del Pedido','Precio Total');
 		$data['lista_ped'] = $this->table->generate($pedidos);
 		$this->template->build('v_datos_cliente',$data);
 	}
