@@ -20,7 +20,9 @@ class Tiendascomida extends DataMapper{
             'other_field' => 'tiendascomida'),
 	'imagen' => array(
             'class' => 'imagen',
-            'other_field' => 'tiendascomida'),
+            'other_field' => 'tiendascomida',
+			'join_other_as' => 'tiendascomida',
+			'join_self_as' => 'tiendascomida'),
 	'extrasplato'=> array(
             'class' => 'extrasplato',
             'other_field' => 'tiendascomida'),
@@ -32,7 +34,9 @@ class Tiendascomida extends DataMapper{
             'other_field' => 'tiendascomida'),
 	'pedido'=> array(
             'class' => 'pedido',
-            'other_field' => 'tiendascomida'),
+            'other_field' => 'tiendascomida',
+			'join_other_as' => 'tiendacomida',
+			'join_self_as' => 'tiendacomida'),
 	'tipotiendascomida'=> array(
 						'class'=>'tipotiendascomida',
 						'other_field' => 'tiendascomida',		

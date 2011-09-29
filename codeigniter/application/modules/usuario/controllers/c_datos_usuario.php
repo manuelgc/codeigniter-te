@@ -6,6 +6,7 @@ class C_datos_usuario extends MX_Controller {
 		parent::__construct();
 		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion');
 		$this->load->helper('language');
+		$this->load->library('table');
 		$this->load->module('busqueda/c_busqueda');	
 	}
 	
@@ -29,6 +30,9 @@ class C_datos_usuario extends MX_Controller {
 		$data['estados_pedido'] = $this->cargarEstadosPedido();
 		$data['tipo_ped'] = $this->cargarTipoPedido();
 		$data['ped_fecha'] = $this->cargarPedidosFecha();
+		$pedidos = $this->cargarPedidos();
+		$this->table->set_heading('Tienda de Comida', 'Cantidad', 'Estado del Pedido','Precio Total');
+		$data['lista_ped'] = $this->table->generate($pedidos);
 		$this->template->build('v_datos_cliente',$data);
 	}
 	
@@ -50,7 +54,7 @@ class C_datos_usuario extends MX_Controller {
 	
 	function getDatosUsuario() {
 		$u = new Usuario();
-		$usuario_actual = $u->getUsuarioById(9); //$this->id_usuario
+		$usuario_actual = $u->getUsuarioById(2); //$this->id_usuario
 		if ($usuario_actual === FALSE) {
 			return NULL;
 		}else {
@@ -60,7 +64,7 @@ class C_datos_usuario extends MX_Controller {
 	
 	function getDireccionesUsuario() {
 		$u = new Usuario();
-		$usuario_actual = $u->getDireccionesEnvio(9); //$this->id_usuario
+		$usuario_actual = $u->getDireccionesEnvio(2); //$this->id_usuario
 		if ($usuario_actual === FALSE) {
 			return NULL;
 		}else {
@@ -89,8 +93,10 @@ class C_datos_usuario extends MX_Controller {
 		return $options;
 	}
 	
-	function get($param) {
-		;
+	function cargarPedidos() {
+		$pedidos_usuario = new Pedido();
+		$resultado = $pedidos_usuario->getPedidosUsuario(2);
+		return $resultado;
 	}
 }
 ?>
