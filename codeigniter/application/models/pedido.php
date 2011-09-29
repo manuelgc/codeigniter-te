@@ -16,10 +16,13 @@ class Pedido extends DataMapper{
             'other_field' => 'pedido'),
 	'estadospedido'=> array(
             'class' => 'estadospedido',
-            'other_field' => 'pedido'),
+            'other_field' => 'pedido',
+			'join_other_as' => 'estadopedido'),
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
-            'other_field' => 'pedido')); 
+            'other_field' => 'pedido',
+			'join_other_as' => 'tiendacomida',
+			'join_self_as' => 'pedido')); 
 	var $has_many = array(
 	'plato'=> array(
 			'class'=>'plato',
@@ -35,7 +38,26 @@ class Pedido extends DataMapper{
 			'join_table' => 'extrasplato_pedido'));
 	
 	function __construct($id = NULL) {
-		parent::__construct($id);
+		parent::__construct($id);		
+	}
+	
+	function getPedidosUsuario($id_usuario) {
+		$u = new Usuario();
+		$arr_pedidos = array();
+		$contador = 0;	
+		$u->where('estatus',1);
+		$u->where('id',$id_usuario);
+		$u->get();		
+		$u->pedido->where('estatus',1)->get();		
+		foreach ($u->pedido->get() as $fila_pedid_user) {			
+			$arr_pedidos[$contador]['ruta_img'] = img(base_url().$fila_pedid_user->tiendascomida->get()->imagen->get()->rutaImagen);
+			$arr_pedidos[$contador]['cant'] = $fila_pedid_user->cantidad;
+			$arr_pedidos[$contador]['nombre'] = $fila_pedid_user->estadospedido->get()->nombre;						
+			$arr_pedidos[$contador]['total'] = $fila_pedid_user->total;
+			$contador++;			
+		}		
+		
+		return $arr_pedidos;
 	}
 }	
 ?>

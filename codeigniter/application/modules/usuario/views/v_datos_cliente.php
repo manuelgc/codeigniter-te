@@ -50,33 +50,36 @@
 		</div>
 		<div id="pedidos">
 		<?php echo form_open('usuario/filtrarBusqueda','id="form-filtro-pedidos"',array('reordenar' => '0'));?>
-			<ul class="">
+			<ul class="content-form-pedido">
 
-				<li id="li_1" class="pedido-usuario"><label class="description" for="element_1">Estado del
-						Pedido </label>
+				<li id="li-estados_ped" class="item-pedido-usuario"><label class="description"
+					for="estados_ped">Estado del Pedido </label>
 					<div>
 					<?php echo form_dropdown('estados_ped',$estados_pedido,'','class="element select medium"');?>
 					</div>
 				</li>
-				<li id="li_2" class="pedido-usuario"><label class="description" for="element_2">Tipo de
-						Pedido </label>
+				<li id="li-tipo_ped" class="item-pedido-usuario"><label class="description"
+					for="tipo_ped">Tipo de Pedido </label>
 					<div>
 					<?php echo form_dropdown('tipo_ped',$tipo_ped,'','class="element select medium"');?>
 					</div>
 				</li>
-				<li id="li_3" class="pedido-usuario"><label class="description" for="element_3">Fecha de
-						Pedido </label>
+				<li id="li-ped_fecha" class="item-pedido-usuario"><label class="description"
+					for="ped_fecha">Fecha de Pedido </label>
 					<div>
 					<?php echo form_dropdown('ped_fecha',$ped_fecha,'','class="element select medium"');?>
 					</div>
 				</li>
 
-				<li class="buttons"><input type="hidden" name="form_id"
-					value="259891" /> <input id="saveForm" class="button_text"
-					type="submit" name="submit" value="Submit" />
+				<li class="item-pedido-usuario">
+					<div>
+						<input class="button_text art-button" type="submit" name="submit-pedidos"
+							value="Buscar" />
+					</div>
 				</li>
 			</ul>
 			<?php echo form_close();?>
+			<?php echo $lista_ped;?>
 		</div>
 	</div>
 

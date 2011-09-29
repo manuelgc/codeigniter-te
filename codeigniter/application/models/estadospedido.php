@@ -4,7 +4,9 @@ class Estadospedido extends DataMapper{
 	var $has_many = array(
 	'pedido'=> array(
             'class' => 'pedido',
-            'other_field' => 'estadospedido'));
+            'other_field' => 'estadospedido',
+			'join_other_as' => 'estadopedido',
+			'join_self_as' => 'estadopedido'));
 	
 	function __construct($id = NULL) {
 		parent::__construct($id);

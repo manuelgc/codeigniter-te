@@ -753,3 +753,12 @@ div.calendar {
 	background: #dedede;
 	font-weight: bold;
 }
+
+ul.content-form-pedido{
+	width: 100%;
+}
+
+li.item-pedido-usuario{
+	width: 25%;
+	float: left;
+}
