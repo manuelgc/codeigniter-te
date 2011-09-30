@@ -60,6 +60,7 @@ class c_busqueda extends MX_Controller{
 						
 				$this->pagination->initialize($this->config);
 				$data['paginas_link']= $this->pagination->create_links();
+				
 				$this->cargarVistaResulados($data);
 
 			}else{
@@ -171,7 +172,7 @@ class c_busqueda extends MX_Controller{
 		if($this->input->post('categoria')!=''){
 			$tiendas->clear();		
 			$tipoComida->get_by_id($this->input->post('categoria'));
-			$tipoComida->where('estatus','1');
+			$tipoComida;
 			$tiendas=$tipoComida->tiendascomida;
 			$tiendas->where('estatus','1')->get();
 			if($tiendas->exists()){
@@ -220,28 +221,9 @@ class c_busqueda extends MX_Controller{
 				foreach ($tiendas as $ti) {
 					$respuesta['tienda_id']=$ti->id;
 					$respuesta['nombre_tienda']=$ti->nombre;
-					$img->clear();
-					$img=$ti->imagen;
-					$img->where('estatus','1')->get();
-					if($img->exists()){
-						$respuesta['ruta_imagen']=base_url().$img->rutaImagen;
-					}else{
-						$respuesta['ruta_imagen']='';
-					}
-					$tipoComida->clear();
-					$tipoComida=$ti->tipotiendascomida;
-					$tipoComida->where('estatus','1')->get();
-					if($tipoComida->exists()){
-						$i=1;
-						foreach ($tipoComida as $tip){
-							if($i==1){
-								$respuesta['tipo_comida']=$tip->nombre;
-							}else{
-								$respuesta['tipo_comida'].=', '.$tip->nombre;
-							}
-							$i++;
-						}
-					}
+					$respuesta['ruta_imagen']=$this->getImagenTienda($ti);
+					$respuesta['tipo_comida']=$this->getTiposComidaTienda($ti);
+					
 					if($ti->minimoordencant!=null){
 						$respuesta['min_cant']=$ti->minimoordencant;
 					}
@@ -249,46 +231,9 @@ class c_busqueda extends MX_Controller{
 						$respuesta['min_pre']=$ti->minimoordenprecio.'Bs';
 					}
 
-					$horario->clear();
-					$horario=$ti->horariosdespacho;
-					$hoy = mdate('%w',now());
-					$hora= strtotime(mdate('%H:%i:%s',now()));
-					$horario->where('estatus',1);
-					$horario->where('dia',$hoy)->get();
-					if($horario->exists()){
-						if($horario->tipohorario==0){
-							if( ( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) )  ){
-								$respuesta['imagen_horario']=base_url().'imagenes/abierto.png';
-							}else{
-								$respuesta['imagen_horario']=base_url().'imagenes/cerrado.png';
-							}
-						}elseif($horario->tipohorario==1){
-							if( (( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) ))
-							|| (( $hora >= strtotime($horario->horainicio2) )&&($hora <=strtotime($horario->horacierre2) ))){
-								$respuesta['imagen_horario']=base_url().'imagenes/abierto.png';
-							}else{
-								$respuesta['imagen_horario']=base_url().'imagenes/cerrado.png';
-							}
-						}else{
-							$respuesta['imagen_horario']=base_url().'imagenes/cerrado.png';
-						}
-					}else{
-						$respuesta['imagen_horario']='';
-					}
-					$tipoVenta->clear;
-					$tipoVenta= $ti->tiposventa;
-					$tipoVenta->where('estatus','1')->get();
-					if($tipoVenta->exists()){
-						$j=1;
-						foreach ($tipoVenta as $ven){
-							if($j==1){
-								$respuesta['tipo_venta']=$ven->nombre;
-							}else{
-								$respuesta['tipo_venta'].=', '.$ven->nombre;
-							}
-							$j++;
-						}
-					}
+					$respuesta['imagen_horario']=$this->getImagenHorario($ti);
+					$respuesta['tipo_venta']=$this->getTiposVentaTienda($ti);
+					
 					$arrtienda[]=$respuesta;
 				}
 				
@@ -387,82 +332,23 @@ class c_busqueda extends MX_Controller{
 			$sql.=' LIMIT '.$offset.' ,'.$this->config['per_page'];
 			$tiendas->query($sql);
 			if($tiendas->exists()){
-				$img= new Imagen() ;
-
-				$horario= new Horariosdespacho();
+			$img= new Imagen() ;
+			$horario= new Horariosdespacho();
 
 				foreach ($tiendas as $ti) {
 					$respuesta['tienda_id']=$ti->id;
 					$respuesta['nombre_tienda']=$ti->nombre;
-					$img->clear();
-					$img=$ti->imagen;
-					$img->where('estatus','1')->get();
-					if($img->exists()){
-						$respuesta['ruta_imagen']=base_url().$img->rutaImagen;
-					}else{
-						$respuesta['ruta_imagen']='';
-					}
-					$tipoComida->clear();
-					$tipoComida=$ti->tipotiendascomida;
-					$tipoComida->where('estatus','1')->get();
-					if($tipoComida->exists()){
-						$i=1;
-						foreach ($tipoComida as $tip){
-							if($i==1){
-								$respuesta['tipo_comida']=$tip->nombre;
-							}else{
-								$respuesta['tipo_comida'].=', '.$tip->nombre;
-							}
-							$i++;
-						}
-					}
+					$respuesta['ruta_imagen']=$this->getImagenTienda($ti);
+					$respuesta['tipo_comida']=$this->getTiposComidaTienda($ti);
 					if($ti->minimoordencant!=null){
 						$respuesta['min_cant']=$ti->minimoordencant;
 					}
 					if($ti->minimoordenprecio!=null){
 						$respuesta['min_pre']=$ti->minimoordenprecio.'Bs';
 					}
-
-					$horario->clear();
-					$horario=$ti->horariosdespacho;
-					$hoy = mdate('%w',now());
-					$hora= strtotime(mdate('%H:%i:%s',now()));
-					$horario->where('estatus',1);
-					$horario->where('dia',$hoy)->get();
-					if($horario->exists()){
-						if($horario->tipohorario==0){
-							if( ( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) )  ){
-								$respuesta['imagen_horario']=base_url().'imagenes/abierto.png';
-							}else{
-								$respuesta['imagen_horario']=base_url().'imagenes/cerrado.png';
-							}
-						}elseif($horario->tipohorario==1){
-							if( (( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) ))
-							|| (( $hora >= strtotime($horario->horainicio2) )&&($hora <=strtotime($horario->horacierre2) ))){
-								$respuesta['imagen_horario']=base_url().'imagenes/abierto.png';
-							}else{
-								$respuesta['imagen_horario']=base_url().'imagenes/cerrado.png';
-							}
-						}else{
-							$respuesta['imagen_horario']=base_url().'imagenes/cerrado.png';
-						}
-					}else{
-						$respuesta['imagen_horario']='';
-					}
-					$tipoVenta->clear;
-					$tipoVenta= $ti->tiposventa;
-					$tipoVenta->where('estatus','1')->get();
-					if($tipoVenta->exists()){
-						$j=1;
-						foreach ($tipoVenta as $ven){
-							if($j==1){
-								$respuesta['tipo_venta']=$ven->nombre;
-							}else{
-								$respuesta['tipo_venta'].=', '.$ven->nombre;
-							}
-							$j++;
-						}
-					}
+					$respuesta['imagen_horario']=$this->getImagenHorario($ti);
+					$respuesta['tipo_venta']=$this->getTiposVentaTienda($ti);
+					
 					$arrtienda[]=$respuesta;
 				}
 
@@ -475,6 +361,82 @@ class c_busqueda extends MX_Controller{
 		}else{
 			return null;
 		}
+	}
+	
+	function getImagenTienda($tienda) {
+		$img=$tienda->getImagen();
+		if($img !=false){
+			$respuesta=base_url().$img->rutaImagen;
+		}else{
+			$respuesta='';
+		}
+		return $respuesta;
+	}
+	
+	function getTiposVentaTienda($tienda){
+		$tipoVenta= $tienda->getTiposVenta();
+		if($tipoVenta!=false){
+			$i=1;
+			foreach ($tipoVenta as $ven){
+				if($i==1){
+					$respuesta=$ven->nombre;
+					$i++;
+				}else{
+					$respuesta .=','.$ven->nombre;
+				}
+				
+			}
+			return $respuesta;
+		}else{
+			return null;
+		}
+
+	}
+	
+	function getTiposComidaTienda($tienda) {
+	$tipoComida=$tienda->getTiposComida();
+		if($tipoComida!=false){
+			$i=1;
+			foreach ($tipoComida as $tip){
+				if($i==1){
+					$respuesta=$tip->nombre;
+					$i++;
+				}else{
+					$respuesta.=', '.$tip->nombre;
+				}
+			}
+			return $respuesta;
+		}else {
+			return null;
+		}
+	}
+	
+	function getImagenHorario($tienda){
+		$hoy = mdate('%w',now());
+		$hora= strtotime(mdate('%H:%i:%s',now()));
+		$horario=$tienda->getHorarioDia($hoy);
+
+		if($horario!=false){
+			if($horario->tipohorario==0){
+				if( ( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) )  ){
+					$respuesta=base_url().'imagenes/abierto.png';
+				}else{
+					$respuesta=base_url().'imagenes/cerrado.png';
+				}
+			}elseif($horario->tipohorario==1){
+				if( (( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) ))
+				|| (( $hora >= strtotime($horario->horainicio2) )&&($hora <=strtotime($horario->horacierre2) ))){
+					$respuesta=base_url().'imagenes/abierto.png';
+				}else{
+					$respuesta=base_url().'imagenes/cerrado.png';
+				}
+			}else{
+				$respuesta=base_url().'imagenes/cerrado.png';
+			}
+		}else{
+			$respuesta='';
+		}
+		return $respuesta;
 	}
 	
 	function cargarCiudad(){
@@ -547,6 +509,7 @@ class c_busqueda extends MX_Controller{
 		}
 
 	}
+	
 	function cargarZona($id_zona){
 		$zona = new Zona();
 		$zona->where('estatus','1');
