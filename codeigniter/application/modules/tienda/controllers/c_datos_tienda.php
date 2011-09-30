@@ -75,72 +75,74 @@
 		}
 		
 		function getHorarioTienda($tienda){
-			$horario=$tienda->horariosdespacho->where('estatus',1)->get(); 
+			$horario=$tienda->horariosdespacho->where('estatus',1)->get();
 			if($horario->exists()){
-				
+
 				foreach ($horario as $h) {
-					switch ($h->dia) {
-						case 0:
-							$respuesta[$h->dia]='DOMINGO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 1:
-							$respuesta[$h->dia]='LUNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 2:
-							$respuesta[$h->dia]='MARTES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 3:
-							$respuesta[$h->dia]='MIERCOLES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 4:
-							$respuesta[$h->dia]='JUEVES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 5:
-							$respuesta[$h->dia]='VIERNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 6:
-							$respuesta[$h->dia]='SABADO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						default:
-							;
-						break;
+
+					if($h->tipohorario==0){
+						switch ($h->dia) {
+							case 0:
+								$respuesta[$h->dia]='DOMINGO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+							case 1:
+								$respuesta[$h->dia]='LUNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+							case 2:
+								$respuesta[$h->dia]='MARTES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+							case 3:
+								$respuesta[$h->dia]='MIERCOLES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+							case 4:
+								$respuesta[$h->dia]='JUEVES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+							case 5:
+								$respuesta[$h->dia]='VIERNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+							case 6:
+								$respuesta[$h->dia]='SABADO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));
+								break;
+									
+						}
+					}elseif($h->tipohorario==1){
+						switch ($h->dia) {
+							case 0:
+								$respuesta[$h->dia]='DOMINGO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+							case 1:
+								$respuesta[$h->dia]='LUNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+							case 2:
+								$respuesta[$h->dia]='MARTES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+							case 3:
+								$respuesta[$h->dia]='MIERCOLES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+							case 4:
+								$respuesta[$h->dia]='JUEVES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+							case 5:
+								$respuesta[$h->dia]='VIERNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+							case 6:
+								$respuesta[$h->dia]='SABADO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1))
+								.'|'.mdate('%h:%i%a',strtotime($h->horainicio2)).'-'.mdate('%h:%i%a',strtotime($h->horacierre2));
+								break;
+						}
+							
 					}
-			
-				}
-			foreach ($horario as $h) {
-				if($h->tipohorario==0){	
-					switch ($h->dia) {
-						case 0:
-							$respuesta[$h->dia]='DOMINGO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 1:
-							$respuesta[$h->dia]='LUNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 2:
-							$respuesta[$h->dia]='MARTES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 3:
-							$respuesta[$h->dia]='MIERCOLES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 4:
-							$respuesta[$h->dia]='JUEVES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 5:
-							$respuesta[$h->dia]='VIERNES '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						case 6:
-							$respuesta[$h->dia]='SABADO '.mdate('%h:%i%a',strtotime($h->horainicio1)).'-'.mdate('%h:%i%a',strtotime($h->horacierre1));						
-						break;
-						default:
-							;
-						break;
-					}
-			
 				}
 			}
 			return $respuesta;
-		} 
-	
+		}
+
 	}
 	   
 ?>
