@@ -33,5 +33,30 @@ class Tiposventa extends DataMapper{
 			return $options;
 		}	
 	}
+	
+	function getTiendasById($id_tipoVenta){
+		$tipoVenta = new Tiposventa();
+		$tipoVenta->where('estatus',1)->get_by_id($id_tipoVenta);
+		if($tipoVenta->exists()){
+			$tienda =$tipoVenta->tiendascomida->where('estatus',1)->get();
+			if($tienda->exists()){
+				return $tienda;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+
+	function getTiendas(){
+		$tienda =$this->tiendascomida->where('estatus',1)->get();
+		if($tienda->exists()){
+			return $tienda;
+		}else{
+			return false;
+		}
+
+	}
 }	
 ?>

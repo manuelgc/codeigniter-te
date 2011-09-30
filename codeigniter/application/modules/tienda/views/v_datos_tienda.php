@@ -8,22 +8,22 @@
 
 <div class="tienda">
 <div >
-	<li class="cabecera_tienda" id="<?php echo $tienda['id'];?>">
+	<li class="cabecera_tienda" id="<?php echo $id;?>">
 			<div class="titulo_tienda" name="" width="70%">
-					 	<h2><span class="text"><?php echo $tienda['nombre'] ?>
+					 	<h2><span class="text"><?php echo $nombre ?>
 					 	</span></h3>
-						<span class="text"><?php echo $tienda['tipo_comida']?> </span><br>
-						<span class="text">Telefonos: <?php echo $tienda['telefono'];?></span><br>
-						<span class="text">Cant. Minima: <?php echo $tienda['min_cant'];?></span><br>
-						<span class="text">Gasto Minimo: <?php echo $tienda['min_cost'];?></span><br>
-						<span class="text"><?php echo $tienda['tipo_venta'];?></span><br>
+						<span class="text"><?php echo $tipo_comida?> </span><br>
+						<span class="text">Telefonos: <?php echo $telefono;?></span><br>
+						<span class="text">Cant. Minima: <?php echo $min_cant;?></span><br>
+						<span class="text">Gasto Minimo: <?php echo $min_cost;?></span><br>
+						<span class="text"><?php echo $tipo_venta;?></span><br>
 			</div>
 			<div class="imagenes_tienda" name="" width="30%">
 				<div>
-					<img src="<?php echo $tienda['imagen'];?>" class="">
+					<img src="<?php echo $imagen;?>" class="">
 				</div>
 				<div>
-					<img src="<?php echo base_url().'imagenes/cerrado.png';?>" class="">
+					<img src="<?php echo $imagen_horario;?>" class="">
 				</div>
 					
 			</div>			
@@ -54,11 +54,12 @@
 		</ul>
 	</div>
 	<div id="tab_info">		
-		<span class="text">Descripci&oacute;n: <?php echo $tienda['descripcion']?> </span><br>
-		<span class="text">Direcci&oacute;n: <?php echo $tienda['direccion']?> </span><br>
+		<span class="text">Descripci&oacute;n: <?php echo $descripcion?> </span><br>
+		<span class="text">Direcci&oacute;n: <?php echo $direccion?> </span><br>
 		<!--foreach motrar horarioa	-->
 		<span class="text">Horarios:</span><br>
-		<?php foreach ($tienda['horario'] as $value):?>
+		<?php foreach ($horario as $key => $value):?>
+			<span class="text"><?php echo $key ?></span>
 			<span class="text"><?php echo $value ?></span><br>
 		<?php endforeach;?>
 	</div>

@@ -51,6 +51,131 @@ class Tiendascomida extends DataMapper{
 			            'join_table' => 'tiendascomida_tiposventa'),		
 	);
 	
+	
+	function getTiposVentaById($id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){	
+			$tipoVenta =$tienda->tiposventa->where('estatus',1)->get();
+				if($tipoVenta->exists()){
+					return $tipoVenta;							
+				}else{
+					return false;	
+				}
+		}else{
+			return false;
+		}	
+	}
+	function getTiposVenta(){
+		$tipoVenta =$this->tiposventa->where('estatus',1)->get();
+			if($tipoVenta->exists()){
+				return $tipoVenta;							
+			}else{
+				return false;	
+			}
+	}
+	//$dia valor numerico entre 0 y 6 
+	
+	function getHorarioDia($dia){
+		$horario=$this->horariosdespacho;
+		$horario->where('estatus',1)
+				->where('dia',$dia)->get();	
+		if($horario->exists()){
+			return $horario;
+		}
+		else{ 
+			return false;
+		}	
+	}
+	function getHorarioDiabyId($dia,$id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){
+			$horario=$tienda->horariosdespacho;
+			$horario->where('estatus',1)
+			->where('dia',$dia)->get();
+			if($horario->exists()){
+				return $horario;
+			}
+			else{
+				return false;
+			}
+		}else {
+			return false;
+		}
+	}
+	function getHorarioCompleto(){
+		$horario=$this->horariosdespacho->where('estatus',1)->get();	
+		if($horario->exists()){
+			return $horario;
+		}
+		else{ 
+			return false;
+		}	
+	}
+	function getHorarioCompletobyId($dia,$id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){
+			$horario=$tienda->horariosdespacho->where('estatus',1)->get();
+			if($horario->exists()){
+				return $horario;
+			}
+			else{
+				return false;
+			}
+		}else {
+			return false;
+		}
+	}
+	
+	function getTiposComidaById($id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){	
+			$tipoComida =$tienda->tipotiendascomida->where('estatus',1)->get();
+				if($tipoComida->exists()){
+					return $tipoComida;							
+				}else{
+					return false;	
+				}
+		}else{
+			return false;
+		}	
+	}
+	
+	function getTiposComida(){
+		$tipoComida =$this->tipotiendascomida->where('estatus',1)->get();
+			if($tipoComida->exists()){
+				return $tipoComida;						
+			}else{
+				return false;	
+			}
+	}
+	function getImagen(){
+		$img=$this->imagen->where('estatus',1)->get();
+		if($img->exists()){
+			return $img;
+		}else {
+			return false;
+		}
+	}
+
+	function getImagenById($id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){
+			$img=$this->imagen->where('estatus',1)->get();
+			if($img->exists()){
+				return $img;
+			}else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+	
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}
