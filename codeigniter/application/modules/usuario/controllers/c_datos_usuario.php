@@ -7,16 +7,18 @@ class C_datos_usuario extends MX_Controller {
 		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion');
 		$this->load->helper('language');
 		$this->load->library('table');
+		$this->load->library('pagination');	
 		$this->load->module('busqueda/c_busqueda');	
 	}
 	
-	function index() {
+	function index($offset = '') {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));		
 
 		$data['output_header'] = $this->getDataPartial('header');		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');		
 		
+		//plantilla
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');				
@@ -25,12 +27,23 @@ class C_datos_usuario extends MX_Controller {
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
 		
+		//paginador
+		$limite = 2;
+		$config['base_url'] = site_url().'/usuario/c_datos_usuario/index/';
+		$config['total_rows'] = $this->getCantPedidos();
+		$config['per_page'] = $limite; 
+		$config['uri_segment'] = 4;
+		
+		$this->pagination->initialize($config);
+
+		$data['link_pag'] = $this->pagination->create_links();
+		
 		$data['datos_usuario'] = $this->getDatosUsuario();
 		$data['dir_usuario'] = $this->getDireccionesUsuario();
 		$data['estados_pedido'] = $this->cargarEstadosPedido();
 		$data['tipo_ped'] = $this->cargarTipoPedido();
 		$data['ped_fecha'] = $this->cargarPedidosFecha();
-		$pedidos = $this->cargarPedidos();
+		$pedidos = $this->cargarPedidos($limite,$offset);
 		$this->table->set_heading('Tienda de Comida', 'Cantidad Total del Pedido', 'Estado del Pedido','Precio Total');
 		$data['lista_ped'] = $this->table->generate($pedidos);
 		$this->template->build('v_datos_cliente',$data);
@@ -93,10 +106,15 @@ class C_datos_usuario extends MX_Controller {
 		return $options;
 	}
 	
-	function cargarPedidos() {
+	function cargarPedidos($limit,$offset) {
 		$pedidos_usuario = new Pedido();
-		$resultado = $pedidos_usuario->getPedidosUsuario(2);
+		$resultado = $pedidos_usuario->getPedidosUsuario(2,$limit,$offset);
 		return $resultado;
+	}
+	
+	function getCantPedidos() {
+		$p = new Pedido();
+		return $p->getCantPedUsuario(2); //$this->id_usuario
 	}
 }
 ?>

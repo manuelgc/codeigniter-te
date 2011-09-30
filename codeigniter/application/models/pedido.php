@@ -41,14 +41,15 @@ class Pedido extends DataMapper{
 		parent::__construct($id);		
 	}
 	
-	function getPedidosUsuario($id_usuario) {
+	function getPedidosUsuario($id_usuario, $limit = '', $offset = '') {
 		$u = new Usuario();
 		$arr_pedidos = array();
 		$contador = 0;	
 		$u->where('estatus',1);
 		$u->where('id',$id_usuario);
-		$u->get();		
-		$u->pedido->where('estatus',1)->get();
+		$u->get();				
+		$u->pedido->where('estatus',1)->limit($limit,$offset)->get();
+						
 		//$u->pedido->order_by('horaPedido','asc');						
 		foreach ($u->pedido->get() as $fila_pedid_user) {					
 			$arr_pedidos[$contador]['ruta_img'] = img(base_url().$fila_pedid_user->tiendascomida->get()->imagen->get()->rutaImagen);
@@ -59,6 +60,18 @@ class Pedido extends DataMapper{
 		}		
 		
 		return $arr_pedidos;
+	}
+	
+	function getCantPedUsuario($id_usuario, $filtro = array()) {
+		if (empty($filtro)) {
+			$u = new Usuario();
+			$arr_pedidos = array();
+			$contador = 0;	
+			$u->where('estatus',1);
+			$u->where('id',$id_usuario);
+			$u->get();												
+			return $u->pedido->where('estatus',1)->count();
+		}
 	}
 }	
 ?>

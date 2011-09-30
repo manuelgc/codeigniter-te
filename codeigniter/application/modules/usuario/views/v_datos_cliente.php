@@ -91,6 +91,7 @@
 			<p class="error" id="error-filtro"></p>
 			<?php echo form_close();?>
 			<?php echo $lista_ped;?>
+			<?php echo $link_pag;?>
 		</div>
 	</div>
 
