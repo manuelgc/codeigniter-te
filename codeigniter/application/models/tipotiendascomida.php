@@ -9,6 +9,7 @@ var $table = 'tipotiendascomida';
 			            'join_other_as' => 'tiendascomida',		
 			            'join_table' => 'tiendascomida_tipotiendascomida')
 	);
+	
 	function getTiendasById($id_tipoComida){
 		$tipoComida = new Tipotiendascomida();
 		$tipoComida->where('estatus',1)->get_by_id($id_tipoComida);

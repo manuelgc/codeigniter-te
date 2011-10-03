@@ -10,7 +10,8 @@ class Estado extends DataMapper {
             'other_field' => 'estado'),
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
-            'other_field' => 'estado'),
+            'other_field' => 'estado',
+			'join_self_as' => 'estados'),
 	'direccionesentrega'=> array(
             'class' => 'direccionesentrega',
             'other_field' => 'estado'));
