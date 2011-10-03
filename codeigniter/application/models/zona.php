@@ -12,7 +12,8 @@ class Zona extends DataMapper{
             'other_field' => 'zona'),
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
-            'other_field' => 'zona'),
+            'other_field' => 'zona',
+			'join_self_as' => 'zonas'),
 	'direccionesentrega'=> array(
             'class' => 'direccionesentrega',
             'other_field' => 'zona'));

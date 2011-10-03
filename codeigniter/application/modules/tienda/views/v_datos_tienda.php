@@ -35,7 +35,10 @@
 	</ul>
 	<div id="tab_menu">
 		<!--Foreach para categoria-->
-		<h3>Categoria plato</h2>
+		<?php 
+		if(is_array($menu)){
+		foreach ($menu as $value):?>
+		<h3><?php echo $value;?></h3>
 		<ul>
 		<!--Foreach para platos-->
 			
@@ -52,16 +55,25 @@
 				</a>
 			</li>
 		</ul>
+		<?php endforeach;
+		}else{?>
+			<span class="text"><?php echo $menu ?></span><br>
+		<?php }//end else?>
+		
 	</div>
 	<div id="tab_info">		
 		<span class="text">Descripci&oacute;n: <?php echo $descripcion?> </span><br>
 		<span class="text">Direcci&oacute;n: <?php echo $direccion?> </span><br>
 		<!--foreach motrar horarioa	-->
 		<span class="text">Horarios:</span><br>
-		<?php foreach ($horario as $key => $value):?>
+		<?php if(is_array($horario)){
+		 foreach ($horario as $key => $value):?>
 			<span class="text"><?php echo $key ?></span>
 			<span class="text"><?php echo $value ?></span><br>
-		<?php endforeach;?>
+		<?php endforeach;
+		}else{?>
+			<span class="text"><?php echo $horario ?></span><br>
+		<?php }//end else?>
 	</div>
 </div>
 

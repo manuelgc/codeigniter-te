@@ -4,7 +4,8 @@ class Categoriaplato extends Datamapper{
 	var $has_many = array(
 	'plato'=> array(
             'class' => 'plato',
-            'other_field' => 'categoriaplato')
+            'other_field' => 'categoriaplato',
+			'join_self_as' => 'categoriaplatos')
 
 	);
 	

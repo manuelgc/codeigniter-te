@@ -171,11 +171,9 @@ class c_busqueda extends MX_Controller{
 		//Busqueda por Tipo de Comida
 		if($this->input->post('categoria')!=''){
 			$tiendas->clear();		
-			$tipoComida->get_by_id($this->input->post('categoria'));
-			$tipoComida;
-			$tiendas=$tipoComida->tiendascomida;
-			$tiendas->where('estatus','1')->get();
-			if($tiendas->exists()){
+			$tiendas=$tipoComida->getTiendasById($this->input->post('categoria'));
+			if($tiendas!=false){
+				echo 'paso IF tcomida ';
 				$sql .=", tiendascomida_tipotiendascomida AS tipoC";
 				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$this->input->post('categoria')." ";
 				$where .="AND tipoC.estatus=1 ";
@@ -189,11 +187,8 @@ class c_busqueda extends MX_Controller{
 		//Busqueda por Tipo de Venta
 		if($this->input->post('tipo_orden')!=''){
 			$tiendas->clear();		
-			$tipoVenta->get_by_id($this->input->post('tipo_orden'));
-			$tipoVenta->where('estatus','1');
-			$tiendas=$tipoVenta->tiendascomida;
-			$tiendas->where('estatus','1')->get();
-			if($tiendas->exists()){
+			$tiendas=$tipoVenta->getTiendasById($this->input->post('tipo_orden'));;	
+			if($tiendas!=false){
 				$sql .=", tiendascomida_tiposventa AS tipoV";
 				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$this->input->post('tipo_orden')." ";
 				$where .="AND tipoV.estatus=1 ";
@@ -292,11 +287,8 @@ class c_busqueda extends MX_Controller{
 		//Busqueda por Tipo de Comida
 		if($categoria!=''){
 			$tiendas->clear();
-			$tipoComida->get_by_id($categoria);
-			$tipoComida->where('estatus','1');
-			$tiendas=$tipoComida->tiendascomida;
-			$tiendas->where('estatus','1')->get();
-			if($tiendas->exists()){
+			$tiendas=$tipoComida->getTiendasById($categoria);
+			if($tiendas!=false){
 				$sql .=", tiendascomida_tipotiendascomida AS tipoC";
 				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$categoria." ";
 				$where .="AND tipoC.estatus=1 ";
@@ -308,11 +300,8 @@ class c_busqueda extends MX_Controller{
 		//Busqueda por Tipo de Venta
 		if($orden!=''){
 			$tiendas->clear();
-			$tipoVenta->get_by_id($orden);
-			$tipoVenta->where('estatus','1');
-			$tiendas=$tipoVenta->tiendascomida;
-			$tiendas->where('estatus','1')->get();
-			if($tiendas->exists()){
+			$tiendas=$tipoVenta->getTiendasById($orden);;
+			if($tiendas!=false){
 				$sql .=", tiendascomida_tiposventa AS tipoV";
 				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$orden." ";
 				$where .="AND tipoV.estatus=1 ";

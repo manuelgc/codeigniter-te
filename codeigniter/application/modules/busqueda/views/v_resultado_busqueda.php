@@ -3,24 +3,31 @@
 <ul class="restaurantes">
 	<?php 
 	if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}
+	echo form_open('tienda/c_datos_tienda',array('id' => 'frm_result_busqueda'));
 	foreach ($restaurantes as $value):
 	 if(is_array($value)){?>
+			 
 		<li class="bloque-restaurante" id="<?php echo $value['tienda_id'];?>">
+		<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $value['tienda_id'];?>" />
 			<div class="titulo_restaurant" name="" width="100%">
 					<p>
-						<a name="<?php echo $value['tienda_id'];?>" onclick="" href=""></a>
-				    	<a><span class=""><?php echo $value['nombre_tienda']; ?></span></a>
+<!--						<a name="<?php echo $value['tienda_id'];?>" onclick="" href=""></a>-->
+<!--				    	<a>-->
+				    		<h3><span class="text" ><?php echo $value['nombre_tienda']; ?></span></h3>
+<!--				    	</a>-->
 					</p>
 			</div>
 			<div width="80%">
 				<div class="cont_imagen" name="" height="80%">
-					<a rel="" href="">
+<!--					<a rel="" href="">-->
 						<img src="<?php echo $value['ruta_imagen'];?>" class="">
-					</a>
+<!--					</a>-->
 				</div>
 				<div class="cont_boton" name="" height="20%">
-					<input id="btn_buscar" , class="button_text art-button"
-					type="button" name="btn_ordenar" value="Ordenar" />
+				
+					
+					<input id="btn_ordenar" , class="button_text art-button"
+					type="submit" name="btn_ordenar" value="Ordenar" />
 				</div>
 			</div>	
 			<div class="descrip_restaurant">
@@ -45,7 +52,7 @@
 	
 	<?php }//end if interno
 	endforeach;
-		
+	echo form_close();	
 	if(isset($paginas_link)){echo $paginas_link;}
 	}//end else externo
 	?>	

@@ -16,8 +16,12 @@ class C_datos_tienda extends MX_Controller{
 		//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
-		$data=$this->getDatosTienda(1);
-		$this->template->build('v_datos_tienda',$data);
+//		$this->getPlatos();
+		if($this->input->post('id_tienda')){
+			$data=$this->getDatosTienda($this->input->post('id_tienda'));
+			$this->template->build('v_datos_tienda',$data);
+		}
+		
 	}
 
 	function getDatosTienda($id) {
@@ -32,18 +36,37 @@ class C_datos_tienda extends MX_Controller{
 			$arrTienda['min_cant'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:'Sin limite';
 			$arrTienda['min_cost'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:'Sin limite';
 			$arrTienda['descripcion'] = $tienda->descripcion;
-			$arrTienda['direccion'] = $tienda->direccion;
+			$arrTienda['direccion'] = $tienda->direccion.'. '.$tienda->getCiudad()->nombreCiudad.', Estado '.$tienda->getEstado()->nombreEstado;
 			$arrTienda['imagen'] = base_url().$tienda->imagen->where('estatus',1)->get()->rutaImagen;
 			$arrTienda['tipo_comida'] = $this->getTiposComidaTienda($tienda);
 			$arrTienda['tipo_venta']=$this->getTiposVentaTienda($tienda);
 			$arrTienda['horario']=$this->getHorarioTienda($tienda);
 			$arrTienda['imagen_horario']=$this->getImagenHorario($tienda);
+			$arrTienda['menu']=$this->getPlatosPorCategoria($tienda);
 			return $arrTienda;
 		}else{
 			return false;
 		}
 	}
-	
+	function getPlatosPorCategoria($tienda){
+		$categoria=$tienda->getCategoriaPlato();
+		$plato=$tienda->getPlatos();
+		if($categoria!=false && $plato!=false){
+			foreach ($categoria as $cat) {
+				$respuesta[$cat->id]=$cat->nombre;
+				print_r($respuesta);
+			}
+		}else {
+			$respuesta='No hay platos registrados para esta tienda';
+		}
+		
+//		$categoria->check_last_query();
+//		foreach ($categoria as $value) {
+//			echo 'categoria: '.$value->nombre.'<br>';
+//		}
+		return $respuesta;
+		
+	}
 	function getTiposVentaTienda($tienda){
 		$tipoVenta= $tienda->getTiposVenta();
 		if($tipoVenta!=false){
@@ -113,7 +136,7 @@ class C_datos_tienda extends MX_Controller{
 	function getHorarioTienda($tienda){
 		$horario=$tienda->getHorarioCompleto();
 		
-		if($horario->exists()){
+		if($horario!=false){
 			foreach ($horario as $h) {
 
 				switch ($h->dia) {
@@ -191,6 +214,8 @@ class C_datos_tienda extends MX_Controller{
 				}
 					
 			}
+		}else{
+			$respuesta='No hay horarios registrados para esta tienda';
 		}
 		return $respuesta;
 	}

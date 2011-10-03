@@ -16,7 +16,8 @@ class Ciudad extends DataMapper{
 			'join_self_as' => 'ciudades'),
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
-            'other_field' => 'ciudad'),
+            'other_field' => 'ciudad',
+			'join_self_as' => 'ciudades'),
 	'direccionesentrega'=> array(
             'class' => 'direccionesentrega',
             'other_field' => 'ciudad'));
