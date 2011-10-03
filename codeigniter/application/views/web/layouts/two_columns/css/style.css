@@ -1978,3 +1978,9 @@ li.bloque-restaurante{
 	float: left;
 }
 /* fin breadcumb */
+
+ul.link li{
+	float: left;
+	margin: 4px;
+	height: 5px; 
+}

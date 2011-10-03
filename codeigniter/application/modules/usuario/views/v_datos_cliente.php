@@ -1,7 +1,20 @@
 <script>
+function preCargador(){
+	$('.content-pedidos').block({
+		message: 'Cargando ...'		
+	});
+}
+
+function cargarTablaPed(html){
+	window.setTimeout( function(){
+		$('div.content-pedidos').html(html.lista_ped);
+		$('ul.link').html(html.link_pag);
+	}, 1000)
+}
 	$(function() {
 		$( "#tabs" ).tabs();
-
+		$("#popup").hide();
+		
 		$("#form-filtro-pedidos").submit(function(){
 			if($("#estados_ped").val() == '' && $("#tipo_ped").val() == '' && $("#ped_fecha").val() == ''){
 				$('p#error-filtro').empty().append('Debes seleccionar algun valor para filtrar tu busqueda').show('fast');
@@ -11,6 +24,71 @@
 					var estado_ped = $('#estados_ped').val();					
 				}
 			}
+		});
+
+		$('ul.link > li a').live('click', function(e){
+			e.preventDefault();
+			var vinculo = $(this).attr('href');
+			//console.log(vinculo);
+			
+			 $.ajax({
+				url: vinculo,
+				type: 'GET',
+				dataType: 'json',
+				beforeSend: function(data){
+					preCargador();
+				},				
+				success: function (data) {					
+					cargarTablaPed(data);
+				}				
+			});			
+		});
+
+		$('img.mas-info-pedido').live('click',function(e){			
+			e.preventDefault();
+			var id_pedido = $(this).attr('alt');
+
+			$.get('<?php echo base_url()?>index.php/usuario/c_datos_usuario/getPedidoPorId/'+id_pedido,										
+					function(data){
+						/*var salida = '<table id="datos-pedido-usuario">';
+						salida += '<tr>'+data.direccion_envio_ciudad+'</tr>';
+						salida += '</table>';*/						
+						var salida = '';
+						salida += '<p> Fecha del pedido: '+data.fecha_pedido+' '+data.hora_pedido+'</p>';
+						salida += '<p> Cantidad total del pedido: '+data.cantidad+'</p>';
+						salida += '<p> Estado del pedido: '+data.estado_pedido+'</p>';
+						salida += '<p> Restaurante: '+data.tienda_comida+'</p>';
+						salida += '<p> Tipo de venta: '+data.tipo_venta+'</p>';
+						salida += '<p> Ciudad: '+data.direccion_envio_ciudad+'</p>';
+						salida += '<p> Zona: '+data.direccion_envio_zona+'</p>';
+						salida += '<p> Calle/Carrera: '+data.direccion_envio_calle+'</p>';
+						salida += '<p> Casa/Urb: '+data.direccion_envio_casa+'</p>';
+						salida += '<p> Lugar de referencia: '+data.direccion_envio_lugarref+'</p>';
+						salida += '<p> Subtotal: '+data.subtotal+'</p>';
+						salida += '<p> Iva: '+data.iva+'</p>';
+						salida += '<p> Total: '+data.total+'</p>';
+						
+						//$('#popup').show();
+						//$('#popup').append(salida);
+						$('#popup').dialog({
+							width:600,
+							title:'Pedido',
+							height: 500,
+							modal:true,
+							show:"blind",
+							hide:"explode",							
+							create:function(){
+								$(this).append(salida);
+							},
+							beforeClose:function(){
+								$(this).html('');
+							}							
+						});						
+				},
+				'json'
+			);
+			
+			//$('#popup').html(id_pedido).show();			
 		});
 	});
 	</script>
@@ -90,11 +168,16 @@
 			</ul>
 			<p class="error" id="error-filtro"></p>
 			<?php echo form_close();?>
+			<div class="content-pedidos">
 			<?php echo $lista_ped;?>
+			</div>
+			<ul class="link">
 			<?php echo $link_pag;?>
+			</ul>
 		</div>
 	</div>
 
 </div>
+<div id="popup"></div>
 <!-- End demo -->
 <?php }?>
