@@ -4,7 +4,9 @@ class Tiposventa extends DataMapper{
 	var $has_many = array(
 	'pedido'=> array(
             'class' => 'pedido',
-            'other_field' => 'tiposventa'),
+            'other_field' => 'tiposventa',
+			'join_other_as' => 'tipoventa',
+			'join_self_as' => 'tipoventa'),
 	'tiendascomida'=> array(
 						'class'=>'tiendascomida',
 						'other_field' => 'tiposventa',		
