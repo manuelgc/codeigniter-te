@@ -16,7 +16,7 @@ class C_datos_tienda extends MX_Controller{
 		//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
-//		$this->getPlatos();
+
 		if($this->input->post('id_tienda')){
 			$data=$this->getDatosTienda($this->input->post('id_tienda'));
 			$this->template->build('v_datos_tienda',$data);
@@ -48,36 +48,37 @@ class C_datos_tienda extends MX_Controller{
 			return false;
 		}
 	}
+	
 	function getPlatosPorCategoria($tienda){
 		$categoria=$tienda->getCategoriaPlato();
-		$plato=$tienda->getPlatos();
+		$plato=$tienda->getPlatosArreglo();
 		if($categoria!=false && $plato!=false){
-			$arrPlato= array();
+				
 			foreach ($categoria as $cat) {
-				$i=0;
-				foreach ($plato as $p){
-					if($p->categoriaplatos_id==$cat->id){
-						
-						$arrPlato[$p->id]['id']=$p->id;
-						$arrPlato[$p->id]['nombre']=$p->nombre;
-						$arrPlato[$p->id]['precio']=$p->precio;
-					}
-					$i++;
+				$arrPlato= array();
+				$iterador= current($plato);
+				while (($iterador!=false) && ($iterador['categoriaplatos_id']==$cat->id)) {
+					$arrPlato[$iterador['id']]['nombre']=$iterador['nombre'];
+					$arrPlato[$iterador['id']]['precio']=$iterador['precio'];
+					$arrPlato[$iterador['id']]['descripcion']=$iterador['descripcion'];
+					$arrPlato[$iterador['id']]['tamano']=$iterador['tamano'];
+					$arrPlato[$iterador['id']]['descuento']=$iterador['descuento'];
+					$arrPlato[$iterador['id']]['estatus']=$iterador['estatus'];
+					$arrPlato[$iterador['id']]['categoriaplatos_id']=$iterador['categoriaplatos_id'];
+					$arrPlato[$iterador['id']]['tiendacomida_id']=$iterador['tiendacomida_id'];
+					next($plato);
+					$iterador= current($plato);
+
 				}
-			$respuesta[$cat->nombre]=$arrPlato;	
+				$respuesta[$cat->nombre]=$arrPlato;
 			}
 		}else {
 			$respuesta='No hay platos registrados para esta tienda';
 		}
-		
-//		$categoria->check_last_query();
-//		foreach ($categoria as $value) {
-//			echo 'categoria: '.$value->nombre.'<br>';
-//		}
-		print_r($respuesta);
 		return $respuesta;
-		
+
 	}
+	
 	function getTiposVentaTienda($tienda){
 		$tipoVenta= $tienda->getTiposVenta();
 		if($tipoVenta!=false){

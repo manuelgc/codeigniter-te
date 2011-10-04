@@ -16,8 +16,8 @@ class c_busqueda extends MX_Controller{
 		$this->config['per_page'] = 1;
 		$this->config['num_links'] = 5;
 		$this->config['uri_segment'] = 4;
-//		$this->config['first_link'] = '<<';
-//		$this->config['last_link'] = '>>';
+		$this->config['first_link'] = '<<';
+		$this->config['last_link'] = '>>';
 		
 	}
 	function index() {

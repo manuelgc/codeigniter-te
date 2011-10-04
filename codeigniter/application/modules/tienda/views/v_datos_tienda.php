@@ -41,11 +41,11 @@
 		<h3><?php echo $categoia;?></h3>
 		<ul>
 
-			<?php foreach ($plato as $p):?>	
+			<?php foreach ($plato as $id => $p):?>	
 				<li>
-					<a name="<?php echo $p['id'];?>" onclick="" href="">
-						<span class="text"><?php echo $p['nombre']?> </span>
-						<span class="text"><?php echo $p['precio']?> </span>
+					<a name="<?php echo $id;?>" onclick="" href="">
+						<span class="text"><?php echo $p['nombre'];?> </span>
+						<span class="text"><?php echo $p['precio'];?> Bs. </span>
 					</a>
 				</li>
 			<?php endforeach;?>	
