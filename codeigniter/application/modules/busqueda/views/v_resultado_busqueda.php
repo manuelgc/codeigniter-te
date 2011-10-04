@@ -1,4 +1,8 @@
+<style>
+<!--
 
+-->
+</style>
 <?php if(isset($mensaje_error)){ echo '<p>'.$mensaje_error.'</p>';}else{?>
 <ul class="restaurantes">
 	<?php 

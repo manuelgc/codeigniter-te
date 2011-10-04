@@ -268,7 +268,27 @@ class Tiendascomida extends DataMapper{
 			return false;
 		}
 	}
-
+	function getPlatosArreglo(){
+		$plato=$this->plato->where('estatus',1)->order_by('categoriaplatos_id asc,nombre asc')->get();
+		if($plato->exists()){
+			foreach ($plato as $p) {
+				$respuesta[$p->id]['id']=$p->id;
+				$respuesta[$p->id]['nombre']=$p->nombre;
+				$respuesta[$p->id]['precio']=$p->precio;
+				$respuesta[$p->id]['descripcion']=$p->descripcion;
+				$respuesta[$p->id]['tamano']=$p->tamano;
+				$respuesta[$p->id]['descuento']=$p->descuento;
+				$respuesta[$p->id]['estatus']=$p->estatus;
+				$respuesta[$p->id]['categoriaplatos_id']=$p->categoriaplatos_id;
+				$respuesta[$p->id]['tiendacomida_id']=$p->tiendacomida_id;
+				
+			}
+			
+			return $respuesta;
+		}else {
+			return false;
+		}
+	}
 	function getPlatosById($id_tienda){
 		$tienda = new Tiendascomida();
 		$tienda->where('estatus',1)->get_by_id($id_tienda);
@@ -289,7 +309,7 @@ class Tiendascomida extends DataMapper{
 		$categoria = new Categoriaplato();
 		$plato=$this->plato->select('categoriaplatos_id as "id"')->distinct()->where('estatus',1)->get();
 		if ($plato->exists()){
-			$categoria->where('estatus',1)->where_in('id',$plato)->order_by('nombre asc')->get();
+			$categoria->where('estatus',1)->where_in('id',$plato)->get();
 			if($categoria->exists()){
 				return $categoria;
 			}else {
@@ -309,7 +329,7 @@ class Tiendascomida extends DataMapper{
 			$categoria = new Categoriaplato();
 			$plato=$tienda->plato->select('categoriaplatos_id as "id"')->distinct()->where('estatus',1)->get();
 			if ($plato->exists()){
-				$categoria->where('estatus',1)->where_in('id',$plato)->order_by('nombre asc')->get();
+				$categoria->where('estatus',1)->where_in('id',$plato)->get();
 				if($categoria->exists()){
 					return $categoria;
 				}else {
