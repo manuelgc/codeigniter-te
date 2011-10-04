@@ -37,23 +37,19 @@
 		<!--Foreach para categoria-->
 		<?php 
 		if(is_array($menu)){
-		foreach ($menu as $value):?>
-		<h3><?php echo $value;?></h3>
+		foreach ($menu as $categoia => $plato):?>
+		<h3><?php echo $categoia;?></h3>
 		<ul>
-		<!--Foreach para platos-->
-			
-			<li>
-				<a name="<?php echo 'id plato';?>" onclick="" href="">
-					<span class="text"><?php echo ' nombre_plato1'?> </span>
-					<span class="text"><?php echo ' precio_plato1'?> </span>
-				</a>
-			</li>
-			<li>
-				<a name="<?php echo 'id plato';?>" onclick="" href="">
-					<span class="text"><?php echo ' nombre_plato2'?> </span>
-					<span class="text"><?php echo ' precio_plato2'?> </span>
-				</a>
-			</li>
+
+			<?php foreach ($plato as $p):?>	
+				<li>
+					<a name="<?php echo $p['id'];?>" onclick="" href="">
+						<span class="text"><?php echo $p['nombre']?> </span>
+						<span class="text"><?php echo $p['precio']?> </span>
+					</a>
+				</li>
+			<?php endforeach;?>	
+
 		</ul>
 		<?php endforeach;
 		}else{?>

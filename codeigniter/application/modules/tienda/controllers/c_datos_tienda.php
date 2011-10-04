@@ -52,9 +52,19 @@ class C_datos_tienda extends MX_Controller{
 		$categoria=$tienda->getCategoriaPlato();
 		$plato=$tienda->getPlatos();
 		if($categoria!=false && $plato!=false){
+			$arrPlato= array();
 			foreach ($categoria as $cat) {
-				$respuesta[$cat->id]=$cat->nombre;
-				print_r($respuesta);
+				$i=0;
+				foreach ($plato as $p){
+					if($p->categoriaplatos_id==$cat->id){
+						
+						$arrPlato[$p->id]['id']=$p->id;
+						$arrPlato[$p->id]['nombre']=$p->nombre;
+						$arrPlato[$p->id]['precio']=$p->precio;
+					}
+					$i++;
+				}
+			$respuesta[$cat->nombre]=$arrPlato;	
 			}
 		}else {
 			$respuesta='No hay platos registrados para esta tienda';
@@ -64,6 +74,7 @@ class C_datos_tienda extends MX_Controller{
 //		foreach ($categoria as $value) {
 //			echo 'categoria: '.$value->nombre.'<br>';
 //		}
+		print_r($respuesta);
 		return $respuesta;
 		
 	}
