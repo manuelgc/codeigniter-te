@@ -52,10 +52,10 @@ class Pedido extends DataMapper{
 		$arr_pedido['fecha_pedido'] = $p->fechaPedido;
 		$arr_pedido['hora_pedido'] = $p->horaPedido;
 		$arr_pedido['cantidad'] = $p->cantidad;
-		$arr_pedidos['subtotal'] = $p->subtotal;
+		$arr_pedido['subtotal'] = $p->subtotal;		
 		$arr_pedido['iva'] = $p->iva;
-		$arr_pedidos['total'] = $p->total;
-		$arr_pedidos['descuento'] = $p->descuento;
+		$arr_pedido['total'] = $p->total;
+		$arr_pedido['descuento'] = $p->descuento;
 		$arr_pedido['estado_pedido'] = $p->estadospedido->get()->nombre;
 		$arr_pedido['tienda_comida'] = $p->tiendascomida->get()->nombre;
 		$arr_pedido['tipo_venta'] = $p->tiposventa->get()->nombre;

@@ -12,8 +12,7 @@ function cargarTablaPed(html){
 	}, 1000)
 }
 	$(function() {
-		$( "#tabs" ).tabs();
-		$("#popup").hide();
+		$( "#tabs" ).tabs();				
 		
 		$("#form-filtro-pedidos").submit(function(){
 			if($("#estados_ped").val() == '' && $("#tipo_ped").val() == '' && $("#ped_fecha").val() == ''){
@@ -47,6 +46,7 @@ function cargarTablaPed(html){
 		$('img.mas-info-pedido').live('click',function(e){			
 			e.preventDefault();
 			var id_pedido = $(this).attr('alt');
+			var popup = $('#popup');
 
 			$.get('<?php echo base_url()?>index.php/usuario/c_datos_usuario/getPedidoPorId/'+id_pedido,										
 					function(data){
@@ -67,28 +67,26 @@ function cargarTablaPed(html){
 						salida += '<p> Subtotal: '+data.subtotal+'</p>';
 						salida += '<p> Iva: '+data.iva+'</p>';
 						salida += '<p> Total: '+data.total+'</p>';
-						
-						//$('#popup').show();
-						//$('#popup').append(salida);
-						$('#popup').dialog({
+
+						popup.html(salida).dialog({
 							width:600,
 							title:'Pedido',
 							height: 500,
 							modal:true,
 							show:"blind",
-							hide:"explode",							
-							create:function(){
-								$(this).append(salida);
-							},
-							beforeClose:function(){
-								$(this).html('');
-							}							
-						});						
+							hide:"explode",
+							buttons:{
+								'Reordenar' : function(){
+									$(location).attr('href','<?php echo base_url();?>index.php/carrito/c_orden/'+id_pedido);
+								},
+								'Cerrar' : function(){
+									$(this).dialog('close');
+								}
+							}
+						}).dialog('open');										
 				},
 				'json'
-			);
-			
-			//$('#popup').html(id_pedido).show();			
+			);					
 		});
 	});
 	</script>
