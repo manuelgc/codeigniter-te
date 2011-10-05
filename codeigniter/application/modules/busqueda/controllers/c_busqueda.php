@@ -10,7 +10,7 @@ class c_busqueda extends MX_Controller{
 		$this->load->library('qtip2');
 		$this->load->helper('url');
 		$this->load->library('pagination');		
-		$this->load->library('table');	
+		$this->load->helper('cookie');	
 		$this->form_validation->CI =& $this;
 		$this->config['base_url'] = site_url().'/busqueda/c_busqueda/index/';
 		$this->config['per_page'] = 2;
@@ -52,10 +52,26 @@ class c_busqueda extends MX_Controller{
 
 		if ($this->input->post('campo_busqueda')) {
 			
-			$this->session->set_userdata('ciudad',$this->input->post('ciudad'));
-			$this->session->set_userdata('zona',$this->input->post('zona'));
-			$this->session->set_userdata('categoria',$this->input->post('categoria'));
-			$this->session->set_userdata('orden',$this->input->post('tipo_orden'));
+			$cookie_ciudad = array(
+					'name' => 'ciudad',
+					'value' => $this->input->post('ciudad'),
+					'expire' => 0);
+			$cookie_zona = array(
+					'name' => 'zona',
+					'value' => $this->input->post('zona'),
+					'expire' => 0);
+			$cookie_categoria = array(
+					'name' => 'categoria',
+					'value' => $this->input->post('categoria'),
+					'expire' => 0); 
+			$cookie_tipo_orden = array(
+					'name' => 'tipo_orden',
+					'value' => $this->input->post('tipo_orden'),
+					'expire' => 0);
+			$this->input->set_cookie($cookie_ciudad);
+			$this->input->set_cookie($cookie_zona);
+			$this->input->set_cookie($cookie_categoria);
+			$this->input->set_cookie($cookie_tipo_orden);
 			
 			if($this->buscarTiendaSql()!=null){
 				
@@ -77,13 +93,13 @@ class c_busqueda extends MX_Controller{
 				$this->cargarVistaResulados($data);
 
 			}else{
-				$this->session->unset_userdata('ciudad');
-				$this->session->unset_userdata('zona');
-				$this->session->unset_userdata('categoria');
-				$this->session->unset_userdata('orden');
+				delete_cookie('ciudad');
+				delete_cookie('zona');
+				delete_cookie('categoria');
+				delete_cookie('tipo_orden');
 				
 				$data['mensaje_error']='Lo sentimos la busqueda no obtuvo ningun resultado.';
-				
+
 				if($this->input->post('ciudad')!=''){
 					$arrCombo['zona']=$this->cargarZona($this->input->post('ciudad'));
 				}
@@ -96,14 +112,12 @@ class c_busqueda extends MX_Controller{
 				
 				$this->cargarVistaResulados($data);
 			}
-//		}elseif ($this->session->userdata('ciudad')!=false || $this->session->userdata('zona')!=false || $this->session->userdata('categoria')!=false || $this->session->userdata('orden')!=false ){
+
 		}elseif ($this->input->is_ajax_request()){ 	
-			echo 'get:'.$this->input->get('orden').'<br>';
-			$data['restaurantes']=$this->construirHtml($this->buscarTiendaPagina($this->session->userdata('ciudad'),$this->session->userdata('zona'),$this->session->userdata('categoria'),$this->session->userdata('orden'),$offset));				
+			$data['restaurantes']=$this->construirHtml($this->
+			buscarTiendaPagina($this->input->cookie('ciudad'),$this->input->cookie('zona'),$this->input->cookie('categoria'),$this->input->cookie('tipo_orden'),$offset));				
 			$this->pagination->initialize($this->config);
 			$data['paginas_link']= $this->pagination->create_links();
-
-//			$this->cargarVistaResulados($data);
 			echo json_encode($data);
 		}
 
