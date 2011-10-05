@@ -1,13 +1,44 @@
-<style>
+<script type="text/javascript">
 <!--
+function preCargador(){
+	$('.content-restaurantes').block({
+		message: 'Cargando ...'		
+	});
+}
 
--->
-</style>
+function cargarListaRest(html){
+	window.setTimeout( function(){
+//		alert(html.restaurantes);
+		console.log(html.restaurantes);
+		console.log(html.paginas_link);
+		$('ul.restaurantes').html(html.restaurantes);
+		$('ul.link-pag').html(html.paginas_link);
+	}, 1000)
+}
+$('ul.link-pag > li a').live('click', function(e){
+	e.preventDefault();
+	var vinculo = $(this).attr('href');
+	//console.log(vinculo);
+	
+	 $.ajax({
+		url: vinculo,
+		type: 'GET',
+		dataType: 'json',
+		beforeSend: function(data){
+//			preCargador();
+		},				
+		success: function (data) {					
+			cargarListaRest(data);
+		}				
+	});			
+});
+//-->
+</script>
 <?php if(isset($mensaje_error)){ echo '<p>'.$mensaje_error.'</p>';}else{?>
+<div class="content-restaurantes">
 <ul class="restaurantes">
-	<?php 
-	if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}
-	echo form_open('tienda/c_datos_tienda',array('id' => 'frm_result_busqueda'));
+	<?php if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}?>
+	<?php echo form_open('tienda/c_datos_tienda',array('id' => 'frm_result_busqueda'));
 	foreach ($restaurantes as $value):
 	 if(is_array($value)){?>
 			 
@@ -15,17 +46,12 @@
 		<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $value['tienda_id'];?>" />
 			<div class="titulo_restaurant" name="" width="100%">
 					<p>
-<!--						<a name="<?php echo $value['tienda_id'];?>" onclick="" href=""></a>-->
-<!--				    	<a>-->
-				    		<h3><span class="text" ><?php echo $value['nombre_tienda']; ?></span></h3>
-<!--				    	</a>-->
+				    	<h3><span class="text" ><?php echo $value['nombre_tienda']; ?></span></h3>
 					</p>
 			</div>
 			<div width="80%">
 				<div class="cont_imagen" name="" height="80%">
-<!--					<a rel="" href="">-->
 						<img src="<?php echo $value['ruta_imagen'];?>" class="">
-<!--					</a>-->
 				</div>
 				<div class="cont_boton" name="" height="20%">
 				
@@ -56,8 +82,10 @@
 	
 	<?php }//end if interno
 	endforeach;
-	echo form_close();	
-	if(isset($paginas_link)){echo $paginas_link;}
-	}//end else externo
-	?>	
-</ul>
+	echo form_close();?>
+	</ul >
+	<?php }//end else externo?>		
+</div>
+<ul class="link-pag">	
+	<?php if(isset($paginas_link)){echo $paginas_link;}?>
+</ul >	
