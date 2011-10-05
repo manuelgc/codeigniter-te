@@ -69,7 +69,7 @@ class Pedido extends DataMapper{
 		return $arr_pedido;
 	}
 	
-	function getPedidosUsuario($id_usuario, $limit = '', $offset = '') {
+	function getPedidosUsuario($id_usuario, $limit = '', $offset = '',$ordenacion = 'fechaPedido desc, horaPedido desc') {
 		$u = new Usuario();
 		$arr_pedidos = array();
 		$contador = 0;
@@ -77,7 +77,7 @@ class Pedido extends DataMapper{
 		$u->where('id',$id_usuario);
 		$u->get();
 		
-		foreach ($u->pedido->where('estatus',1)->limit($limit,$offset)->get() as $fila_pedid_user) { //$u->pedido->get()
+		foreach ($u->pedido->where('estatus',1)->order_by($ordenacion)->get($limit,$offset) as $fila_pedid_user) { //$u->pedido->get()					
 			$arr_pedidos[$contador]['ruta_img'] = img(base_url().$fila_pedid_user->tiendascomida->get()->imagen->get()->rutaImagen);
 			$arr_pedidos[$contador]['cant'] = $fila_pedid_user->cantidad;
 			$arr_pedidos[$contador]['nombre'] = $fila_pedid_user->estadospedido->get()->nombre;
@@ -86,21 +86,52 @@ class Pedido extends DataMapper{
 														'src' => base_url().'application/img/icon/Add-icon.png',
 														'alt' => $fila_pedid_user->id,
 														'class' => "mas-info-pedido"));
+			$arr_pedidos[$contador]['reordenar'] = anchor('carrito/c_orden/'.$fila_pedid_user->id,
+													img(base_url().'application/img/arrow_double.png'),
+													array('title' => 'start'));
 			$contador++;
 		}
 
 		return $arr_pedidos;
 	}
 
-	function getCantPedUsuario($id_usuario, $filtro = array()) {
-		if (empty($filtro)) {
-			$u = new Usuario();
+	function getPedidoPorParam($parametros_pedido = array(),$parametros_usuario = array(),$limit = '',$offset = '',$ordenacion = 'fechaPedido desc, horaPedido desc') {
+		if (empty($parametros_pedido) || empty($parametros_usuario)) {
+			return FALSE;
+		}else{
 			$arr_pedidos = array();
-			$contador = 0;
-			$u->where('estatus',1);
-			$u->where('id',$id_usuario);
+			$u = new Usuario();
+			$u->where($parametros_usuario);
 			$u->get();
+			$contador = 0;
+			foreach ($u->pedido->where($parametros_pedido)->order_by($ordenacion)->get($limit,$offset) as $fila_pedid_user) {									
+				$arr_pedidos[$contador]['ruta_img'] = img(base_url().$fila_pedid_user->tiendascomida->get()->imagen->get()->rutaImagen);
+				$arr_pedidos[$contador]['cant'] = $fila_pedid_user->cantidad;
+				$arr_pedidos[$contador]['nombre'] = $fila_pedid_user->estadospedido->get()->nombre;
+				$arr_pedidos[$contador]['total'] = $fila_pedid_user->total;
+				$arr_pedidos[$contador]['mas_info'] = img(array(
+														'src' => base_url().'application/img/icon/Add-icon.png',
+														'alt' => $fila_pedid_user->id,
+														'class' => "mas-info-pedido"));
+				$arr_pedidos[$contador]['reordenar'] = anchor('carrito/c_orden/'.$fila_pedid_user->id,
+													img(base_url().'application/img/arrow_double.png'),
+													array('title' => 'start'));
+				$contador++;
+			}			
+			return $arr_pedidos;
+		}
+	}
+	
+	function getCantPedUsuario($id_usuario, $filtro = array()) {
+		$u = new Usuario();
+		$u->where('estatus',1);
+		$u->where('id',$id_usuario);
+		$u->get();
+		if (empty($filtro)) {										
 			return $u->pedido->where('estatus',1)->count();
+		}else {						
+			$resultado = $u->pedido->where($filtro)->count();			
+			return $resultado;						 
 		}
 	}
 }

@@ -28,8 +28,22 @@ function cargarTablaPed(html){
 		$('ul.link > li a').live('click', function(e){
 			e.preventDefault();
 			var vinculo = $(this).attr('href');
-			//console.log(vinculo);
-			
+			var oculto_url = $('#oculto_url').val();
+
+			console.log('antes de: '+vinculo);
+			if(oculto_url == 'processFiltro'){				
+				if ($('#estados_ped').val() == ''){
+					vinculo += '/'+'0';
+				}else{
+					vinculo += '/'+$('#estados_ped').val();
+				}
+				if ($('#tipo_ped').val() == ''){
+					vinculo += '/'+'0';
+				}else{
+					vinculo += '/'+$('#tipo_ped').val();
+				}						
+			}			
+			console.log('despues de: '+vinculo);
 			 $.ajax({
 				url: vinculo,
 				type: 'GET',
@@ -135,25 +149,35 @@ function cargarTablaPed(html){
 			<?php echo anchor('usuario/c_editar_direccion','Agregar Direccion','class="button_text art-button"');?>
 		</div>
 		<div id="pedidos">
-		<?php echo form_open('usuario/filtrarBusqueda','id="form-filtro-pedidos"',array('reordenar' => '0'));?>
-			<ul class="content-form-pedido">
-
+		<?php echo form_open('usuario/c_datos_usuario/processFiltro','id="form-filtro-pedidos"',array('reordenar' => '1'));?>
+			<ul class="content-form-pedido">				
 				<li id="li-estados_ped" class="item-pedido-usuario"><label class="description"
 					for="estados_ped">Estado del Pedido </label>
 					<div>
-					<?php echo form_dropdown('estados_ped',$estados_pedido,'','class="element select medium" id="estados_ped"');?>
+					<?php					
+					echo form_dropdown('estados_ped',
+										$estados_pedido,
+										($this->input->post('estados_ped')) ? $this->input->post('estados_ped') : '',
+										'class="element select medium" id="estados_ped"');
+					?>
 					</div>
 				</li>
 				<li id="li-tipo_ped" class="item-pedido-usuario"><label class="description"
 					for="tipo_ped">Tipo de Pedido </label>
 					<div>
-					<?php echo form_dropdown('tipo_ped',$tipo_ped,'','class="element select medium" id="tipo_ped"');?>
+					<?php echo form_dropdown('tipo_ped',
+											$tipo_ped,
+											($this->input->post('tipo_ped')) ? $this->input->post('tipo_ped') : '',
+											'class="element select medium" id="tipo_ped"');?>
 					</div>
 				</li>
 				<li id="li-ped_fecha" class="item-pedido-usuario"><label class="description"
 					for="ped_fecha">Fecha de Pedido </label>
 					<div>
-					<?php echo form_dropdown('ped_fecha',$ped_fecha,'','class="element select medium" id="ped_fecha"');?>
+					<?php echo form_dropdown('ped_fecha',
+											$ped_fecha,
+											($this->input->post('ped_fecha')) ? $this->input->post('ped_fecha') : '',
+											'class="element select medium" id="ped_fecha"');?>
 					</div>
 				</li>
 
