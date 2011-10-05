@@ -13,16 +13,29 @@ class c_busqueda extends MX_Controller{
 		$this->load->library('table');	
 		$this->form_validation->CI =& $this;
 		$this->config['base_url'] = site_url().'/busqueda/c_busqueda/index/';
-		$this->config['per_page'] = 1;
+		$this->config['per_page'] = 2;
 		$this->config['num_links'] = 5;
 		$this->config['uri_segment'] = 4;
 		$this->config['first_link'] = '<<';
 		$this->config['last_link'] = '>>';
+		$this->config['next_tag_open'] = '<li>';
+		$this->config['next_tag_close'] = '</li>';
+		$this->config['prev_tag_open'] = '<li>';
+		$this->config['prev_tag_close'] = '</li>';
+		$this->config['num_tag_open'] = '<li>';
+		$this->config['num_tag_close'] = '</li>';
+		$this->config['cur_tag_open'] = '<li>';
+		$this->config['cur_tag_close'] = '</li>';
+		$this->config['first_tag_open'] = '<li>';
+		$this->config['first_tag_close'] = '</li>';
+		$this->config['last_tag_open'] = '<li>';
+		$this->config['last_tag_close'] = '</li>';
 		
 	}
-	function index() {
+	function index($offset = '') {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
+		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery.blockUI.js'));
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip('li','select');
 				
@@ -83,25 +96,15 @@ class c_busqueda extends MX_Controller{
 				
 				$this->cargarVistaResulados($data);
 			}
-		}elseif ($this->session->userdata('ciudad')!=false || $this->session->userdata('zona')!=false || $this->session->userdata('categoria')!=false || $this->session->userdata('orden')!=false ){
-				
-				$data['restaurantes']=$this->buscarTiendaPagina($this->session->userdata('ciudad'),$this->session->userdata('zona'),$this->session->userdata('categoria'),$this->session->userdata('orden'),$this->uri->segment(4));
-				
-				if($this->session->userdata('ciudad')!=''){
-					$arrCombo['zona']=$this->cargarZona($this->session->userdata('ciudad'));
-				}
-				$arrCombo['select_ciudad']= $this->session->userdata('ciudad');
-				$arrCombo['select_zona']  = $this->session->userdata('zona');
-				$arrCombo['select_categoria']= $this->session->userdata('categoria');
-				$arrCombo['select_orden']= $this->session->userdata('orden');
-				
-				$data['opcion_combos']=$arrCombo;
-											
-				$this->pagination->initialize($this->config);
-				$data['paginas_link']= $this->pagination->create_links();
-				
-				$this->cargarVistaResulados($data);
+//		}elseif ($this->session->userdata('ciudad')!=false || $this->session->userdata('zona')!=false || $this->session->userdata('categoria')!=false || $this->session->userdata('orden')!=false ){
+		}elseif ($this->input->is_ajax_request()){ 	
+			echo 'get:'.$this->input->get('orden').'<br>';
+			$data['restaurantes']=$this->construirHtml($this->buscarTiendaPagina($this->session->userdata('ciudad'),$this->session->userdata('zona'),$this->session->userdata('categoria'),$this->session->userdata('orden'),$offset));				
+			$this->pagination->initialize($this->config);
+			$data['paginas_link']= $this->pagination->create_links();
 
+//			$this->cargarVistaResulados($data);
+			echo json_encode($data);
 		}
 
 		return $arrCombo;
@@ -350,6 +353,36 @@ class c_busqueda extends MX_Controller{
 		}else{
 			return null;
 		}
+	}
+	
+	function construirHtml($datos){
+		$respuesta='';
+		if(isset($datos['mensaje'])){
+			$respuesta.='<p>'.$datos['mensaje'].'</p>';
+		}
+		$respuesta.= form_open('tienda/c_datos_tienda',array('id' => 'frm_result_busqueda'));
+		foreach ($datos as $value){
+	 		if(is_array($value)){
+	 			$respuesta.='<li class="bloque-restaurante" id="'.$value['tienda_id'].'">';
+				$respuesta.='<input id="id_tienda" name="id_tienda" type="hidden" value="'.$value['tienda_id'].'" />';
+				$respuesta.='<div class="titulo_restaurant" name="" width="100%">';
+				$respuesta.='<p><h3><span class="text" > '.$value['nombre_tienda'].'</span></h3></p></div>';
+		    	$respuesta.='<div width="80%">';
+		    	$respuesta.='<div class="cont_imagen" name="" height="80%">';
+				$respuesta.='<img src="'.$value['ruta_imagen'].'" class=""></div>';
+				$respuesta.='<div class="cont_boton" name="" height="20%">';
+				$respuesta.='<input id="btn_ordenar" , class="button_text art-button" type="submit" name="btn_ordenar" value="Ordenar" /></div></div>';
+				$respuesta.='<div class="descrip_restaurant">';
+				$respuesta.='<div><img src="'.$value['imagen_horario'].'" class=""></div>';
+				$respuesta.='<div><p class="">'.$value['tipo_comida'].'</p></div>';
+				$respuesta.='<div><p>Cant. Minima: '.$value['min_cant'].'</p></div>';
+				$respuesta.='<div><p>Gasto Minimo: '.$value['min_pre'].'</p></div>';
+				$respuesta.='<div><p class="">'.$value['tipo_venta'].'</p></div></div></li>';
+	 			
+	 		}	
+		}
+		$respuesta.=form_close();
+		return $respuesta;	
 	}
 	
 	function getImagenTienda($tienda) {
