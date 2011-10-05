@@ -124,7 +124,7 @@ if ( ! function_exists('form_open_multipart'))
  */
 if ( ! function_exists('form_hidden'))
 {
-	function form_hidden($name, $value = '', $recursing = FALSE)
+	function form_hidden($name, $value = '', $recursing = FALSE, $id = FALSE)
 	{
 		static $form;
 
@@ -144,7 +144,7 @@ if ( ! function_exists('form_hidden'))
 
 		if ( ! is_array($value))
 		{
-			$form .= '<input type="hidden" name="'.$name.'" value="'.form_prep($value, $name).'" />'."\n";
+			$form .= '<input type="hidden" id="'.($id ? $id : $name).'" name="'.$name.'" value="'.form_prep($value, $name).'" />'."\n";
 		}
 		else
 		{
@@ -332,7 +332,7 @@ if ( ! function_exists('form_dropdown'))
 		$form = '<select name="'.$name.'"'.$extra.$multiple.">\n";
 		
 		if ($item_seleccione == 0) {
-			$form .= '<option value="" selected="selected">Seleccione</option>';
+			$form .= '<option value="">Seleccione</option>';
 		}
 		foreach ($options as $key => $val)
 		{
