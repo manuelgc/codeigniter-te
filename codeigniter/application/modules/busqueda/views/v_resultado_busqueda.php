@@ -1,6 +1,6 @@
 <script type="text/javascript">
 <!--
-function preCargador(){
+function Cargador(){
 	$('.content-restaurantes').block({
 		message: 'Cargando ...'		
 	});
@@ -8,29 +8,42 @@ function preCargador(){
 
 function cargarListaRest(html){
 	window.setTimeout( function(){
-//		alert(html.restaurantes);
-		console.log(html.restaurantes);
-		console.log(html.paginas_link);
+		if (typeof html.zona == "undefined"){
+			$("#cmb_zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);	
+		}else{
+			$(".combo-zona").html(html.zona);
+		}				
+		
+		$("#cmb_ciudad").attr("value",html.select_ciudad);
+		$("#cmb_zona").attr("value",html.select_zona);
+		$("#cmb_categoria").attr("value",html.select_categoria);
+		$("#cmb_tipo_orden").attr("value",html.select_orden);
 		$('ul.restaurantes').html(html.restaurantes);
 		$('ul.link-pag').html(html.paginas_link);
+
+		$('.content-restaurantes').unblock();
+		
 	}, 1000)
 }
-$('ul.link-pag > li a').live('click', function(e){
-	e.preventDefault();
-	var vinculo = $(this).attr('href');
-	//console.log(vinculo);
-	
-	 $.ajax({
-		url: vinculo,
-		type: 'GET',
-		dataType: 'json',
-		beforeSend: function(data){
-//			preCargador();
-		},				
-		success: function (data) {					
-			cargarListaRest(data);
-		}				
-	});			
+$(function() {
+	$('ul.link-pag > li.li-pag a').live('click', function(e){
+		e.preventDefault();
+		var vinculo = $(this).attr('href')+"/busqueda";
+		//console.log(vinculo);
+		
+		 $.ajax({
+			url: vinculo,
+			type: 'GET',
+			dataType: 'json',
+			beforeSend: function(data){
+				Cargador();
+			},				
+			success: function (data) {					
+				cargarListaRest(data);
+				
+			}				
+		});			
+	});
 });
 //-->
 </script>

@@ -8,11 +8,6 @@ class C_home extends MX_Controller {
 		$this->partial_respuesta == FALSE;
 		//$this->load->module('banner_principal/c_banner_principal');
 		$this->load->module('busqueda/c_busqueda');	
-			
-		$this->session->unset_userdata('ciudad');
-		$this->session->unset_userdata('zona');
-		$this->session->unset_userdata('categoria');
-		$this->session->unset_userdata('orden');
 	
 	}
 		

@@ -1,7 +1,7 @@
 <script type="text/javascript">
 <!--
 $(document).ready(function(){
-	$("#element_1").change(	
+	$("#cmb_ciudad").change(	
 		function(event){	
 		event.preventDefault();
 		var id_ciudad = $(this).val();
@@ -10,20 +10,20 @@ $(document).ready(function(){
 				{'id_ciudad':id_ciudad},
 				function(data){
 					if(data.zona!='0'){
-					$("#element_2").empty().append(data.zona).attr("disabled",false);
+					$("#cmb_zona").empty().append(data.zona).attr("disabled",false);
 					}else{
-						$("#element_2").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
+						$("#cmb_zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
 						alert("La ciudad seleccionada no tiene zonas registtradas");
 						}
 				},
 				'json'
 			);
 		}else{
-			$("#element_2").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
+			$("#cmb_zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
 		}	
 	});
 	$("#frm_busqueda").submit(function() {
-		if(($("#element_1").val() == '') && ($("#element_2").val() == '') && ($("#element_3").val() == '') &&($("#element_4").val() == '')){
+		if(($("#cmb_ciudad").val() == '') && ($("#cmb_zona").val() == '') && ($("#cmb_categoria").val() == '') &&($("#cmb_tipo_orden").val() == '')){
 
 			$('#error_combos_vacios').empty().append('Debe seleccionar al menos 1 criterio de busqueda').show();	
 			return false;	
@@ -45,27 +45,29 @@ $(document).ready(function(){
 </div>
 <ul>
 
-	<li id="li_1"><?php echo lang('busqueda_ciudad','element_1','description');?>
-	<div><?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],$opcion_combos['select_ciudad'],'id=element_1 class="element text medium"'); ?>
+	<li id="li_1"><?php echo lang('busqueda_ciudad','cmb_ciudad','description');?>
+	<div><?php echo form_dropdown('ciudad',$opcion_combos['ciudad'],$opcion_combos['select_ciudad'],'id=cmb_ciudad class="element text medium"'); ?>
 	<small class="guidelines" id="guide_1">Seleciona la ciudad donde te en
 	cuentras</small></div>
 
 	</li>
-	<li id="li_2"><?php echo lang('busqueda_zona','element_2','description');?>
-	<div><?php 
+	<li id="li_2"><?php echo lang('busqueda_zona','cmb_zona','description');?>
+	<div class="combo-zona"><?php 
 	$disb=(sizeof($opcion_combos['zona'])==0)?'disabled="disabled"':'';
-	echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=element_2 class="element text medium" '.$disb);?>
+	echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=cmb_zona class="element text medium" '.$disb);?>
+	</div>
 	<small class="guidelines" id="guide_2">Seleciona la zona donde te en
-	cuentras</small></div>
+	cuentras</small>
 
 	</li>
-	<li id="li_3"><?php echo lang('busqueda_categoria','element_3','description');?>
-	<div><?php echo form_dropdown('categoria',$opcion_combos['categoria'],$opcion_combos['select_categoria'],'id=element_3 class="element text medium"'); ?>
+	<li id="li_3"><?php echo lang('busqueda_categoria','cmb_categoria','description');?>
+	<div>
+	<?php echo form_dropdown('categoria',$opcion_combos['categoria'],$opcion_combos['select_categoria'],'id=cmb_categoria class="element text medium"'); ?>
 	<small class="guidelines" id="guide_3">Seleciona el tipo de comida</small>
 	</div>
 	</li>
-	<li id="li_4"><?php echo lang('busqueda_tipo_orden','element_4','description');?>
-	<div><?php echo form_dropdown('tipo_orden',$opcion_combos['orden'],$opcion_combos['select_orden'],'id=element_4 class="element text medium"'); ?>
+	<li id="li_4"><?php echo lang('busqueda_tipo_orden','cmb_tipo_orden','description');?>
+	<div><?php echo form_dropdown('tipo_orden',$opcion_combos['orden'],$opcion_combos['select_orden'],'id=cmb_tipo_orden class="element text medium"'); ?>
 	<small class="guidelines" id="guide_4">Seleciona el tipo de orden</small>
 	</div>
 	</li>

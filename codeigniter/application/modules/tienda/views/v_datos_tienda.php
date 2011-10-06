@@ -1,6 +1,20 @@
 <script>
 	$(function() {
 		$( "#tabs_tienda" ).tabs();
+		$(".a-plato").click(function(event){	
+			event.preventDefault();
+			var id_tienda = $(this).val();
+			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/validarAbierto",
+					{'id_tienda':id_tienda},
+					function(data){
+						if(!data.abierto){
+							alert("Tienda cerrada")
+						}
+					},
+					'json'
+				);
+				
+		});
 	});
 </script>
 
@@ -43,7 +57,7 @@
 
 			<?php foreach ($plato as $id => $p):?>	
 				<li>
-					<a name="<?php echo $id;?>" onclick="" href="">
+					<a class="a-plato" name="<?php echo $id;?>" value="<?php echo $id;?>" href="">
 						<span class="text"><?php echo $p['nombre'];?> </span>
 						<span class="text"><?php echo $p['precio'];?> Bs. </span>
 					</a>
@@ -60,7 +74,6 @@
 	<div id="tab_info">		
 		<span class="text">Descripci&oacute;n: <?php echo $descripcion?> </span><br>
 		<span class="text">Direcci&oacute;n: <?php echo $direccion?> </span><br>
-		<!--foreach motrar horarioa	-->
 		<span class="text">Horarios:</span><br>
 		<?php if(is_array($horario)){
 		 foreach ($horario as $key => $value):?>
