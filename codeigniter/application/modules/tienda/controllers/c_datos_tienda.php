@@ -12,7 +12,7 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
-		//$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
+//		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
 		//$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
@@ -78,6 +78,38 @@ class C_datos_tienda extends MX_Controller{
 		return $respuesta;
 
 	}
+	
+	function validarAbierto(){
+		$tienda = new Tiendascomida();
+		$hoy = mdate('%w',now());
+		$hora= strtotime(mdate('%H:%i:%s',now()));
+		$horario=$tienda->getHorarioDiaById($hoy,$this->input->post('id_tienda'));
+
+		if($horario!=false){
+			if($horario->tipohorario==0){
+				if( ( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) )  ){
+					$respuesta=true;
+				}else{
+					$respuesta=false;
+				}
+			}elseif($horario->tipohorario==1){
+				if( (( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) ))
+				|| (( $hora >= strtotime($horario->horainicio2) )&&($hora <=strtotime($horario->horacierre2) ))){
+					$respuesta=true;
+				}else{
+					$respuesta=false;
+				}
+			}else{
+				$respuesta=false;
+			}
+		}else{
+			$respuesta=false;
+		}
+		$data['abierto']=$respuesta;
+		
+		echo json_encode($data); 
+	}
+	
 	
 	function getTiposVentaTienda($tienda){
 		$tipoVenta= $tienda->getTiposVenta();

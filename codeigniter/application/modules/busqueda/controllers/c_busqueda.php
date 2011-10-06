@@ -13,29 +13,31 @@ class c_busqueda extends MX_Controller{
 		$this->load->helper('cookie');	
 		$this->form_validation->CI =& $this;
 		$this->config['base_url'] = site_url().'/busqueda/c_busqueda/index/';
-		$this->config['per_page'] = 2;
-		$this->config['num_links'] = 5;
+		$this->config['per_page'] = 1;
+		$this->config['num_links'] = 1;
 		$this->config['uri_segment'] = 4;
 		$this->config['first_link'] = '<<';
 		$this->config['last_link'] = '>>';
-		$this->config['next_tag_open'] = '<li>';
+		$this->config['next_tag_open'] = '<li class="li-pag">';
 		$this->config['next_tag_close'] = '</li>';
-		$this->config['prev_tag_open'] = '<li>';
+		$this->config['prev_tag_open'] = '<li class="li-pag">';
 		$this->config['prev_tag_close'] = '</li>';
-		$this->config['num_tag_open'] = '<li>';
+		$this->config['num_tag_open'] = '<li class="li-pag">';
 		$this->config['num_tag_close'] = '</li>';
-		$this->config['cur_tag_open'] = '<li>';
+		$this->config['cur_tag_open'] = '<li class="li-pag">';
 		$this->config['cur_tag_close'] = '</li>';
-		$this->config['first_tag_open'] = '<li>';
+		$this->config['first_tag_open'] = '<li class="li-pag">';
 		$this->config['first_tag_close'] = '</li>';
-		$this->config['last_tag_open'] = '<li>';
+		$this->config['last_tag_open'] = '<li class="li-pag">';
 		$this->config['last_tag_close'] = '</li>';
 		
 	}
-	function index($offset = '') {
+	function index($offset = '',$desde ='') {
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/view.js'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery.blockUI.js'));
+//		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
+//		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip('li','select');
 				
@@ -73,9 +75,11 @@ class c_busqueda extends MX_Controller{
 			$this->input->set_cookie($cookie_categoria);
 			$this->input->set_cookie($cookie_tipo_orden);
 			
-			if($this->buscarTiendaSql()!=null){
+			$resultado=$this->buscarTiendaSql($this->input->post('ciudad'),$this->input->post('zona'),$this->input->post('categoria'),$this->input->post('tipo_orden'),$offset);
+			
+			if($resultado!=null){
 				
-				$data['restaurantes']=$this->buscarTiendaSql();
+				$data['restaurantes']=$resultado;
 				
 				if($this->input->post('ciudad')!=''){
 					$arrCombo['zona']=$this->cargarZona($this->input->post('ciudad'));
@@ -93,10 +97,6 @@ class c_busqueda extends MX_Controller{
 				$this->cargarVistaResulados($data);
 
 			}else{
-				delete_cookie('ciudad');
-				delete_cookie('zona');
-				delete_cookie('categoria');
-				delete_cookie('tipo_orden');
 				
 				$data['mensaje_error']='Lo sentimos la busqueda no obtuvo ningun resultado.';
 
@@ -113,12 +113,21 @@ class c_busqueda extends MX_Controller{
 				$this->cargarVistaResulados($data);
 			}
 
-		}elseif ($this->input->is_ajax_request()){ 	
-			$data['restaurantes']=$this->construirHtml($this->
-			buscarTiendaPagina($this->input->cookie('ciudad'),$this->input->cookie('zona'),$this->input->cookie('categoria'),$this->input->cookie('tipo_orden'),$offset));				
+		}elseif ($this->input->is_ajax_request() && ($desde=='busqueda' || $offset=='busqueda')){  	
+			
+			if($this->input->cookie('ciudad')){
+					$data['zona']=form_dropdown('zona',$this->cargarZona($this->input->cookie('ciudad')),null,'id=cmb_zona class="element text medium" ');
+			}
+			$data['select_ciudad']= ($this->input->cookie('ciudad'))?$this->input->cookie('ciudad'):'';
+			$data['select_zona']  = ($this->input->cookie('zona'))?$this->input->cookie('zona'):'';
+			$data['select_categoria']= ($this->input->cookie('categoria'))?$this->input->cookie('categoria'):'';
+			$data['select_orden']= ($this->input->cookie('tipo_orden'))?$this->input->cookie('tipo_orden'):'';
+	
+			$data['restaurantes']=$this->construirHtml($this->buscarTiendaSql($this->input->cookie('ciudad'),$this->input->cookie('zona'),$this->input->cookie('categoria'),$this->input->cookie('tipo_orden'),(($offset=='busqueda')?0:$offset)));				
 			$this->pagination->initialize($this->config);
 			$data['paginas_link']= $this->pagination->create_links();
 			echo json_encode($data);
+		
 		}
 
 		return $arrCombo;
@@ -139,128 +148,8 @@ class c_busqueda extends MX_Controller{
 
 		$this->template->build('v_resultado_busqueda',$data);
 	}
-	function  buscarTiendaSql(){
-
-		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
-		$where=" WHERE tienda.estatus=1 ";
-		$tiendas = new Tiendascomida();
-		$tipoComida = new Tipotiendascomida();
-		$tipoVenta = new Tiposventa();
-		$arrtienda = array();
-		$respuesta = array();
-		$sw=false;
-		$bool_ciudad=false;
-		$bool_zona=false;
-		$bool_categoria=false;
-		$bool_venta=false;
-		
-		//Busqueda por ciudad
-		if($this->input->post('ciudad')!=''){
-			$tiendas->clear();		
-			$tiendas->where('ciudades_id',$this->input->post('ciudad'));
-			$tiendas->where('estatus','1')->get();
-			if($tiendas->exists()){
-				$sql .=", direccionesentrega AS dir";
-				$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$this->input->post('ciudad')." ";
-				$where .="AND dir.estatus=1 ";
-				$bool_ciudad=true;
-			}else{
-				$arrtienda['mesaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
-			}
-			
-
-			//Busqueda por zona
-			if($this->input->post('zona')!=''){
-				$tiendas->clear();		
-				$tiendas->where('zonas_id',$this->input->post('zona'));
-				$tiendas->where('estatus','1')->get();
-				if($tiendas->exists()){
-					$where .="AND dir.zonas_id =".$this->input->post('zona')." ";
-					$bool_zona=true;
-				}else{
-				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
-				}	
-			}
-			$sw=true;
-			
-		}
-
-		//Busqueda por Tipo de Comida
-		if($this->input->post('categoria')!=''){
-			$tiendas->clear();		
-			$tiendas=$tipoComida->getTiendasById($this->input->post('categoria'));
-			if($tiendas!=false){
-				echo 'paso IF tcomida ';
-				$sql .=", tiendascomida_tipotiendascomida AS tipoC";
-				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$this->input->post('categoria')." ";
-				$where .="AND tipoC.estatus=1 ";
-				$bool_categoria=true;
-			}else{
-				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
-			}
-			$sw=true;
-		}
-
-		//Busqueda por Tipo de Venta
-		if($this->input->post('tipo_orden')!=''){
-			$tiendas->clear();		
-			$tiendas=$tipoVenta->getTiendasById($this->input->post('tipo_orden'));;	
-			if($tiendas!=false){
-				$sql .=", tiendascomida_tiposventa AS tipoV";
-				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$this->input->post('tipo_orden')." ";
-				$where .="AND tipoV.estatus=1 ";
-				$bool_venta=true;
-			}else{
-				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
-			}
-			$sw=true;
-				
-		}
-
-		if (($bool_ciudad || $bool_zona || $bool_venta || $bool_categoria) && $sw){
-			$tiendas->clear();
-			$sql.=$where.'GROUP BY tienda.id ORDER BY tienda.nombre';
-			$tiendas->query($sql);
-			$this->config['total_rows']=$tiendas->result_count();
-			$tiendas->clear();
-			$sql.=' LIMIT '.$this->config['per_page'];
-			$tiendas->query($sql);
-			if($tiendas->exists()){
-				$img= new Imagen() ;
-				
-				$horario= new Horariosdespacho();
-				
-				foreach ($tiendas as $ti) {
-					$respuesta['tienda_id']=$ti->id;
-					$respuesta['nombre_tienda']=$ti->nombre;
-					$respuesta['ruta_imagen']=$this->getImagenTienda($ti);
-					$respuesta['tipo_comida']=$this->getTiposComidaTienda($ti);
-					
-					if($ti->minimoordencant!=null){
-						$respuesta['min_cant']=$ti->minimoordencant;
-					}
-					if($ti->minimoordenprecio!=null){
-						$respuesta['min_pre']=$ti->minimoordenprecio.'Bs';
-					}
-
-					$respuesta['imagen_horario']=$this->getImagenHorario($ti);
-					$respuesta['tipo_venta']=$this->getTiposVentaTienda($ti);
-					
-					$arrtienda[]=$respuesta;
-				}
-				
-
-				return $arrtienda;
-			}else {
-				return null;
-			}
-
-		}else{
-			return null;
-		}
-	}
     
-	function  buscarTiendaPagina($ciudad,$zona,$categoria,$orden,$offset){
+	function  buscarTiendaSql($ciudad,$zona,$categoria,$orden,$offset){
 
 		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
 		$where=" WHERE tienda.estatus=1 ";
@@ -285,6 +174,8 @@ class c_busqueda extends MX_Controller{
 				$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$ciudad." ";
 				$where .="AND dir.estatus=1 ";
 				$bool_ciudad=true;
+			}else{
+				$arrtienda['mesaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 			}
 				
 			//Busqueda por zona
@@ -295,7 +186,9 @@ class c_busqueda extends MX_Controller{
 				if($tiendas->exists()){
 					$where .="AND dir.zonas_id =".$zona." ";
 					$bool_zona=true;
-				}
+				}else{
+				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
+				}	
 			}
 			$sw=true;
 				
@@ -303,39 +196,43 @@ class c_busqueda extends MX_Controller{
 
 		//Busqueda por Tipo de Comida
 		if($categoria!=''){
-			$tiendas->clear();
+
 			$tiendas=$tipoComida->getTiendasById($categoria);
 			if($tiendas!=false){
 				$sql .=", tiendascomida_tipotiendascomida AS tipoC";
 				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$categoria." ";
 				$where .="AND tipoC.estatus=1 ";
 				$bool_categoria=true;
+			}else{
+				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 			}
 			$sw=true;
 		}
 		
 		//Busqueda por Tipo de Venta
 		if($orden!=''){
-			$tiendas->clear();
+
 			$tiendas=$tipoVenta->getTiendasById($orden);;
 			if($tiendas!=false){
 				$sql .=", tiendascomida_tiposventa AS tipoV";
 				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$orden." ";
 				$where .="AND tipoV.estatus=1 ";
 				$bool_venta=true;
+			}else{
+				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
 			}
 			$sw=true;
 
 		}
 
 		if (($bool_ciudad || $bool_zona || $bool_venta || $bool_categoria) && $sw){
-			if($offset==''){$offset=0;}
+			
 			$tiendas->clear();
 			$sql.=$where.'GROUP BY tienda.id ORDER BY tienda.nombre';
 			$tiendas->query($sql);
 			$this->config['total_rows']=$tiendas->result_count();
 			$tiendas->clear();
-			$sql.=' LIMIT '.$offset.' ,'.$this->config['per_page'];
+			$sql.=' LIMIT '.(($offset=='')?0:$offset).' ,'.$this->config['per_page'];
 			$tiendas->query($sql);
 			if($tiendas->exists()){
 			$img= new Imagen() ;
@@ -371,9 +268,9 @@ class c_busqueda extends MX_Controller{
 	
 	function construirHtml($datos){
 		$respuesta='';
-		if(isset($datos['mensaje'])){
-			$respuesta.='<p>'.$datos['mensaje'].'</p>';
-		}
+//		if(isset($datos['mensaje'])){
+//			$respuesta.='<p>'.$datos['mensaje'].'</p>';
+//		}
 		$respuesta.= form_open('tienda/c_datos_tienda',array('id' => 'frm_result_busqueda'));
 		foreach ($datos as $value){
 	 		if(is_array($value)){
