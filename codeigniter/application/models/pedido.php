@@ -122,17 +122,20 @@ class Pedido extends DataMapper{
 		}
 	}
 	
-	function getCantPedUsuario($id_usuario, $filtro = array()) {
+	function getCantPedUsuario($id_usuario, $filtro = array(),$order = '') {
 		$u = new Usuario();
 		$u->where('estatus',1);
 		$u->where('id',$id_usuario);
 		$u->get();
-		if (empty($filtro)) {										
+		if (empty($filtro) && empty($order)) {										
 			return $u->pedido->where('estatus',1)->count();
-		}else {						
-			$resultado = $u->pedido->where($filtro)->count();			
-			return $resultado;						 
-		}
+		}elseif (empty($filtro) && !empty($order)){
+			return $u->pedido->where('estatus',1)->order_by($order)->count();
+		}elseif (!empty($filtro) && empty($order)){
+			return $u->pedido->where($filtro)->count();
+		}elseif (!empty($filtro) && !empty($order)){
+			return $u->pedido->where($filtro)->order_by($order)->count();
+		}				
 	}
 }
 ?>
