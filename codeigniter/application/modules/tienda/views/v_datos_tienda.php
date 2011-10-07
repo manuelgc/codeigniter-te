@@ -3,13 +3,43 @@
 		$( "#tabs_tienda" ).tabs();
 		$(".a-plato").click(function(event){	
 			event.preventDefault();
-			var id_tienda = $(this).val();
-			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/validarAbierto",
+			var id_tienda = $("#id_tienda").val() ;
+			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/validarDatos",
 					{'id_tienda':id_tienda},
 					function(data){
 						if(!data.abierto){
-							alert("Tienda cerrada")
-						}
+//							console.log("Tienda cerrada");
+							$("#popup").html('<p>El Restaurante esta cerrado, En este momento no puede realizar pedidos</p>').dialog({
+								title:'Cerrado',
+								modal:true,
+								resizable: false,
+								show:"blind",
+								hide:"explode",
+								buttons: {
+								'Cerrar' : function(){
+								$(this).dialog('close');
+									}
+								}
+
+												
+							}).dialog('open');
+						}else if(!data.zona){
+							$("#popup").html('<p>Aun no ha seleccionado la zona donde se encuentra</p>').dialog({
+								title:'Cerrado',
+								modal:true,
+								resizable: false,
+								show:"blind",
+								hide:"explode",
+								buttons: {
+								'Cerrar' : function(){
+								$(this).dialog('close');
+									}
+								}
+
+												
+							}).dialog('open');
+						}	
+							
 					},
 					'json'
 				);
@@ -21,16 +51,15 @@
 
 
 <div class="tienda">
-<div >
-	<li class="cabecera_tienda" id="<?php echo $id;?>">
+<div id="cabecera_tienda">
+			<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $id;?>" />
 			<div class="titulo_tienda" name="" width="70%">
-					 	<h2><span class="text"><?php echo $nombre ?>
-					 	</span></h3>
-						<span class="text"><?php echo $tipo_comida?> </span><br>
-						<span class="text">Telefonos: <?php echo $telefono;?></span><br>
-						<span class="text">Cant. Minima: <?php echo $min_cant;?></span><br>
-						<span class="text">Gasto Minimo: <?php echo $min_cost;?></span><br>
-						<span class="text"><?php echo $tipo_venta;?></span><br>
+				<h2><span class="text"><?php echo $nombre ?> </span></h2>
+				<span class="text"><?php echo $tipo_comida?> </span><br>
+				<span class="text">Telefonos: <?php echo $telefono;?></span><br>
+				<span class="text">Cant. Minima: <?php echo $min_cant;?></span><br>
+				<span class="text">Gasto Minimo: <?php echo $min_cost;?></span><br>
+				<span class="text"><?php echo $tipo_venta;?></span><br>
 			</div>
 			<div class="imagenes_tienda" name="" width="30%">
 				<div>
@@ -48,7 +77,7 @@
 		<li><a href="#tab_info">Informaci&oacute;n</a></li>
 	</ul>
 	<div id="tab_menu">
-		<!--Foreach para categoria-->
+
 		<?php 
 		if(is_array($menu)){
 		foreach ($menu as $categoia => $plato):?>
@@ -87,4 +116,5 @@
 </div>
 
 </div>
+<div id="popup"></div>
 

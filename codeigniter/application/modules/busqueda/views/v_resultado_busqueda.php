@@ -48,6 +48,9 @@ $(function() {
 //-->
 </script>
 <?php if(isset($mensaje_error)){ echo '<p>'.$mensaje_error.'</p>';}else{?>
+<input id="id_ciudad" name="id_zona" type="hidden" value="<?php echo $value['ciudad_id'];?>" />
+<input id="id_zona" name="id_zona" type="hidden" value="<?php echo $value['zona_id'];?>" />
+<input id="id_tipo_orden" name="id_tipo_orden" type="hidden" value="<?php echo $value['tipo_orden_id'];?>" />
 <div class="content-restaurantes">
 <ul class="restaurantes">
 	<?php if(isset($restaurantes['mensaje'])){echo '<p>'.$restaurantes['mensaje'].'</p>';}?>
@@ -56,7 +59,7 @@ $(function() {
 	 if(is_array($value)){?>
 			 
 		<li class="bloque-restaurante" id="<?php echo $value['tienda_id'];?>">
-		<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $value['tienda_id'];?>" />
+		<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $value['tienda_id'];?>" />		
 			<div class="titulo_restaurant" name="" width="100%">
 					<p>
 				    	<h3><span class="text" ><?php echo $value['nombre_tienda']; ?></span></h3>
