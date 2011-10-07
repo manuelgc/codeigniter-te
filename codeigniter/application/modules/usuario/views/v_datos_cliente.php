@@ -12,7 +12,11 @@ function cargarTablaPed(html){
 	}, 1000)
 }
 	$(function() {
-		$( "#tabs" ).tabs();				
+		$( "#tabs" ).tabs({
+			cookie:{				
+				expires:1
+			}
+		});				
 		
 		$("#form-filtro-pedidos").submit(function(){
 			if($("#estados_ped").val() == '' && $("#tipo_ped").val() == '' && $("#ped_fecha").val() == ''){
@@ -28,22 +32,6 @@ function cargarTablaPed(html){
 		$('ul.link > li a').live('click', function(e){
 			e.preventDefault();
 			var vinculo = $(this).attr('href');
-			var oculto_url = $('#oculto_url').val();
-
-			console.log('antes de: '+vinculo);
-			if(oculto_url == 'processFiltro'){				
-				if ($('#estados_ped').val() == ''){
-					vinculo += '/'+'0';
-				}else{
-					vinculo += '/'+$('#estados_ped').val();
-				}
-				if ($('#tipo_ped').val() == ''){
-					vinculo += '/'+'0';
-				}else{
-					vinculo += '/'+$('#tipo_ped').val();
-				}						
-			}			
-			console.log('despues de: '+vinculo);
 			 $.ajax({
 				url: vinculo,
 				type: 'GET',
@@ -63,10 +51,7 @@ function cargarTablaPed(html){
 			var popup = $('#popup');
 
 			$.get('<?php echo base_url()?>index.php/usuario/c_datos_usuario/getPedidoPorId/'+id_pedido,										
-					function(data){
-						/*var salida = '<table id="datos-pedido-usuario">';
-						salida += '<tr>'+data.direccion_envio_ciudad+'</tr>';
-						salida += '</table>';*/						
+					function(data){						
 						var salida = '';
 						salida += '<p> Fecha del pedido: '+data.fecha_pedido+' '+data.hora_pedido+'</p>';
 						salida += '<p> Cantidad total del pedido: '+data.cantidad+'</p>';
@@ -194,7 +179,7 @@ function cargarTablaPed(html){
 			<?php echo $lista_ped;?>
 			</div>
 			<ul class="link">
-			<?php echo $link_pag;?>
+			<?php echo (!empty($link_pag)) ? $link_pag : '';?>
 			</ul>
 		</div>
 	</div>
