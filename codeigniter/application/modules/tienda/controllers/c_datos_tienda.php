@@ -83,8 +83,7 @@ class C_datos_tienda extends MX_Controller{
 		$tienda = new Tiendascomida();
 		$hoy = mdate('%w',now());
 		$hora= strtotime(mdate('%H:%i:%s',now()));
-		$horario=$tienda->getHorarioDiaById($hoy,$this->input->post('id_tienda'));
-
+		$horario=$tienda->getHorarioDiabyId($hoy,$this->input->post('id_tienda'));
 		if($horario!=false){
 			if($horario->tipohorario==0){
 				if( ( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) )  ){
@@ -105,11 +104,28 @@ class C_datos_tienda extends MX_Controller{
 		}else{
 			$respuesta=false;
 		}
-		$data['abierto']=$respuesta;
+//		$data['abierto']=$respuesta;
+//		echo json_encode($data); 
 		
-		echo json_encode($data); 
+		return  $respuesta;
 	}
 	
+	function validarDatos(){
+
+//		$this->input->cookie('ciudad')
+//		$this->input->cookie('zona')
+//		$this->input->cookie('categoria')
+//		$this->input->cookie('tipo_orden')
+		
+		if (!$this->input->cookie('zona')){
+			$data['zona']=false;
+		}else{
+			$data['zona']=true;
+		}
+		$data['abierto']=$this->validarAbierto();
+		
+		echo json_encode($data);
+	}
 	
 	function getTiposVentaTienda($tienda){
 		$tipoVenta= $tienda->getTiposVenta();
