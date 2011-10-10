@@ -1,15 +1,32 @@
+
 <script>
 	$(function() {
+		
 		$( "#tabs_tienda" ).tabs();
+		$("#popup-zona").dialog({
+			title:'Seleccionar Zona',
+			autoOpen: false,
+			modal:true,
+			resizable: false,
+			show:"blind",
+			hide:"explode",
+			buttons: {
+			'Cancelar' : function(){
+			$(this).dialog('close');
+				}
+			}							
+		});
+		
 		$(".a-plato").click(function(event){	
 			event.preventDefault();
 			var id_tienda = $("#id_tienda").val() ;
+			
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/validarDatos",
 					{'id_tienda':id_tienda},
 					function(data){
 						if(!data.abierto){
-//							console.log("Tienda cerrada");
-							$("#popup").html('<p>El Restaurante esta cerrado, En este momento no puede realizar pedidos</p>').dialog({
+//						if(data.abierto){	
+							$("#popup-tienda").html(data.html).dialog({
 								title:'Cerrado',
 								modal:true,
 								resizable: false,
@@ -24,20 +41,23 @@
 												
 							}).dialog('open');
 						}else if(!data.zona){
-							$("#popup").html('<p>Aun no ha seleccionado la zona donde se encuentra</p>').dialog({
-								title:'Cerrado',
+							$("#popup-tienda").html(data.html)
+							.dialog({
+								title:'Seleccionar Zona',
+								autoOpen: false,
 								modal:true,
 								resizable: false,
 								show:"blind",
 								hide:"explode",
 								buttons: {
-								'Cerrar' : function(){
+								'Cancelar' : function(){
 								$(this).dialog('close');
 									}
 								}
 
 												
-							}).dialog('open');
+							})
+							.dialog('open');
 						}	
 							
 					},
@@ -116,5 +136,26 @@
 </div>
 
 </div>
-<div id="popup"></div>
+<div id="popup-tienda"></div>
+<div id="popup-zona" title="Create new user">
+	<p>Aun no ha seleccionado la zona donde se encuentra</p>
+	<form>
+	<fieldset>
+	
+	<?php echo lang('busqueda_ciudad','cmb_ciudad','description');?>
+	<div><?php echo form_dropdown('ciudad',$ciudad,null,'id=cmb_ciudad class="element text medium"'); ?>
+	<small class="guidelines" id="guide_1">Seleciona la ciudad donde te encuentras</small></div>
+
+	
+	<?php echo lang('busqueda_zona','cmb_zona','description');?>
+	<div class="combo-zona"><?php 
+	$disb=(sizeof($opcion_combos['zona'])==0)?'disabled="disabled"':'';
+	echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=cmb_zona class="element text medium" '.$disb);?>
+	</div>
+	<small class="guidelines" id="guide_2">Seleciona la zona donde te encuentras</small>
+	</ul>
+		</fieldset>
+	</form>
+</div>
+
 

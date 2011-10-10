@@ -29,7 +29,7 @@ class Tiendascomida extends DataMapper{
 	'imagen' => array(
             'class' => 'imagen',
             'other_field' => 'tiendascomida',
-			'join_other_as' => 'tiendascomida',
+			'join_other_as' => 'imagenes',
 			'join_self_as' => 'tiendascomida'),
 	'extrasplato'=> array(
             'class' => 'extrasplato',
@@ -39,11 +39,13 @@ class Tiendascomida extends DataMapper{
             'other_field' => 'tiendascomida'),
 	'direccionesentrega'=> array(
             'class' => 'direccionesentrega',
-            'other_field' => 'tiendascomida'),
+            'other_field' => 'tiendascomida',
+			'join_other_as' => 'direccionesentrega',
+			'join_self_as' => 'tiendascomida'),
 	'pedido'=> array(
             'class' => 'pedido',
             'other_field' => 'tiendascomida',
-			'join_other_as' => 'tiendacomida',
+			'join_other_as' => 'pedidos',
 			'join_self_as' => 'tiendacomida'),
 	'tipotiendascomida'=> array(
 						'class'=>'tipotiendascomida',
@@ -343,5 +345,108 @@ class Tiendascomida extends DataMapper{
 		}
 
 	}
-}	
+	
+	function getDireccionesEntrega(){
+		$direccion = $this->direccionesentrega->where('estatus',1)->order_by('estados_id,ciudades_id')->get();
+		if($direccion->exists()){
+			return $direccion;
+		}else {
+			return false;
+		}
+	}
+
+	function getDireccionesEntregaById($id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){
+			$direccion = $tienda->direccionesentrega->where('estatus',1)->order_by('estados_id,ciudades_id')->get();
+			if($direccion->exists()){
+				return $direccion;
+			}else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	//Retorna las ciudades donde la tienda puedes hacer envios  
+	function getCiudadesEntrega(){
+		 $direcciones= $this->direccionesentrega->select('ciudades_id as "id"')->distinct()->where('estatus',1)->get();
+		 if($direcciones->exists()){
+		 	$ciudades = new Ciudad();
+			$ciudades->where('estatus',1)->where_in('id',$direcciones)->order_by('nombreCiudad')->get();
+			
+			if ($ciudades->exists()) {
+				return $ciudades;
+			}else {
+				return false;
+			}
+		 }else {
+		 	return false;
+		 }
+	}
+	
+	//igual que getCiudadesEntrega() pero se debe suministrar el id de la tienda 
+	function getCiudadesEntregaById($id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){
+			$direcciones= $tienda->direccionesentrega->select('ciudades_id as "id"')->distinct()->where('estatus',1)->get();
+			if($direcciones->exists()){
+			 	$ciudades = new Ciudad();
+			 	$ciudades->where('estatus',1)->where_in('id',$direcciones)->order_by('nombreCiudad')->get();
+			 	 
+			 	if ($ciudades->exists()) {
+			 		return $ciudades;
+			 	}else {
+			 		return false;
+			 	}
+			}else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	//Retorna las zonas donde la tienda puedes hacer envios, se debe suministrar el id de la ciudad
+	function getZonasEntrega($id_ciudad){
+		 $direcciones= $this->direccionesentrega->select('zonas_id as "id"')->distinct()->where('ciudades_id',$id_ciudad)->where('estatus',1)->get();
+		 if($direcciones->exists()){
+		 	$zonas = new Zona();
+			$zonas->where('estatus',1)->where_in('id',$direcciones)->order_by('nombreZona')->get();
+			
+			if ($zonas->exists()) {
+				return $zonas;
+			}else {
+				return false;
+			}
+		 }else {
+		 	return false;
+		 }
+	}
+	//Igual que getZonazEntrega() pero se debe suministrar el id de la tienda 
+	function getZonasEntregaBy($id_ciudad,$id_tienda){
+		$tienda = new Tiendascomida();
+		$tienda->where('estatus',1)->get_by_id($id_tienda);
+		if($tienda->exists()){
+			$direcciones= $tienda->direccionesentrega->select('zonas_id as "id"')->distinct()->where('ciudades_id',$id_ciudad)->where('estatus',1)->get();
+			if($direcciones->exists()){
+				$zonas = new Zona();
+				$zonas->where('estatus',1)->where_in('id',$direcciones)->order_by('nombreZona')->get();
+					
+				if ($zonas->exists()) {
+					return $zonas;
+				}else {
+					return false;
+				}
+			}else {
+				return false;
+			}
+		}else {
+			return false;
+		}
+	}
+}
 ?>
