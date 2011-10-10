@@ -71,5 +71,27 @@ class Usuario extends DataMapper {
 		}									
 		return $resultadoDireccion;
 	}
+	
+	function getDireccionesEnvioId($id_usuario) {
+		$u = new Usuario();
+		$resultadoDireccion = array();
+		$contador = 0;
+		$u->where('id',$id_usuario);
+		$u->where('estatus',1);
+		$u->get();		
+		$u->direccionesenvio->where('estatus',1)->get();		
+		foreach ($u->direccionesenvio->get() as $valor) {
+			$resultadoDireccion[$contador]['calle_carrera'] = $valor->calle_carrera;
+			$resultadoDireccion[$contador]['casa_urb'] = $valor->casa_urb;
+			$resultadoDireccion[$contador]['numeroCasaApto'] = $valor->numeroCasaApto;
+			$resultadoDireccion[$contador]['lugarreferencia'] = $valor->lugarreferencia;
+			$resultadoDireccion[$contador]['estado'] = $valor->estado->where('estatus',1)->get()->id;
+			$resultadoDireccion[$contador]['ciudad'] = $valor->ciudad->where('estatus',1)->get()->id;
+			$resultadoDireccion[$contador]['zona'] = $valor->zona->where('estatus',1)->get()->id;
+			$resultadoDireccion[$contador]['id'] = $valor->id;
+			$contador++;									
+		}									
+		return $resultadoDireccion;
+	}
 }
 ?>
