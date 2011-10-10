@@ -14,7 +14,8 @@ class Estado extends DataMapper {
 			'join_self_as' => 'estados'),
 	'direccionesentrega'=> array(
             'class' => 'direccionesentrega',
-            'other_field' => 'estado'));
+            'other_field' => 'estado',
+			'join_self_as' => 'estados'));
 	
 	function __construct($id = NULL){
 		parent::__construct($id);

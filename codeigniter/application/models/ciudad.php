@@ -20,7 +20,8 @@ class Ciudad extends DataMapper{
 			'join_self_as' => 'ciudades'),
 	'direccionesentrega'=> array(
             'class' => 'direccionesentrega',
-            'other_field' => 'ciudad'));
+            'other_field' => 'ciudad',
+			'join_self_as' => 'ciudades'));
 	
 	function __construct($id = NULL){
 		parent::__construct($id);

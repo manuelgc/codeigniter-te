@@ -4,7 +4,9 @@ class Imagen extends DataMapper {
 	var $has_one = array(
 	'plato'=> array(
             'class' => 'plato',
-            'other_field' => 'imagen'),
+            'other_field' => 'imagen',
+			'join_other_as' => 'plato',
+			'join_self_as' => 'imagenes'),
 	'promocion'=> array(
             'class' => 'promocion',
             'other_field' => 'imagen'),
@@ -15,7 +17,7 @@ class Imagen extends DataMapper {
             'class' => 'tiendascomida',
             'other_field' => 'imagen',
 			'join_other_as' => 'tiendascomida',
-			'join_self_as' => 'imagen')
+			'join_self_as' => 'imagenes')
 	);
 	
 	function __construct($id = NULL) {
