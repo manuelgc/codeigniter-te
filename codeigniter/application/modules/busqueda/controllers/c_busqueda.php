@@ -443,10 +443,10 @@ class c_busqueda extends MX_Controller{
 
 	}
 	
-	function cargarZona($id_zona){
+	function cargarZona($id_ciudad){
 		$zona = new Zona();
 		$zona->where('estatus','1');
-		$zona->where('ciudades_id',$id_zona);
+		$zona->where('ciudades_id',$id_ciudad);
 		$zona->order_by('nombreZona','ASD')->get_iterated();
 		$option=array();
 		if (!$zona->exists()) {

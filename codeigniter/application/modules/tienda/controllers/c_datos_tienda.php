@@ -9,15 +9,20 @@ class C_datos_tienda extends MX_Controller{
 		$this->load->helper('language');
 		$this->load->helper('cookie');
 		$this->load->library('qtip2');
+		$this->load->module('busqueda/c_busqueda');
 	}
 
 	function index(){
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
+				
+		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
+		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
-//		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
+		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
 //		$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
@@ -115,24 +120,25 @@ class C_datos_tienda extends MX_Controller{
 	}
 	
 	function validarDatos(){
-
-//		$this->input->cookie('ciudad')
-//		$this->input->cookie('zona')
-//		$this->input->cookie('categoria')
-//		$this->input->cookie('tipo_orden')
-		
-		
+			
 		$data['abierto']=$this->validarAbierto();
 		if($data['abierto']==false){
+			
 			$data['html']='<p>El Restaurante esta cerrado, En este momento no puede realizar pedidos</p>';
+		
 		}
 		
 		if (!$this->input->cookie('zona')){
 			$data['zona']=false;
-			$data['html']='<p>Aun no ha seleccionado la zona donde se encuentra</p>';
-			$data['html'].=lang('busqueda_ciudad','cmb_ciudad','description');
-			$data['html'].=$this->cargarCiudad($this->input->post('id_tienda'));
-					
+			
+			$data['html_zona']='<form>';
+			$data['html_zona'].='<p>Aun no ha seleccionado la zona donde se encuentra</p>';
+			$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
+			$data['html_zona'].=lang('busqueda_ciudad','cmb_ciudad','description');
+			$data['html_zona'].=$this->cargarCiudad($this->input->post('id_tienda'));
+			$data['html_zona'].=lang('busqueda_zona','cmb_zona','description');
+			$data['html_zona'].=$this->cargarZona((($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),$this->input->post('id_tienda'));
+			$data['html_zona'].='</form>';	
 		}else{
 			$data['zona']=true;
 		}
@@ -149,11 +155,65 @@ class C_datos_tienda extends MX_Controller{
 			foreach ($ciudad as $ci) {
 				$options[$ci->id] = $ci->nombreCiudad;
 			}
-			return form_dropdown('ciudad',$options,(($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),'id=cmb_ciudad class="element text medium"');
+			return form_dropdown('ciudad',$options,(($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),'id=cmbx_ciudad class="element text medium"');
 		}else{
 			return array();		
 		}
 
+	}
+
+	function cargarZona($id_ciudad,$id_tienda){
+		$tienda = new Tiendascomida();
+		$zona= $tienda->getZonasEntregaById($id_ciudad,$id_tienda);
+		$options=array();
+		if ($zona!=false) {
+			foreach ($zona as $zon) {
+				$options[$zon->id] = $zon->nombreZona;
+			}
+			$disable='';
+		}else{
+			$options=array();
+			$disable='disabled="disabled"';
+		}
+		
+		return form_dropdown('zona',$options,null,'id=cmbx_zona class="element text medium" '.$disable);		
+	}
+
+	function cargarZonaAjax(){
+		$tienda = new Tiendascomida();
+		$zona= $tienda->getZonasEntregaById($this->input->post('id_ciudad'),$this->input->post('id_tienda'));
+		$data['html_zona']='<option value="" selected="selected">Seleccione</option>;';
+		if ($zona!=false) {
+			foreach ($zona as $zon) {		
+				$data['html_zona'] .= '<option value="'.$zon->id.'">'.$zon->nombreZona.'</option>';
+			}
+			$data['disable']=false;
+			$data['zona']=true;
+		}else{		
+			$data['disable']=true;
+			$data['zona']=false;
+		}
+
+		
+		echo json_encode($data);
+				
+		}
+
+	
+	function getDataPartial($partial = '') {
+		$output = '';
+		switch ($partial) {
+			case 'breadcrumb':
+				$output = $this->c_busqueda->index();
+				break;
+			case 'header':
+				$output = Modules::run('banner_principal/c_banner_principal/index');
+				break;
+			case 'block':
+				$output = Modules::run('autenticacion/c_login/cargarView');
+		}
+
+		return $output;
 	}
 	
 	function getTiposVentaTienda($tienda){
@@ -198,7 +258,7 @@ class C_datos_tienda extends MX_Controller{
 		$hoy = mdate('%w',now());
 		$hora= strtotime(mdate('%H:%i:%s',now()));
 		$horario=$tienda->getHorarioDia($hoy);
-
+		 
 		if($horario!=false){
 			if($horario->tipohorario==0){
 				if( ( $hora >= strtotime($horario->horainicio1) )&&($hora <=strtotime($horario->horacierre1) )  ){
