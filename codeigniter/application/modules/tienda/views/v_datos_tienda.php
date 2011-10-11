@@ -1,20 +1,60 @@
 
 <script>
 	$(function() {
+
+		function mostrarError(objeto,texto){
+			objeto.text( texto ).addClass( "ui-state-highlight" );
+			setTimeout(function() {
+				objeto.removeClass( "ui-state-highlight", 1500 );
+			}, 500 );
+				
+				
+		}
+		function validarSeleccion(){
+			if($("#cmbx_ciudad").val()=='' || $("#cmbx_zona").val()==''){
+				mostrarError($("#mensaje_error"), 'Debe seleccionar Ciudad y Zona');
+				return false;
+			}else {
+				return true;
+			}		
+		}
+		function actualizarCiudadZona(id_ciudad,id_zona) {
+			if($.cookie('ciudad')==null){
+				$.cookie('ciudad', id_ciudad,{path: '/'});
+			}else {
+				$.cookie('ciudad', id_ciudad);
+			}
+				
+			if($.cookie('zona')==null){
+				$.cookie('zona', id_zona,{path: '/'});
+			}else {
+				$.cookie('zona', id_zona);
+			}
+		}			
+				
+		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
 		
-		$( "#tabs_tienda" ).tabs();
-		$("#popup-zona").dialog({
-			title:'Seleccionar Zona',
-			autoOpen: false,
-			modal:true,
-			resizable: false,
-			show:"blind",
-			hide:"explode",
-			buttons: {
-			'Cancelar' : function(){
-			$(this).dialog('close');
-				}
-			}							
+		$("#cmbx_ciudad").live('change',function(event){	
+			event.preventDefault();
+			var id_ciudad = $(this).val(),
+			id_tienda = $("#id_tienda").val() ;
+			if(id_ciudad != ''){
+			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarZonaAjax",
+					{'id_ciudad':id_ciudad,'id_tienda':id_tienda},
+					function(data){
+						if(data.zona!=false){
+							$("#cmbx_zona").html(data.html_zona).attr("disabled",data.disable);
+						}else{
+							$("#cmbx_zona").html(data.html_zona).attr("disabled",data.disable);
+							mostrarError($("#mensaje_error"), 'La ciudad seleccionada no tiene zonas registradas');
+
+							}
+					},
+					'json'
+				);
+			}else{
+				$("#cmbx_zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
+			}	
 		});
 		
 		$(".a-plato").click(function(event){	
@@ -25,7 +65,7 @@
 					{'id_tienda':id_tienda},
 					function(data){
 						if(!data.abierto){
-//						if(data.abierto){	
+						
 							$("#popup-tienda").html(data.html).dialog({
 								title:'Cerrado',
 								modal:true,
@@ -41,7 +81,7 @@
 												
 							}).dialog('open');
 						}else if(!data.zona){
-							$("#popup-tienda").html(data.html)
+							$("#popup-tienda").html(data.html_zona)
 							.dialog({
 								title:'Seleccionar Zona',
 								autoOpen: false,
@@ -50,9 +90,15 @@
 								show:"blind",
 								hide:"explode",
 								buttons: {
-								'Cancelar' : function(){
-								$(this).dialog('close');
+								'Aceptar' : function(){
+									if(validarSeleccion()){
+										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val());
+										$(this).dialog('close');
 									}
+								},
+								'Cancelar': function() {
+									$(this).dialog('close');
+								}
 								}
 
 												
@@ -137,25 +183,6 @@
 
 </div>
 <div id="popup-tienda"></div>
-<div id="popup-zona" title="Create new user">
-	<p>Aun no ha seleccionado la zona donde se encuentra</p>
-	<form>
-	<fieldset>
-	
-	<?php echo lang('busqueda_ciudad','cmb_ciudad','description');?>
-	<div><?php echo form_dropdown('ciudad',$ciudad,null,'id=cmb_ciudad class="element text medium"'); ?>
-	<small class="guidelines" id="guide_1">Seleciona la ciudad donde te encuentras</small></div>
-
-	
-	<?php echo lang('busqueda_zona','cmb_zona','description');?>
-	<div class="combo-zona"><?php 
-	$disb=(sizeof($opcion_combos['zona'])==0)?'disabled="disabled"':'';
-	echo form_dropdown('zona',$opcion_combos['zona'],$opcion_combos['select_zona'],'id=cmb_zona class="element text medium" '.$disb);?>
-	</div>
-	<small class="guidelines" id="guide_2">Seleciona la zona donde te encuentras</small>
-	</ul>
-		</fieldset>
-	</form>
 </div>
 
 

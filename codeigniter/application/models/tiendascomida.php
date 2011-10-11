@@ -427,7 +427,7 @@ class Tiendascomida extends DataMapper{
 		 }
 	}
 	//Igual que getZonazEntrega() pero se debe suministrar el id de la tienda 
-	function getZonasEntregaBy($id_ciudad,$id_tienda){
+	function getZonasEntregaById($id_ciudad,$id_tienda){
 		$tienda = new Tiendascomida();
 		$tienda->where('estatus',1)->get_by_id($id_tienda);
 		if($tienda->exists()){
