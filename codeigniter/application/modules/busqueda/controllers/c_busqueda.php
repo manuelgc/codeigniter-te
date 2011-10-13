@@ -51,8 +51,15 @@ class c_busqueda extends MX_Controller{
 						'select_orden' => null
 						);
 		
-
-		if ($this->input->post('campo_busqueda')) {
+			if($this->input->cookie('ciudad')!=false){
+					$arrCombo['zona']=$this->cargarZona($this->input->cookie('ciudad'));
+			}			
+			$arrCombo['select_ciudad']= ($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):'';
+			$arrCombo['select_zona']  = ($this->input->cookie('zona')!=false)?$this->input->cookie('zona'):'';
+			$arrCombo['select_categoria']= ($this->input->cookie('categoria')!=false)?$this->input->cookie('categoria'):'';
+			$arrCombo['select_orden']= ($this->input->cookie('tipo_orden')!=false)?$this->input->cookie('tipo_orden'):'';
+			
+		if ($this->input->post('campo_busqueda')!=false) {
 			
 			$cookie_ciudad = array(
 					'name' => 'ciudad',
@@ -115,13 +122,13 @@ class c_busqueda extends MX_Controller{
 
 		}elseif ($this->input->is_ajax_request() && ($desde=='busqueda' || $offset=='busqueda')){  	
 			
-			if($this->input->cookie('ciudad')){
+			if($this->input->cookie('ciudad')!=false){
 					$data['zona']=form_dropdown('zona',$this->cargarZona($this->input->cookie('ciudad')),null,'id=cmb_zona class="element text medium" ');
 			}
-			$data['select_ciudad']= ($this->input->cookie('ciudad'))?$this->input->cookie('ciudad'):'';
-			$data['select_zona']  = ($this->input->cookie('zona'))?$this->input->cookie('zona'):'';
-			$data['select_categoria']= ($this->input->cookie('categoria'))?$this->input->cookie('categoria'):'';
-			$data['select_orden']= ($this->input->cookie('tipo_orden'))?$this->input->cookie('tipo_orden'):'';
+			$data['select_ciudad']= ($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):'';
+			$data['select_zona']  = ($this->input->cookie('zona')!=false)?$this->input->cookie('zona'):'';
+			$data['select_categoria']= ($this->input->cookie('categoria')!=false)?$this->input->cookie('categoria'):'';
+			$data['select_orden']= ($this->input->cookie('tipo_orden')!=false)?$this->input->cookie('tipo_orden'):'';
 	
 			$data['restaurantes']=$this->construirHtml($this->buscarTiendaSql($this->input->cookie('ciudad'),$this->input->cookie('zona'),$this->input->cookie('categoria'),$this->input->cookie('tipo_orden'),(($offset=='busqueda')?0:$offset)));				
 			$this->pagination->initialize($this->config);

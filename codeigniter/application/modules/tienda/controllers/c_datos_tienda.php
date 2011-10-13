@@ -18,7 +18,7 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 				
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
-		
+		echo print_r($data['opcion_combos']);
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
@@ -29,6 +29,7 @@ class C_datos_tienda extends MX_Controller{
 
 		if($this->input->post('id_tienda')){
 			$data=$this->getDatosTienda($this->input->post('id_tienda'));
+			$data+=$this->getCiudadZona();
 			$this->template->build('v_datos_tienda',$data);
 		}
 		
@@ -60,6 +61,7 @@ class C_datos_tienda extends MX_Controller{
 		}
 	}
 	
+	
 	function getPlatosPorCategoria($tienda){
 		$categoria=$tienda->getCategoriaPlato();
 		$plato=$tienda->getPlatosArreglo();
@@ -88,6 +90,26 @@ class C_datos_tienda extends MX_Controller{
 		}
 		return $respuesta;
 
+	}
+	
+	function getCiudadZona() {
+		
+		if ($this->input->cookie('ciudad')!=false){
+			$ciudad= new Ciudad();
+			$ciudad->where('estatus',1)->get_by_id($this->input->cookie('ciudad'));
+			$arreglo['nombreCiudad']=$ciudad->nombreCiudad;
+		}else{
+			$arreglo['nombreCiudad']='No Seleccionada';
+		}
+		
+		if ($this->input->cookie('zona')!=false){
+			$zona= new Zona();
+			$zona->where('estatus',1)->get_by_id($this->input->cookie('zona'));
+			$arreglo['nombreZona']=$zona->nombreZona;
+		}else{
+			$arreglo['nombreZona']='No Seleccionada';
+		}
+		return $arreglo;
 	}
 	
 	function validarAbierto(){
@@ -128,7 +150,7 @@ class C_datos_tienda extends MX_Controller{
 		
 		}
 		
-		if (!$this->input->cookie('zona')){
+		if (!$this->input->cookie('zona') && !$this->input->cookie('ciudad') ){
 			$data['zona']=false;
 			
 			$data['html_zona']='<form>';
@@ -146,7 +168,20 @@ class C_datos_tienda extends MX_Controller{
 		
 		echo json_encode($data);
 	}
-	
+
+	function cargarPopupAjax() {
+
+		$data['html_zona']='<form>';
+		$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
+		$data['html_zona'].=lang('busqueda_ciudad','cmb_ciudad','description');
+		$data['html_zona'].=$this->cargarCiudad($this->input->post('id_tienda'));
+		$data['html_zona'].=lang('busqueda_zona','cmb_zona','description');
+		$data['html_zona'].=$this->cargarZona((($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),$this->input->post('id_tienda'));
+		$data['html_zona'].='</form>';
+
+		echo json_encode($data);
+	}
+
 	function cargarCiudad($id_tienda){
 		$tienda = new Tiendascomida();
 		$ciudad= $tienda->getCiudadesEntregaById($id_tienda);
@@ -176,7 +211,7 @@ class C_datos_tienda extends MX_Controller{
 			$disable='disabled="disabled"';
 		}
 		
-		return form_dropdown('zona',$options,null,'id=cmbx_zona class="element text medium" '.$disable);		
+		return form_dropdown('zona',$options,(($this->input->cookie('zona')!=false)?$this->input->cookie('zona'):''),'id=cmbx_zona class="element text medium" '.$disable);		
 	}
 
 	function cargarZonaAjax(){
