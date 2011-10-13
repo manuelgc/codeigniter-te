@@ -27,5 +27,30 @@ class Ciudad extends DataMapper{
 		parent::__construct($id);
 	}
 	
+	function getTiendasById($id_ciudad){
+		$ciudad = new Ciudad();
+		$ciudad->where('estatus',1)->get_by_id($id_ciudad);
+		if($ciudad->exists()){
+			$tienda =$ciudad->tiendascomida->where('estatus',1)->get();
+			if($tienda->exists()){
+				return $tienda;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+
+	function getTiendas(){
+		$tienda =$this->tiendascomida->where('estatus',1)->get();
+		if($tienda->exists()){
+			return $tienda;
+		}else{
+			return false;
+		}
+
+	}
+	
 }
 ?>

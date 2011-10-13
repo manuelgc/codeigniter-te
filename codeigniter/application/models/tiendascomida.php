@@ -238,6 +238,7 @@ class Tiendascomida extends DataMapper{
 				return false;	
 			}
 	}
+	
 	function getImagen(){
 		$img=$this->imagen->where('estatus',1)->get();
 		if($img->exists()){
