@@ -6,7 +6,7 @@ class C_editar_usuario extends MX_Controller {
 				array(
 				'field'=>'password',
 				'label'=>'lang:regcliente_contrasena',
-				'rules'=>'trim|required|matches[passwordConfirm]|md5'
+				'rules'=>'trim|md5'
 				),
 				array(
 				'field'=>'nombre',
@@ -32,32 +32,7 @@ class C_editar_usuario extends MX_Controller {
 				'field'=>'celular_1',
 				'label'=>'lang:regcliente_celular',
 				'rules'=>'trim|required|max_length[3]|callback_validar_celular'
-				),
-				array(
-				'field'=>'ciudad',
-				'label'=>'lang:regcliente_ciudad',
-				'rules'=>'required'
-				),
-				array(
-				'field'=>'calle_carrera',
-				'label'=>'lang:regcliente_calle_carr',
-				'rules'=>'trim|required|max_length[255]|xss_clean'
-				),
-				array(
-				'field'=>'urb_edif',
-				'label'=>'lang:regcliente_urb_edif',
-				'rules'=>'trim|required|max_length[255]|xss_clean'
-				),
-				array(
-				'field'=>'nroCasa_apt',
-				'label'=>'lang:regcliente_numcasa_apto',
-				'rules'=>'trim|required|max_length[255]|xss_clean'
-				),
-				array(
-				'field'=>'lugar_referencia',
-				'label'=>'lang:regcliente_lugar_referencia',
-				'rules'=>'trim|required|max_length[255]|xss_clean'
-				)				
+				)								
 	);
 	
 	
@@ -65,6 +40,7 @@ class C_editar_usuario extends MX_Controller {
 		parent::__construct();
 		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion');
 		$this->load->module('busqueda/c_busqueda');
+		//$this->load->library('form_validation');
 		
 		//$data['output_header'] = $this->getDataPartial('header');
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
@@ -81,24 +57,77 @@ class C_editar_usuario extends MX_Controller {
 	}
 	
 	function index() {
-		if ($this->input->post('oculto_edicion_usuario')) {
-			
-		}
-		
 		$data = $this->getDatosDireccionUsuario();
-		$this->template->build('v_editar_usuario',$data);
+		$this->agregarValidaciones($data);
+
+		$this->form_validation->set_rules($this->config);
+		if ($this->input->post('oculto_edicion_usuario')) {			
+			if ($this->form_validation->run($this) == FALSE) {				
+				$this->template->build('v_editar_usuario',$data);		
+			}else {				
+				if ($this->guardarCambios()) {
+					$data['error_bd'] = 'Se han registrado tus cambios.';
+				}else {
+					$data['error_bd'] = 'No hemos podido registrar tus cambios, por favor verifica los datos e intenta nuevamente';
+				}
+				redirect('usuario/c_datos_usuario/index/1');	
+			}	
+		}else {			
+			$this->template->build('v_editar_usuario',$data);
+		}					
 	}
 	
-	function editarUsuario($datos) {
-		$cant_direcciones = count($datos['direcciones']);
-		for ($i = 0; $i < $cant_direcciones; $i++) {
+	function agregarValidaciones($datos) {
+		$cant_direcciones = count($datos['direcciones']);		
+		for ($i = 1; $i <= $cant_direcciones; $i++) {
 			$this->config[] = array('field'=>'ciudad_'.$i,'label'=>'lang:regcliente_ciudad','rules'=>'required');
 			$this->config[] = array('field'=>'zona_'.$i,'label'=>'lang:regcliente_zona','rules'=>'required');
 			$this->config[] = array('field'=>'calle_carrera_'.$i,'label'=>'lang:regcliente_calle_carr','rules'=>'trim|required|max_length[255]|xss_clean');
 			$this->config[]	= array('field'=>'urb_edif_'.$i,'label'=>'lang:regcliente_urb_edif','rules'=>'trim|required|max_length[255]|xss_clean');
 			$this->config[]	= array('field'=>'nroCasa_apt_'.$i,'label'=>'lang:regcliente_numcasa_apto','rules'=>'trim|required|max_length[255]|xss_clean');
 			$this->config[]	= array('field'=>'lugar_referencia_'.$i,'label'=>'lang:regcliente_lugar_referencia','rules'=>'trim|required|max_length[255]|xss_clean');
+		}		
+	}
+	
+	function guardarCambios() {
+		$i = 1;
+		$cant_direcciones = $this->input->post('cant_dir');
+		$resultado = TRUE;
+		$u = new Usuario();
+		$u->id = 2; //$this->id_usuario;
+		$u->nombre = $this->input->post('nombre');
+		$u->apellidos = $this->input->post('apellidos');
+		$u->telfijo = $this->input->post('tlf_fijo_1').$this->input->post('tlf_fijo_2').$this->input->post('tlf_fijo_3');		
+		$u->telefonoCel = $this->input->post('celular_1').$this->input->post('celular_2').$this->input->post('celular_3');
+		$u->correo = $this->input->post('correo');
+		if ($this->input->post('password') != '') {
+			$u->password = $this->input->post('password');
+		}				
+		
+		if ($u->save() == FALSE) {			
+			$resultado = FALSE;
+		}		
+		
+		while ($i <= $cant_direcciones) {
+			$d = new Direccionesenvio();
+			$ciu = new Ciudad();
+			$zona = new Zona();
+			
+			$d->id = $this->input->post('dir_id_'.$i);			
+			$d->calle_carrera = $this->input->post('calle_carrera_'.$i);			
+			$d->casa_urb = $this->input->post('urb_edif_'.$i);			
+			$d->numeroCasaApto = $this->input->post('nroCasa_apt_'.$i);
+			$d->lugarreferencia = $this->input->post('lugar_referencia_'.$i);			
+						
+			$ciu->get_by_id($this->input->post('ciudad_'.$i));
+			$zona->get_by_id($this->input->post('zona_'.$i));						
+									
+			if ($d->save(array($ciu,$zona,$u)) == FALSE) {					
+				$resultado = FALSE;
+			}
+			$i++;
 		}
+		return $resultado;			
 	}
 	
 	function getDataPartial($partial = '') {
@@ -144,8 +173,9 @@ class C_editar_usuario extends MX_Controller {
 			$copia_direcciones = $datos['direcciones'];			
 			for ($i = 0; $i < count($copia_direcciones); $i++) {
 				$arr_zonas_ciudad[$i] = $this->cargarZonaPorCiudad($copia_direcciones[$i]['ciudad']);
-			}						
+			}									
 			$datos['zonas_ciudad'] = $arr_zonas_ciudad;
+			$datos['cant_dir'] = count($copia_direcciones);
 		}			
 		return $datos;	
 	}
@@ -231,6 +261,17 @@ class C_editar_usuario extends MX_Controller {
 				return TRUE;
 			}
 		}
+	}
+	
+	function mostrarFormDireccion() {
+		$id_usuario = 2;//$this->id_usuario
+		$data['ciudades'] = $this->cargarCiudad();	
+		$data['formulario'] = $this->load->view('v_form_direccion',$data,true); 	
+		echo json_encode($data);
+	}
+	
+	function guardarDireccion() {
+		;
 	}
 	
 }

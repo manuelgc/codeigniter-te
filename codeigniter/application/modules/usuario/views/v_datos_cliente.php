@@ -1,15 +1,21 @@
 <script>
-function preCargador(){
-	$('.content-pedidos').block({
+function preCargador(selector){
+	$(selector).block({ //'.content-pedidos'
 		message: 'Cargando ...'		
 	});
+}
+
+function cargarFormularioDireccion(html,selector){
+	window.setTimeout(function(){
+		$(selector).html(html.formulario);
+	},1000);
 }
 
 function cargarTablaPed(html){
 	window.setTimeout( function(){
 		$('div.content-pedidos').html(html.lista_ped);
 		$('ul.link').html(html.link_pag);
-	}, 1000)
+	}, 1000);
 }
 	$(function() {
 		$( "#tabs" ).tabs({
@@ -37,7 +43,7 @@ function cargarTablaPed(html){
 				type: 'GET',
 				dataType: 'json',
 				beforeSend: function(data){
-					preCargador();
+					preCargador('.content-pedidos');
 				},				
 				success: function (data) {					
 					cargarTablaPed(data);
@@ -87,6 +93,48 @@ function cargarTablaPed(html){
 				'json'
 			);					
 		});
+
+		$('img#agregar-dir').live('click',function(e){
+			$.ajax({
+				url: '<?php echo base_url()?>index.php/usuario/c_editar_usuario/mostrarFormDireccion',
+				type:'POST',
+				dataType : 'json',
+				beforeSend: function(data){
+					preCargador('#nueva-dir');
+				},
+				success:function(data){
+					cargarFormularioDireccion(data, '#nueva-dir');
+					$('img#agregar-dir').hide();
+				}
+			});
+		});
+
+		$('#cancelar').live('click',function(e){
+			e.preventDefault();			
+			$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
+			$('img#agregar-dir').show();
+		});
+
+		$("#ciudad").live('change',function(event){	
+			event.preventDefault();
+			var id_ciudad = $(this).val();
+			if(id_ciudad != ''){
+			$.post("<?php echo base_url();?>index.php/usuario/c_editar_usuario/cargarZona",
+					{'id_ciudad':id_ciudad},
+					function(data){
+						if(data.zona!='0'){
+						$("#zona").empty().append(data.zona).attr("disabled",false);
+						}else{
+							$("#zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
+							alert("La ciudad seleccionada no tiene zonas registradas");
+							}
+					},
+					'json'
+				);
+			}else{
+				$("#zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
+			}				
+		});
 	});
 	</script>
 
@@ -97,8 +145,20 @@ function cargarTablaPed(html){
 	del siguiente vinculo
 	<?php echo anchor('home/c_home','Inicio');?>
 </p>
-	<?php
-}else {?>
+<?php
+}else {
+	if (isset($mensaje)) {
+		if ($mensaje == '0') {					
+		?>
+		<div class="error">No hemos podido registrar los cambios, por favor intenta nuevamente.</div>
+<?php 		
+		}else {
+			?>
+		<div class="message">Hemos registrado tus cambios.</div>			
+<?php 
+		}
+	}
+?>
 <div class="demo">	
 	<div id="tabs">
 		<ul>
@@ -131,7 +191,11 @@ function cargarTablaPed(html){
 				<?php echo anchor('usuario/c_editar_direccion/'.$direcciones['id'],'Editar Direccion','class="button_text art-button"');?>
 				<?php endforeach;?>
 			</ul>
-			<?php echo anchor('usuario/c_editar_direccion','Agregar Direccion','class="button_text art-button"');?>
+			<div id="nueva-dir"></div>
+			<?php echo img(array(
+							'src' =>base_url().'application/img/icon/Add-icon.png',
+							'id'=>'agregar-dir',
+							'alt'=>'Agregar Direccion'));?>
 		</div>
 		<div id="pedidos">
 		<?php echo form_open('usuario/c_datos_usuario/processFiltro','id="form-filtro-pedidos"',array('reordenar' => '1'));?>

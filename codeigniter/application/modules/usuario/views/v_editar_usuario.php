@@ -5,29 +5,30 @@ $(document).ready(function(){
 		$(this).collapse({closed:true});
 	});	
 
-	$().
-
-	$("#element_16").change(	
-			function(event){	
-			event.preventDefault();
+	$('.ciudad').each(function (){
+		$(this).change(function(e){
+			e.preventDefault();
 			var id_ciudad = $(this).val();
+			var id = $(this).attr('id').substr(7,8);
+			
 			if(id_ciudad != ''){
-			$.post("<?php echo base_url();?>index.php/autenticacion/c_registro_usuario/cargarZona",
-					{'id_ciudad':id_ciudad},
-					function(data){
-						if(data.zona!='0'){
-						$("#element_17").empty().append(data.zona).attr("disabled",false);
-						}else{
-							$("#element_17").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
-							alert("La ciudad seleccionada no tiene zonas registradas");
-							}
-					},
-					'json'
-				);
+				$.post("<?php echo base_url();?>index.php/usuario/c_editar_usuario/cargarZona",
+						{'id_ciudad':id_ciudad},
+						function(data){
+							if(data.zona!='0'){
+							$("#zona_"+id).empty().append(data.zona).attr("disabled",false);
+							}else{
+								$("#zona_"+id).empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
+									alert("La ciudad seleccionada no tiene zonas registradas");
+								}
+						},
+						'json'
+					);
 			}else{
-				$("#element_17").empty().append('<option value="">Seleccione</option>;').attr("disabled",true);
-			}	
+					$("#zona_"+id).empty().append('<option value="">Seleccione</option>;').attr("disabled",true);
+			}
 		});
+	});
 });
 //-->
 </script>
@@ -37,7 +38,7 @@ $(document).ready(function(){
 	<?php echo $error_bd;?>
 	</div>
 	<?php }?>
-	<?php $oculto = array('oculto_edicion_usuario'=>'1');
+	<?php $oculto = array('oculto_edicion_usuario'=>'1','cant_dir' => $cant_dir);
 	echo form_open('usuario/c_editar_usuario','',$oculto);?>
 	<div class="form_description">
 		<h2>Edita tus datos</h2>
@@ -75,7 +76,15 @@ $(document).ready(function(){
 			<div>
 				<input id="element_2" name="nombre" class="element text medium"
 					type="text" maxlength="255"
-					value="<?php echo (!empty($nombre)) ? $nombre : set_value('nombre') ;?>" />
+					value="<?php 
+						if (form_error('nombre','<p class="error">','</p>') == '') {
+							if (set_value('nombre') == '') {
+								echo $nombre;
+							}else {
+								echo set_value('nombre');
+							}
+						}
+					?>" />
 					<?php echo form_error('nombre','<p class="error">','</p>');?>
 			</div> <small class="guidelines" id="guide_2">Ingresa tu nombre</small>
 
@@ -84,7 +93,15 @@ $(document).ready(function(){
 			<div>
 				<input id="element_3" name="apellidos" class="element text medium"
 					type="text" maxlength="255"
-					value="<?php echo (!empty($apellidos)) ? $apellidos : set_value('apellidos');?>" />
+					value="<?php 
+					if (form_error('apellidos','<p class="error">','</p>') == '') {
+						if (set_value('apellidos') == '') {
+							echo $apellidos;
+						}else {
+							echo set_value('apellidos');
+						}
+					}
+					?>" />
 					<?php echo form_error('apellidos','<p class="error">','</p>');?>
 			</div> <small class="guidelines" id="guide_3">Ingresa tus apellidos</small>
 
@@ -93,7 +110,15 @@ $(document).ready(function(){
 			<div>
 				<input id="element_5" name="correo" class="element text medium"
 					type="text" maxlength="255"
-					value="<?php echo (!empty($correo)) ? $correo : set_value('correo');?>" />
+					value="<?php 
+					if (form_error('correo','<p class="error">','</p>') == '') {
+						if (set_value('correo') == '') {
+							echo $correo;
+						}else {
+							echo set_value('correo');
+						}
+					}
+					?>" />
 					<?php echo form_error('correo','<p class="error">','</p>');?>
 			</div> <small class="guidelines" id="guide_5">Es importante que
 				ingreses una direccion de correo electronico valida ya que a traves
@@ -102,15 +127,39 @@ $(document).ready(function(){
 		<li id="li_9"><?php echo lang('regcliente_tlf_fijo','element_9','description');?>
 			<span> <input id="element_9_1" name="tlf_fijo_1" class="element text"
 				size="3" maxlength="3"
-				value="<?php echo (!empty($tlf_fijo_1)) ? $tlf_fijo_1 : set_value('tlf_fijo_1');?>"
+				value="<?php 
+				if (form_error('tlf_fijo_1','<p class="error">','</p>') == '') {
+					if (set_value('tlf_fijo_1') == '') {
+						echo $tlf_fijo_1;
+					}else {
+						echo set_value('tlf_fijo_1');
+					}
+				}
+				?>"
 				type="text"> - <label for="element_9_1">(251)</label> </span> <span>
 				<input id="element_9_2" name="tlf_fijo_2" class="element text"
 				size="3" maxlength="3"
-				value="<?php echo (!empty($tlf_fijo_2)) ? $tlf_fijo_2 : set_value('tlf_fijo_2');?>"
+				value="<?php 
+				if (form_error('tlf_fijo_1','<p class="error">','</p>') == '') {
+					if (set_value('tlf_fijo_2') == '') {
+						echo $tlf_fijo_2;
+					}else {
+						echo set_value('tlf_fijo_2');
+					}
+				}							
+				?>"
 				type="text"> - <label for="element_9_2">255</label> </span> <span> <input
 				id="element_9_3" name="tlf_fijo_3" class="element text" size="4"
 				maxlength="4"
-				value="<?php echo (!empty($tlf_fijo_3)) ? $tlf_fijo_3 : set_value('tlf_fijo_3');?>"
+				value="<?php 
+				if (form_error('tlf_fijo_1','<p class="error">','</p>') == '') {
+					if (set_value('tlf_fijo_3') == '') {
+						echo $tlf_fijo_3;
+					}else {
+						echo set_value('tlf_fijo_3');
+					}
+				}					
+				?>"
 				type="text"> <label for="element_9_3">5555</label> </span> <?php echo form_error('tlf_fijo_1','<p class="error">','</p>');?>
 			<small class="guidelines" id="guide_4">Ingresa tu numero de telefono
 				fijo tal como se te indica.</small>
@@ -118,15 +167,39 @@ $(document).ready(function(){
 		<li id="li_4"><?php echo lang('regcliente_celular','element_4','description');?>
 			<span> <input id="element_4_1" name="celular_1" class="element text"
 				size="3" maxlength="3"
-				value="<?php echo (!empty($celular_1)) ? $celular_1 : set_value('celular_1');?>"
+				value="<?php 
+				if (form_error('celular_1','<p class="error">','</p>') == '') {
+					if (set_value('celular_1') == '') {
+						echo $celular_1;
+					}else {
+						echo set_value('celular_1');
+					}
+				}					
+				?>"
 				type="text"> - <label for="element_4_1">(416)</label> </span> <span>
 				<input id="element_4_2" name="celular_2" class="element text"
 				size="3" maxlength="3"
-				value="<?php echo (!empty($celular_2)) ? $celular_2 : set_value('celular_2');?>"
+				value="<?php 
+				if (form_error('celular_1','<p class="error">','</p>') == '') {
+					if (set_value('celular_2') == '') {
+						echo $celular_2;
+					}else {
+						echo set_value('celular_2');
+					}
+				}					
+				?>"
 				type="text"> - <label for="element_4_2">555</label> </span> <span> <input
 				id="element_4_3" name="celular_3" class="element text" size="4"
 				maxlength="4"
-				value="<?php echo (!empty($celular_3)) ? $celular_3 : set_value('celular_3');?>"
+				value="<?php 
+				if (form_error('celular_1','<p class="error">','</p>') == '') {
+					if (set_value('celular_3') == '') {
+						echo $celular_3;
+					}else {
+						echo set_value('celular_3');
+					}
+				}					
+				?>"
 				type="text"> <label for="element_4_3">5555</label> </span> <?php echo form_error('celular_1','<p class="error">','</p>');?>
 
 			<small class="guidelines" id="guide_4">Ingresa tu numero de telefono
@@ -138,6 +211,7 @@ $(document).ready(function(){
 		foreach ($direcciones as $direccion):
 		?>
 			<fieldset>
+				<?php echo form_hidden('dir_id_'.$i,$direccion['id']);?>
 				<legend>
 					Direccion de envio
 					<?php echo $i;?>
@@ -145,8 +219,16 @@ $(document).ready(function(){
 
 				<div>
 				<?php
-				echo form_dropdown('ciudad_'.$i,$ciudades,$direccion['ciudad'],'class="element select medium" id="ciudad_'.$i.'"');
-				echo form_error('ciudad','<p class="error">','</p>');
+				if (form_error('ciudad_'.$i,'<p class="error">','</p>') == '') {
+					if (set_select('ciudad_'.$i) == '') {
+						echo form_dropdown('ciudad_'.$i,$ciudades,$direccion['ciudad'],'class="element select medium ciudad" id="ciudad_'.$i.'"');
+					}else {
+						echo form_dropdown('ciudad_'.$i,$ciudades,set_select('ciudad_'.$i),'class="element select medium ciudad" id="ciudad_'.$i.'"');
+					}
+				}else {
+					echo form_dropdown('ciudad_'.$i,$ciudades,array(),'class="element select medium ciudad" id="ciudad_'.$i.'"');
+				}				
+				echo form_error('ciudad_'.$i,'<p class="error">','</p>');
 				?>
 					<small class="guidelines" id="guide_ciudad_<?php echo $i;?>">Seleccione
 						la ciudad donde se encuentra ubicado</small>
@@ -155,8 +237,17 @@ $(document).ready(function(){
 
 				<div>
 				<?php
-				echo form_dropdown('zona_'.$i,$zonas_ciudad[$contador_zona],$direccion['zona'],'class="element select medium" id="zona_'.$i.'"');
-				echo form_error('zona','<p class="error">','</p>');
+				if (form_error('zona_'.$i,'<p class="error">','</p>') == '') {
+					if (set_select('zona_'.$i) == '') {
+						echo form_dropdown('zona_'.$i,$zonas_ciudad[$contador_zona],$direccion['zona'],'class="element select medium" id="zona_'.$i.'"');
+					}else {
+						echo form_dropdown('zona_'.$i,$zonas_ciudad[$contador_zona],set_select('zona_'.$i),'class="element select medium" id="zona_'.$i.'"');
+					}
+				}else {
+					echo form_dropdown('zona_'.$i,$zonas_ciudad[$contador_zona],array(),'class="element select medium" id="zona_'.$i.'"');
+				}	
+				
+				echo form_error('zona_'.$i,'<p class="error">','</p>');
 				?>
 					<small class="guidelines" id="guide_zona_<?php echo $i;?>">Seleccione
 						la zona donde se encuentra ubicado</small>
@@ -167,8 +258,16 @@ $(document).ready(function(){
 					<input id="calle_carrera_<?php echo $i;?>"
 						name="calle_carrera_<?php echo $i;?>" class="element text medium"
 						type="text" maxlength="255"
-						value="<?php echo (!empty($direccion['calle_carrera'])) ? $direccion['calle_carrera'] : set_value('calle_carrera');?>" />
-						<?php echo form_error('calle_carrera','<p class="error">','</p>');?>
+						value="<?php 
+						if (form_error('calle_carrera_'.$i,'<p class="error">','</p>') == '') {
+							if (set_value('calle_carrera_'.$i) == '') {
+								echo $direccion['calle_carrera'];
+							}else {
+								echo set_value('calle_carrera_'.$i);
+							}
+						}													
+						?>" />
+						<?php echo form_error('calle_carrera_'.$i,'<p class="error">','</p>');?>
 
 						<?php echo lang('regcliente_calle_carr','calle_carrera_'.$i,'description');?>
 					<small class="guidelines" id="guide_11">Ingrese la
@@ -179,8 +278,16 @@ $(document).ready(function(){
 					<input id="urb_edif_<?php echo $i;?>"
 						name="urb_edif_<?php echo $i;?>" class="element text medium"
 						type="text" maxlength="255"
-						value="<?php echo (!empty($direccion['casa_urb'])) ? $direccion['casa_urb'] : set_value('urb_edif');?>" />
-						<?php echo form_error('urb_edif','<p class="error">','</p>');?>
+						value="<?php 
+						if (form_error('urb_edif_'.$i,'<p class="error">','</p>') == '') {
+							if (set_value('urb_edif_'.$i) == '') {
+								echo $direccion['casa_urb'];
+							}else {
+								echo set_value('urb_edif_'.$i);
+							}
+						}							
+						?>" />
+						<?php echo form_error('urb_edif_'.$i,'<p class="error">','</p>');?>
 
 						<?php echo lang('regcliente_urb_edif','urb_edif_'.$i,'description');?>
 					<small class="guidelines" id="guide_12">Seleccione la urbanizacion
@@ -191,8 +298,16 @@ $(document).ready(function(){
 					<input id="nroCasa_apt_<?php echo $i;?>"
 						name="nroCasa_apt_<?php echo $i;?>" class="element text medium"
 						type="text" maxlength="255"
-						value="<?php echo (!empty($direccion['numeroCasaApto'])) ? $direccion['numeroCasaApto'] : set_value('nroCasa_apt');?>" />
-						<?php echo form_error('nroCasa_apt','<p class="error">','</p>');?>
+						value="<?php 
+						if (form_error('nroCasa_apt_'.$i,'<p class="error">','</p>') == '') {
+							if (set_value('nroCasa_apt_'.$i) == '') {
+								echo $direccion['numeroCasaApto'];
+							}else {
+								echo set_value('nroCasa_apt_'.$i);
+							}
+						}													
+						?>" />
+						<?php echo form_error('nroCasa_apt_'.$i,'<p class="error">','</p>');?>
 						<?php echo lang('regcliente_numcasa_apto','nroCasa_apt_'.$i,'description');?>
 					<small id="guide_13" class="guidelines">Ingrese el numero de casa o
 						apartamento</small>
@@ -202,8 +317,16 @@ $(document).ready(function(){
 					<input id="lugar_referencia_<?php echo $i;?>"
 						name="lugar_referencia_<?php echo $i;?>"
 						class="element text medium" type="text" maxlength="255"
-						value="<?php echo (!empty($direccion['lugarreferencia'])) ? $direccion['lugarreferencia'] : set_value('lugar_referencia');?>" />
-						<?php echo form_error('lugar_referencia','<p class="error">','</p>');?>
+						value="<?php 
+						if (form_error('lugar_referencia_'.$i,'<p class="error">','</p>') == '') {
+							if (set_value('lugar_referencia_'.$i) == '') {
+								echo $direccion['lugarreferencia'];
+							}else {
+								echo set_value('lugar_referencia_'.$i);
+							}
+						}							
+						?>" />
+						<?php echo form_error('lugar_referencia_'.$i,'<p class="error">','</p>');?>
 						<?php echo lang('regcliente_lugar_referencia','lugar_referencia_'.$i,'description');?>
 					<small id="guide_13" class="guidelines">Ingrese el numero de casa o
 						apartamento</small>
