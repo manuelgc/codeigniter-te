@@ -92,6 +92,6 @@ class Usuario extends DataMapper {
 			$contador++;									
 		}									
 		return $resultadoDireccion;
-	}
+	}		
 }
 ?>

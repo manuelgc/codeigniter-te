@@ -80,6 +80,9 @@ class C_datos_usuario extends MX_Controller {
 			$data_ajax['link_pag'] = $this->pagination->create_links();
 			echo json_encode($data_ajax);
 		}else {
+			if ($offset != '') {
+				$data['mensaje'] = $offset;
+			}
 			$this->template->build('v_datos_cliente',$data);
 		}
 	}
