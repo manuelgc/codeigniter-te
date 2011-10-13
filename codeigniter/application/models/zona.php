@@ -22,4 +22,30 @@ class Zona extends DataMapper{
 	function __construct($id = NULL){
 		parent::__construct($id);
 	}
+	
+	function getTiendasById($id_zona){
+		$zona = new Zona();
+		$zona->where('estatus',1)->get_by_id($id_zona);
+		if($zona->exists()){
+			$tienda =$zona->tiendascomida->where('estatus',1)->get();
+			if($tienda->exists()){
+				return $tienda;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+
+	function getTiendas(){
+		$tienda =$this->tiendascomida->where('estatus',1)->get();
+		if($tienda->exists()){
+			return $tienda;
+		}else{
+			return false;
+		}
+
+	}
+	
 }

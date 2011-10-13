@@ -18,7 +18,7 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 				
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
-		echo print_r($data['opcion_combos']);
+	
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
@@ -150,7 +150,7 @@ class C_datos_tienda extends MX_Controller{
 		
 		}
 		
-		if (!$this->input->cookie('zona') && !$this->input->cookie('ciudad') ){
+		if (!$this->input->cookie('zona') || !$this->input->cookie('ciudad') ){
 			$data['zona']=false;
 			
 			$data['html_zona']='<form>';
@@ -169,7 +169,7 @@ class C_datos_tienda extends MX_Controller{
 		echo json_encode($data);
 	}
 
-	function cargarPopupAjax() {
+	function cargarPopupActualizarAjax() {
 
 		$data['html_zona']='<form>';
 		$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
@@ -181,7 +181,48 @@ class C_datos_tienda extends MX_Controller{
 
 		echo json_encode($data);
 	}
-
+	
+	function cargarPopupPlatoAjax{
+		$plato = new Plato();
+		$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+		
+		if($plato->exists()){
+			$data['plato']=true;
+			$data['html']='<form>';
+			$img=$plato->getImagen();
+			if($img!=false){
+				$data['html'].='<div class="imagene_plato">	<img src="'.$this->base_url().$img->rutaImagen.'"></div>';
+			}else {
+				$data['html'].='<div class="imagene_plato">	<img src=""></div>';
+			}
+			$data['html'].='<p class="error" id="mensaje_plato"></p>';
+			$data['html'].='<p>Precio: '.$plato->precio.' Bs.</p>';
+			$data['html'].='<p>'.$plato->descripcion.'</p>';
+			$data['html'].=form_label('Cantidad', 'cantidad');
+			$attr = array(
+              'name'        => 'cantidad',
+              'id'          => 'cantidad',
+              'maxlength'   => '100',
+              'size'        => '50',
+              
+            );
+			$data['html'].=form_input($attr);
+			$data['html'].=form_label('Instrucciones Extra', 'instrucciones');
+			$attr2 = array(
+              'name'        => 'instrucciones',
+              'id'          => 'instrucciones',
+              'rows'   => '3',
+              'cols'        => '100',
+              
+            );
+			$data['html'].=form_txetarea($attr2);
+			$data['html'].='</form>';
+		}else{
+			
+		}
+		echo json_encode($data);
+	}
+	
 	function cargarCiudad($id_tienda){
 		$tienda = new Tiendascomida();
 		$ciudad= $tienda->getCiudadesEntregaById($id_tienda);

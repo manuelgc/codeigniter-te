@@ -19,7 +19,8 @@ class Plato extends DataMapper {
             'other_field' => 'plato'),
 	'imagen'=> array(
             'class' => 'imagen',
-            'other_field' => 'plato'),
+            'other_field' => 'plato',
+			'join_self_as' => 'plato'),
 	'calificacionesproducto'=> array(
             'class' => 'calificacionesproducto',
             'other_field' => 'plato'),
@@ -36,7 +37,17 @@ class Plato extends DataMapper {
 	
 	function __construct($id = NULL) {
 		parent::__construct($id);
-	}	
+	}
+
+	function getImagen(){
+		$img=$this->imagen->where('estatus',1)->get();
+		if($img->exists()){
+			return $img;
+		}else {
+			return false;
+		}
+	}
+	
 }
 
 ?>

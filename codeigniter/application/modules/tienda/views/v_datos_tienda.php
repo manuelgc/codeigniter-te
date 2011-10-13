@@ -10,6 +10,7 @@
 				
 				
 		}
+
 		function validarSeleccion(){
 			if($("#cmbx_ciudad").val()=='' || $("#cmbx_zona").val()==''){
 				mostrarError($("#mensaje_error"), 'Debe seleccionar Ciudad y Zona');
@@ -20,20 +21,10 @@
 		}
 		
 		function actualizarCiudadZona(id_ciudad,id_zona,nombreCiudad,nombreZona) {
-			if($.cookie('ciudad')==null){
-				$.cookie('ciudad', id_ciudad,{path: '/'});
-			}else {
-				$.cookie('ciudad', id_ciudad);
-			}
-			
-			
-			if($.cookie('zona')==null){
-				$.cookie('zona', id_zona,{path: '/'});
-			}else {
-				$.cookie('zona', id_zona);
-			}
-			
+		
+			$.cookie('ciudad', id_ciudad,{path: '/'});
 			$("#nombre_ciudad").html('<b>'+nombreCiudad+'</b>');
+			$.cookie('zona', id_zona,{path: '/'});
 			$("#nombre_zona").html('<b>'+nombreZona+'</b>');
 			
 		}			
@@ -99,7 +90,7 @@
 								'Aceptar' : function(){
 									if(validarSeleccion()){
 										
-										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad").val(),$("#cmbx_zona").val());
+										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
 										$(this).dialog('close');
 									}
 								},
@@ -111,6 +102,8 @@
 												
 							})
 							.dialog('open');
+						}else{
+							
 						}	
 							
 					},
@@ -123,7 +116,7 @@
 			event.preventDefault();
 			var id_tienda = $("#id_tienda").val() ;
 			
-			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupAjax",
+			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupActualizarAjax",
 					{'id_tienda':id_tienda},
 					function(data){
 						$("#popup-tienda").html(data.html_zona)
@@ -137,7 +130,7 @@
 							buttons: {
 							'Aceptar' : function(){
 								if(validarSeleccion()){
-									actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad").val(),$("#cmbx_zona").val());
+									actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
 									$(this).dialog('close');
 								}
 								},
@@ -160,12 +153,12 @@
 
 
 <div class="tienda">
-<div class="info-usuario"> 
+<div class="message"> 
 	<p>
 		<span>Usted ha seleccionado Ciudad: </span>
 		<span id="nombre_ciudad"><b><?php echo $nombreCiudad;?></b></span><span>, Zona: </span>
 		<span id="nombre_zona"><b><?php echo $nombreZona;?></b></span>
-		<a id="cambiar_ubicacion" >Cambiar</a>
+		<a id="cambiar_ubicacion" href="">Cambiar</a>
 	</p>
 </div>
 <div id="cabecera_tienda">

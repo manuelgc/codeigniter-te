@@ -7,11 +7,21 @@ class C_home extends MX_Controller {
 		$this->view_respuesta == NULL;
 		$this->partial_respuesta == FALSE;
 		//$this->load->module('banner_principal/c_banner_principal');
+		$this->load->helper('cookie');	
+		delete_cookie('ciudad');
+		delete_cookie('zona');
+		delete_cookie('categoria');
+		delete_cookie('tipo_orden');
 		$this->load->module('busqueda/c_busqueda');	
-	
+		
+			
+		//Eliminar cookie creadas al hacer busquedas
+		
+		
 	}
 		
 	function index() {				
+				
 		$msg = $this->encrypt->encode('home/c_home');
 		$this->session->set_userdata('caller_block',$msg);			
 		switch ($this->partial_respuesta) {

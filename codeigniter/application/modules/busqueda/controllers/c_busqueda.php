@@ -156,13 +156,14 @@ class c_busqueda extends MX_Controller{
 		$this->template->build('v_resultado_busqueda',$data);
 	}
     
-	function  buscarTiendaSql($ciudad,$zona,$categoria,$orden,$offset){
+	function  buscarTiendaSql($id_ciudad,$id_zona,$id_categoria,$id_orden,$offset){
 
 		$sql="SELECT tienda.* FROM tiendascomida AS tienda";
 		$where=" WHERE tienda.estatus=1 ";
 		$tiendas = new Tiendascomida();
 		$tipoComida = new Tipotiendascomida();
 		$tipoVenta = new Tiposventa();
+		$direccion= new DireccionesEntrega();
 		$arrtienda = array();
 		$respuesta = array();
 		$sw=false;
@@ -172,13 +173,11 @@ class c_busqueda extends MX_Controller{
 		$bool_venta=false;
 		
 		//Busqueda por ciudad
-		if($ciudad!=''){
-			$tiendas->clear();
-			$tiendas->where('ciudades_id',$ciudad);
-			$tiendas->where('estatus','1')->get();
-			if($tiendas->exists()){
+		if($id_ciudad!=''){
+			$temp=$direccion->getDirecionesByParam(array("ciudades_id" => $id_ciudad));
+			if($temp!=false){
 				$sql .=", direccionesentrega AS dir";
-				$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$ciudad." ";
+				$where .="AND tienda.id = dir.tiendascomida_id AND dir.ciudades_id =".$id_ciudad." ";
 				$where .="AND dir.estatus=1 ";
 				$bool_ciudad=true;
 			}else{
@@ -186,28 +185,26 @@ class c_busqueda extends MX_Controller{
 			}
 				
 			//Busqueda por zona
-			if($zona!=''){
-				$tiendas->clear();
-				$tiendas->where('zonas_id',$zona);
-				$tiendas->where('estatus','1')->get();
-				if($tiendas->exists()){
-					$where .="AND dir.zonas_id =".$zona." ";
+			if($id_zona!=''){
+				$temp=$direccion->getDirecionesByParam(array("ciudades_id" => $id_ciudad,"zonas_id" => $id_zona));
+				if($temp!=false){
+					$where .="AND dir.zonas_id =".$id_zona." ";
 					$bool_zona=true;
 				}else{
-				$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
-				}	
+					$arrtienda['mensaje']='Lo sentimos la busqueda no obtuvo ningun resultado, le sugerimos algunos restaurantes:';
+				}
 			}
 			$sw=true;
 				
 		}
 
 		//Busqueda por Tipo de Comida
-		if($categoria!=''){
+		if($id_categoria!=''){
 
-			$tiendas=$tipoComida->getTiendasById($categoria);
-			if($tiendas!=false){
+			$temp=$tipoComida->getTiendasById($id_categoria);
+			if($temp!=false){
 				$sql .=", tiendascomida_tipotiendascomida AS tipoC";
-				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$categoria." ";
+				$where .="AND tienda.id = tipoC.tiendascomida_id	AND tipoC.tipotiendascomida_id =".$id_categoria." ";
 				$where .="AND tipoC.estatus=1 ";
 				$bool_categoria=true;
 			}else{
@@ -217,12 +214,12 @@ class c_busqueda extends MX_Controller{
 		}
 		
 		//Busqueda por Tipo de Venta
-		if($orden!=''){
+		if($id_orden!=''){
 
-			$tiendas=$tipoVenta->getTiendasById($orden);;
-			if($tiendas!=false){
+			$temp=$tipoVenta->getTiendasById($id_orden);;
+			if($temp!=false){
 				$sql .=", tiendascomida_tiposventa AS tipoV";
-				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$orden." ";
+				$where .="AND tienda.id = tipoV.tiendascomida_id AND tipoV.tiposventa_id =".$id_orden." ";
 				$where .="AND tipoV.estatus=1 ";
 				$bool_venta=true;
 			}else{
@@ -234,7 +231,6 @@ class c_busqueda extends MX_Controller{
 
 		if (($bool_ciudad || $bool_zona || $bool_venta || $bool_categoria) && $sw){
 			
-			$tiendas->clear();
 			$sql.=$where.'GROUP BY tienda.id ORDER BY tienda.nombre';
 			$tiendas->query($sql);
 			$this->config['total_rows']=$tiendas->result_count();
