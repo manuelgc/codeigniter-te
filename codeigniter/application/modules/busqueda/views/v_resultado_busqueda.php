@@ -57,16 +57,16 @@ $(function() {
 			 
 		<li class="bloque-restaurante" id="<?php echo $value['tienda_id'];?>">
 		<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $value['tienda_id'];?>" />		
-			<div class="titulo_restaurant" name="" width="100%">
+			<div class="titulo_restaurant"  >
 					<p>
 				    	<h3><span class="text" ><?php echo $value['nombre_tienda']; ?></span></h3>
 					</p>
 			</div>
-			<div width="80%">
-				<div class="cont_imagen" name="" height="80%">
+			<div>
+				<div class="cont_imagen"  >
 						<img src="<?php echo $value['ruta_imagen'];?>" class="">
 				</div>
-				<div class="cont_boton" name="" height="20%">
+				<div class="cont_boton" >
 				
 					
 					<input id="btn_ordenar" , class="button_text art-button"

@@ -1,7 +1,7 @@
 
 <script>
 	$(function() {
-
+		
 		function mostrarError(objeto,texto){
 			objeto.text( texto ).addClass( "ui-state-highlight" );
 			setTimeout(function() {
@@ -18,18 +18,24 @@
 				return true;
 			}		
 		}
-		function actualizarCiudadZona(id_ciudad,id_zona) {
+		
+		function actualizarCiudadZona(id_ciudad,id_zona,nombreCiudad,nombreZona) {
 			if($.cookie('ciudad')==null){
 				$.cookie('ciudad', id_ciudad,{path: '/'});
 			}else {
 				$.cookie('ciudad', id_ciudad);
 			}
-				
+			
+			
 			if($.cookie('zona')==null){
 				$.cookie('zona', id_zona,{path: '/'});
 			}else {
 				$.cookie('zona', id_zona);
 			}
+			
+			$("#nombre_ciudad").html('<b>'+nombreCiudad+'</b>');
+			$("#nombre_zona").html('<b>'+nombreZona+'</b>');
+			
 		}			
 				
 		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
@@ -92,7 +98,8 @@
 								buttons: {
 								'Aceptar' : function(){
 									if(validarSeleccion()){
-										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val());
+										
+										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad").val(),$("#cmbx_zona").val());
 										$(this).dialog('close');
 									}
 								},
@@ -111,15 +118,59 @@
 				);
 				
 		});
+		
+		$("#cambiar_ubicacion").click(function(event){
+			event.preventDefault();
+			var id_tienda = $("#id_tienda").val() ;
+			
+			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupAjax",
+					{'id_tienda':id_tienda},
+					function(data){
+						$("#popup-tienda").html(data.html_zona)
+						.dialog({
+							title:'Actualizar Zona',
+							autoOpen: false,
+							modal:true,
+							resizable: false,
+							show:"blind",
+							hide:"explode",
+							buttons: {
+							'Aceptar' : function(){
+								if(validarSeleccion()){
+									actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad").val(),$("#cmbx_zona").val());
+									$(this).dialog('close');
+								}
+								},
+								'Cancelar': function() {
+									$(this).dialog('close');
+								}
+								}								
+							})
+							.dialog('open');
+						
+							
+					},
+					'json'
+				);
+		});
+			
 	});
 </script>
 
 
 
 <div class="tienda">
+<div class="info-usuario"> 
+	<p>
+		<span>Usted ha seleccionado Ciudad: </span>
+		<span id="nombre_ciudad"><b><?php echo $nombreCiudad;?></b></span><span>, Zona: </span>
+		<span id="nombre_zona"><b><?php echo $nombreZona;?></b></span>
+		<a id="cambiar_ubicacion" >Cambiar</a>
+	</p>
+</div>
 <div id="cabecera_tienda">
 			<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $id;?>" />
-			<div class="titulo_tienda" name="" width="70%">
+			<div class="titulo_tienda">
 				<h2><span class="text"><?php echo $nombre ?> </span></h2>
 				<span class="text"><?php echo $tipo_comida?> </span><br>
 				<span class="text">Telefonos: <?php echo $telefono;?></span><br>
@@ -127,7 +178,7 @@
 				<span class="text">Gasto Minimo: <?php echo $min_cost;?></span><br>
 				<span class="text"><?php echo $tipo_venta;?></span><br>
 			</div>
-			<div class="imagenes_tienda" name="" width="30%">
+			<div class="imagenes_tienda" >
 				<div>
 					<img src="<?php echo $imagen;?>" class="">
 				</div>
@@ -183,6 +234,6 @@
 
 </div>
 <div id="popup-tienda"></div>
-</div>
+
 
 
