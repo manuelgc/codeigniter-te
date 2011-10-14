@@ -1,6 +1,7 @@
 <script type="text/javascript">
 <!--
 $(document).ready(function(){	
+		
 	$('fieldset').each(function(){
 		$(this).collapse({closed:true});
 	});	

@@ -1,4 +1,4 @@
-<?php echo form_open('usuario/c_editar_usuario','id="form_agregar_dir"');?>
+<?php echo form_open('usuario/c_editar_usuario/guardarDireccion','id="form_agregar_dir"');?>
 <fieldset>
 	<legend> Direccion de envio </legend>
 
@@ -69,7 +69,14 @@
 <span class="art-button-wrapper">
 	<span class="art-button-l"> </span>
 	<span class="art-button-r"> </span>
-<?php echo anchor('usuario/c_editar_usuario/guardarDireccion','Guardar','class="button_text art-button"');?>	
+<?php echo form_input(array(
+				'id'=>'guardar-dir',
+				'name'=>'guardar-dir',
+				'value'=>'Guardar',
+				'type'=>'button',
+				'class' => 'button_text art-button'
+			)); 
+?>	
 </span>
 <span class="art-button-wrapper">
 	<span class="art-button-l"> </span>

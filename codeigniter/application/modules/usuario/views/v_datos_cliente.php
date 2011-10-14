@@ -11,6 +11,21 @@ function cargarFormularioDireccion(html,selector){
 	},1000);
 }
 
+function agregarDireccion(datos){
+	if(datos.respuesta == false){		
+		window.setTimeout(function(){
+			$('#nueva-dir').html('Lo sentimos, no hemos podido agregar la direccion especificada, por favor verifica los datos e intenta de nuevo');
+		},1000);		
+	}else{		
+		window.setTimeout(function(){
+			alert(datos.respuesta);
+			$('ul.direcciones-content').append(datos.respuesta);
+			$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
+			$('img#agregar-dir').show();
+		},1000);		
+	}	
+}
+
 function cargarTablaPed(html){
 	window.setTimeout( function(){
 		$('div.content-pedidos').html(html.lista_ped);
@@ -107,8 +122,27 @@ function cargarTablaPed(html){
 					$('img#agregar-dir').hide();
 				}
 			});
+		});		
+		
+		$('#guardar-dir').live('click',function(e){	
+			e.preventDefault();		
+			var formulario_action = $("#form_agregar_dir").attr("action");
+			var datos_form = $('#form_agregar_dir').serialize();
+			
+			$.ajax({
+				url: formulario_action,
+				type:'POST',
+				dataType:'json',				
+				data:datos_form,
+				beforeSend: function(){
+					preCargador('#nueva-dir');
+				},
+				success:function(data){
+					agregarDireccion(data);				
+				}
+			});						
 		});
-
+		
 		$('#cancelar').live('click',function(e){
 			e.preventDefault();			
 			$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
@@ -145,21 +179,22 @@ function cargarTablaPed(html){
 	del siguiente vinculo
 	<?php echo anchor('home/c_home','Inicio');?>
 </p>
-<?php
+	<?php
 }else {
 	if (isset($mensaje)) {
-		if ($mensaje == '0') {					
-		?>
-		<div class="error">No hemos podido registrar los cambios, por favor intenta nuevamente.</div>
-<?php 		
+		if ($mensaje == '0') {
+			?>
+<div class="error">No hemos podido registrar los cambios, por favor
+	intenta nuevamente.</div>
+			<?php
 		}else {
 			?>
-		<div class="message">Hemos registrado tus cambios.</div>			
-<?php 
+<div class="message">Hemos registrado tus cambios.</div>
+			<?php
 		}
 	}
-?>
-<div class="demo">	
+	?>
+<div class="demo">
 	<div id="tabs">
 		<ul>
 			<li><a href="#datos">Tus Datos</a></li>
@@ -179,16 +214,22 @@ function cargarTablaPed(html){
 		<div id="direcciones">
 			<ul class="direcciones-content">
 			<?php foreach ($dir_usuario as $direcciones):?>
-				<li><span class="inline">Estado: <?php echo $direcciones['estado'];?>
-				</span> <span class="inline">Ciudad: <?php echo $direcciones['ciudad'];?>
-				</span> <span class="inline">Zona: <?php echo $direcciones['zona'];?>
-				</span> <span class="inline">Calle/Carrera: <?php echo $direcciones['calle_carrera'];?>
-				</span> <span class="inline">Casa/Urb: <?php echo $direcciones['casa_urb'];?>
-				</span> <span class="inline">Numero Casa/Apto: <?php echo $direcciones['numeroCasaApto'];?>
-				</span> <span class="inline">Lugar de Referencia: <?php echo $direcciones['lugarreferencia'];?>
+				<li><span class="inline">
+				Ciudad: <?php echo $direcciones['ciudad'];?>
+				, Zona: <?php echo $direcciones['zona'];?>
+				, Calle/Carrera: <?php echo $direcciones['calle_carrera'];?>
+				, Casa/Urb: <?php echo $direcciones['casa_urb'];?>
+				, Numero Casa/Apto: <?php echo $direcciones['numeroCasaApto'];?>
+				, Lugar de Referencia: <?php echo $direcciones['lugarreferencia'];?>
 				</span>
+				<div class="opciones-dir">
+							<img
+								src="<?php echo base_url();?>application/img/icon/edit-icon.png" />
+							<img
+								src="<?php echo base_url();?>application/img/icon/delete-icon.png" />
+				</div>
 				</li>
-				<?php echo anchor('usuario/c_editar_direccion/'.$direcciones['id'],'Editar Direccion','class="button_text art-button"');?>
+				<?php //echo anchor('usuario/c_editar_direccion/'.$direcciones['id'],'Editar Direccion','class="button_text art-button"');?>
 				<?php endforeach;?>
 			</ul>
 			<div id="nueva-dir"></div>
@@ -199,41 +240,41 @@ function cargarTablaPed(html){
 		</div>
 		<div id="pedidos">
 		<?php echo form_open('usuario/c_datos_usuario/processFiltro','id="form-filtro-pedidos"',array('reordenar' => '1'));?>
-			<ul class="content-form-pedido">				
-				<li id="li-estados_ped" class="item-pedido-usuario"><label class="description"
-					for="estados_ped">Estado del Pedido </label>
+			<ul class="content-form-pedido">
+				<li id="li-estados_ped" class="item-pedido-usuario"><label
+					class="description" for="estados_ped">Estado del Pedido </label>
 					<div>
-					<?php					
+					<?php
 					echo form_dropdown('estados_ped',
-										$estados_pedido,
-										($this->input->post('estados_ped')) ? $this->input->post('estados_ped') : '',
+					$estados_pedido,
+					($this->input->post('estados_ped')) ? $this->input->post('estados_ped') : '',
 										'class="element select medium" id="estados_ped"');
 					?>
 					</div>
 				</li>
-				<li id="li-tipo_ped" class="item-pedido-usuario"><label class="description"
-					for="tipo_ped">Tipo de Pedido </label>
+				<li id="li-tipo_ped" class="item-pedido-usuario"><label
+					class="description" for="tipo_ped">Tipo de Pedido </label>
 					<div>
 					<?php echo form_dropdown('tipo_ped',
-											$tipo_ped,
-											($this->input->post('tipo_ped')) ? $this->input->post('tipo_ped') : '',
+					$tipo_ped,
+					($this->input->post('tipo_ped')) ? $this->input->post('tipo_ped') : '',
 											'class="element select medium" id="tipo_ped"');?>
 					</div>
 				</li>
-				<li id="li-ped_fecha" class="item-pedido-usuario"><label class="description"
-					for="ped_fecha">Fecha de Pedido </label>
+				<li id="li-ped_fecha" class="item-pedido-usuario"><label
+					class="description" for="ped_fecha">Fecha de Pedido </label>
 					<div>
 					<?php echo form_dropdown('ped_fecha',
-											$ped_fecha,
-											($this->input->post('ped_fecha')) ? $this->input->post('ped_fecha') : '',
+					$ped_fecha,
+					($this->input->post('ped_fecha')) ? $this->input->post('ped_fecha') : '',
 											'class="element select medium" id="ped_fecha"');?>
 					</div>
 				</li>
 
 				<li class="item-pedido-usuario">
 					<div>
-						<input class="button_text art-button" type="submit" name="submit-pedidos"
-							value="Buscar" />
+						<input class="button_text art-button" type="submit"
+							name="submit-pedidos" value="Buscar" />
 					</div>
 				</li>
 			</ul>
@@ -251,4 +292,4 @@ function cargarTablaPed(html){
 </div>
 <div id="popup"></div>
 <!-- End demo -->
-<?php }?>
+			<?php }?>
