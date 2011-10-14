@@ -271,7 +271,42 @@ class C_editar_usuario extends MX_Controller {
 	}
 	
 	function guardarDireccion() {
-		;
+		$id_usuario = 2;//$this->id_usuario
+		if ($this->input->is_ajax_request()) {
+			$d = new Direccionesenvio();
+			$ciu = new Ciudad();
+			$zona = new Zona();
+			$u = new Usuario();
+			
+			$d->calle_carrera = $this->input->post('calle_carrera');			
+			$d->casa_urb = $this->input->post('urb_edif');			
+			$d->numeroCasaApto = $this->input->post('nroCasa_apt');
+			$d->lugarreferencia = $this->input->post('lugar_referencia');	
+			$d->estatus = (int)1;
+										
+			$d->estado_id = (int)7; //para cuando se implemente en otros estados
+			$ciu->get_by_id($this->input->post('ciudad'));
+			$zona->get_by_id($this->input->post('zona'));						
+			$u->get_by_id($id_usuario);
+			
+			if ($d->save(array($ciu,$zona,$u)) == FALSE) {					
+				$resultado = FALSE;
+			}else {				
+				$resultado = '<li><span class="inline">Ciudad: '. $d->ciudad->get()->nombreCiudad;
+				$resultado .= ', Zona: '. $d->zona->get()->nombreZona;
+				$resultado .= ', Calle/Carrera: '. $d->calle_carrera;
+				$resultado .= ', Casa/Urb: '. $d->casa_urb;
+				$resultado .= ', Numero Casa/Apto: '. $d->numeroCasaApto;
+				$resultado .= ', Lugar de Referencia: '. $d->lugarreferencia;
+				$resultado .= '</span>';
+				$resultado .= '<div class="opciones-dir">';
+				$resultado .= '<img src="'.base_url().'application/img/icon/edit-icon.png" />';
+				$resultado .= '<img src="'.base_url().'application/img/icon/delete-icon.png" />';
+				$resultado .= '</div></li>';				
+			}						
+			
+			echo json_encode($resultado);			
+		}
 	}
 	
 }
