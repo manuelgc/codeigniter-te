@@ -16,7 +16,8 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
-				
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery.spinbox.css'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.spinbox.js'));		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 	
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
@@ -182,7 +183,7 @@ class C_datos_tienda extends MX_Controller{
 		echo json_encode($data);
 	}
 	
-	function cargarPopupPlatoAjax{
+	function cargarPopupPlatoAjax(){
 		$plato = new Plato();
 		$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 		
@@ -191,33 +192,37 @@ class C_datos_tienda extends MX_Controller{
 			$data['html']='<form>';
 			$img=$plato->getImagen();
 			if($img!=false){
-				$data['html'].='<div class="imagene_plato">	<img src="'.$this->base_url().$img->rutaImagen.'"></div>';
+				$data['html'].='<div align="center" class="imagene_plato">	<img height="auto" width="350px" src="'.base_url().$img->rutaImagen.'"></div>';
 			}else {
 				$data['html'].='<div class="imagene_plato">	<img src=""></div>';
 			}
-			$data['html'].='<p class="error" id="mensaje_plato"></p>';
-			$data['html'].='<p>Precio: '.$plato->precio.' Bs.</p>';
-			$data['html'].='<p>'.$plato->descripcion.'</p>';
-			$data['html'].=form_label('Cantidad', 'cantidad');
+			$data['html'].='<div><p class="error" id="mensaje_plato"></p></div>';
+			$data['html'].='<div><p>Precio: '.$plato->precio.' Bs.</p></div>';
+			$data['html'].='<div><p>'.$plato->descripcion.'</p></div>';
+			$data['html'].='<div>'.form_label('Cantidad', 'cantidad');
 			$attr = array(
               'name'        => 'cantidad',
               'id'          => 'cantidad',
-              'maxlength'   => '100',
-              'size'        => '50',
-              
-            );
-			$data['html'].=form_input($attr);
-			$data['html'].=form_label('Instrucciones Extra', 'instrucciones');
+//              'maxlength'   => '2',
+//              'size'        => '2',
+
+			);
+			$data['html'].=form_input($attr,1).'</div>';
+			$data['html'].='<div>'.form_label('Instrucciones Extra', 'instrucciones');
 			$attr2 = array(
               'name'        => 'instrucciones',
               'id'          => 'instrucciones',
-              'rows'   => '3',
-              'cols'        => '100',
+              'rows'   		=> '2',
+              'cols'        => '40',
               
             );
-			$data['html'].=form_txetarea($attr2);
+			$data['html'].=form_textarea($attr2).'</div>';
 			$data['html'].='</form>';
+			$data['nombrePlato']=$plato->nombre;
 		}else{
+			$data['plato']=false;
+			$data['html']='<p>error</p>';
+			$data['nombrePlato']=$plato->nombre;
 			
 		}
 		echo json_encode($data);

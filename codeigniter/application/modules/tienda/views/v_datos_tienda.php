@@ -10,7 +10,7 @@
 				
 				
 		}
-
+		
 		function validarSeleccion(){
 			if($("#cmbx_ciudad").val()=='' || $("#cmbx_zona").val()==''){
 				mostrarError($("#mensaje_error"), 'Debe seleccionar Ciudad y Zona');
@@ -27,10 +27,51 @@
 			$.cookie('zona', id_zona,{path: '/'});
 			$("#nombre_zona").html('<b>'+nombreZona+'</b>');
 			
+		}
+		
+		function cargarPopupplato(id_plato){
+			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
+					{'id_plato':id_plato},
+					function(data){
+			$("#popup-tienda").html(data.html)
+			.dialog({
+				title:data.nombrePlato,
+				autoOpen: false,
+				modal:true,
+				resizable: false,
+				width:400,
+				show:"blind",
+				hide:"explode",
+				buttons: {
+				'Aceptar' : function(){
+					$(this).dialog('close');
+				},
+				'Cancelar': function() {
+					$(this).dialog('close');
+				}
+				}
+
+								
+			});
+			$("input#cantidad").spinbox({
+				  min: 1,    
+				  max: 10,  
+				  step: 1 
+				});
+			$("#popup-tienda").dialog('open');
+			
+					},
+					'json'
+				);
+		}
+
+		function validarNumero(valor) {
+			
 		}			
 				
 		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
-		
+
+						
 		$("#cmbx_ciudad").live('change',function(event){	
 			event.preventDefault();
 			var id_ciudad = $(this).val(),
@@ -56,7 +97,8 @@
 		
 		$(".a-plato").click(function(event){	
 			event.preventDefault();
-			var id_tienda = $("#id_tienda").val() ;
+			var id_tienda = $("#id_tienda").val(),
+				id_plato = $(this).attr('id') ;
 			
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/validarDatos",
 					{'id_tienda':id_tienda},
@@ -91,7 +133,9 @@
 									if(validarSeleccion()){
 										
 										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
-										$(this).dialog('close');
+										cargarPopupplato(id_plato);
+//										$(this).dialog('close');
+										
 									}
 								},
 								'Cancelar': function() {
@@ -103,7 +147,7 @@
 							})
 							.dialog('open');
 						}else{
-							
+							cargarPopupplato(id_plato);
 						}	
 							
 					},
@@ -114,7 +158,8 @@
 		
 		$("#cambiar_ubicacion").click(function(event){
 			event.preventDefault();
-			var id_tienda = $("#id_tienda").val() ;
+			var id_tienda = $("#id_tienda").val();
+			
 			
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupActualizarAjax",
 					{'id_tienda':id_tienda},
@@ -161,9 +206,10 @@
 		<a id="cambiar_ubicacion" href="">Cambiar</a>
 	</p>
 </div>
+
 <div id="cabecera_tienda">
 			<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $id;?>" />
-			<div class="titulo_tienda">
+			<div  class="titulo_tienda">
 				<h2><span class="text"><?php echo $nombre ?> </span></h2>
 				<span class="text"><?php echo $tipo_comida?> </span><br>
 				<span class="text">Telefonos: <?php echo $telefono;?></span><br>
@@ -196,7 +242,7 @@
 
 			<?php foreach ($plato as $id => $p):?>	
 				<li>
-					<a class="a-plato" name="<?php echo $id;?>" value="<?php echo $id;?>" href="">
+					<a class="a-plato" name="<?php echo $id;?>" id="<?php echo $id;?>" href="">
 						<span class="text"><?php echo $p['nombre'];?> </span>
 						<span class="text"><?php echo $p['precio'];?> Bs. </span>
 					</a>
