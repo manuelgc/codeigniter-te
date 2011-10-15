@@ -1,9 +1,29 @@
 <script type="text/javascript">
 <!--
-$(document).ready(function(){	
-		
+$(document).ready(function(){			
+	<?php 
+			if (isset($editar_dir)) {
+		?>
+			var id_direccion = <?php echo $editar_dir;?>;	
+		<?php
+			}else{
+		?>
+			var id_direccion = '';
+		<?php
+			}
+		?>	
+
 	$('fieldset').each(function(){
-		$(this).collapse({closed:true});
+		var id = $(this).attr('id');
+		if(id_direccion == ''){
+			$(this).collapse({closed:true});
+		}else{
+			if(id_direccion == id){
+				$(this).collapse();
+			}else{
+				$(this).collapse({closed:true});
+			}
+		}
 	});	
 
 	$('.ciudad').each(function (){
@@ -211,7 +231,7 @@ $(document).ready(function(){
 		$contador_zona = 0;
 		foreach ($direcciones as $direccion):
 		?>
-			<fieldset>
+			<fieldset id="<?php echo $direccion['id'];?>">
 				<?php echo form_hidden('dir_id_'.$i,$direccion['id']);?>
 				<legend>
 					Direccion de envio

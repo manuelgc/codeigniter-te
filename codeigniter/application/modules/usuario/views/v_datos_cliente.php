@@ -11,21 +11,6 @@ function cargarFormularioDireccion(html,selector){
 	},1000);
 }
 
-function agregarDireccion(datos){
-	if(datos.respuesta == false){		
-		window.setTimeout(function(){
-			$('#nueva-dir').html('Lo sentimos, no hemos podido agregar la direccion especificada, por favor verifica los datos e intenta de nuevo');
-		},1000);		
-	}else{		
-		window.setTimeout(function(){
-			alert(datos.respuesta);
-			$('ul.direcciones-content').append(datos.respuesta);
-			$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
-			$('img#agregar-dir').show();
-		},1000);		
-	}	
-}
-
 function cargarTablaPed(html){
 	window.setTimeout( function(){
 		$('div.content-pedidos').html(html.lista_ped);
@@ -138,7 +123,18 @@ function cargarTablaPed(html){
 					preCargador('#nueva-dir');
 				},
 				success:function(data){
-					agregarDireccion(data);				
+					if(data.resultado == false){		
+						window.setTimeout(function(){
+							$('#nueva-dir').html('Lo sentimos, no hemos podido agregar la direccion especificada, por favor verifica los datos e intenta de nuevo');
+						},1000);		
+					}else{		
+						window.setTimeout(function(){
+							$('ul.direcciones-content').append(data.resultado);
+							$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
+							$('img#agregar-dir').show();
+							$('#nueva-dir').unblock();
+						},1000);								
+					}					
 				}
 			});						
 		});
@@ -214,19 +210,18 @@ function cargarTablaPed(html){
 		<div id="direcciones">
 			<ul class="direcciones-content">
 			<?php foreach ($dir_usuario as $direcciones):?>
-				<li><span class="inline">
+				<li><div class="direcciones">
 				Ciudad: <?php echo $direcciones['ciudad'];?>
 				, Zona: <?php echo $direcciones['zona'];?>
 				, Calle/Carrera: <?php echo $direcciones['calle_carrera'];?>
 				, Casa/Urb: <?php echo $direcciones['casa_urb'];?>
 				, Numero Casa/Apto: <?php echo $direcciones['numeroCasaApto'];?>
 				, Lugar de Referencia: <?php echo $direcciones['lugarreferencia'];?>
-				</span>
+				</div>
 				<div class="opciones-dir">
-							<img
-								src="<?php echo base_url();?>application/img/icon/edit-icon.png" />
-							<img
-								src="<?php echo base_url();?>application/img/icon/delete-icon.png" />
+					<?php echo anchor('usuario/c_editar_usuario/index/'.$direcciones['id'],
+							img(base_url().'application/img/icon/edit-icon.png'),
+							array('title'=>'Editar Direccion'));?>														
 				</div>
 				</li>
 				<?php //echo anchor('usuario/c_editar_direccion/'.$direcciones['id'],'Editar Direccion','class="button_text art-button"');?>
