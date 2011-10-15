@@ -56,7 +56,7 @@ class C_editar_usuario extends MX_Controller {
 		$this->template->set_layout('two_columns/theme');
 	}
 	
-	function index() {
+	function index($direccion = '') {
 		$data = $this->getDatosDireccionUsuario();
 		$this->agregarValidaciones($data);
 
@@ -73,7 +73,12 @@ class C_editar_usuario extends MX_Controller {
 				redirect('usuario/c_datos_usuario/index/1');	
 			}	
 		}else {			
-			$this->template->build('v_editar_usuario',$data);
+			if ($direccion == '') {
+				$this->template->build('v_editar_usuario',$data);
+			}else {
+				$data['editar_dir'] = $direccion;
+				$this->template->build('v_editar_usuario',$data);
+			}			
 		}					
 	}
 	
@@ -273,6 +278,7 @@ class C_editar_usuario extends MX_Controller {
 	function guardarDireccion() {
 		$id_usuario = 2;//$this->id_usuario
 		if ($this->input->is_ajax_request()) {
+			$data = array();
 			$d = new Direccionesenvio();
 			$ciu = new Ciudad();
 			$zona = new Zona();
@@ -290,22 +296,21 @@ class C_editar_usuario extends MX_Controller {
 			$u->get_by_id($id_usuario);
 			
 			if ($d->save(array($ciu,$zona,$u)) == FALSE) {					
-				$resultado = FALSE;
+				$data['resultado'] = FALSE;
 			}else {				
-				$resultado = '<li><span class="inline">Ciudad: '. $d->ciudad->get()->nombreCiudad;
-				$resultado .= ', Zona: '. $d->zona->get()->nombreZona;
-				$resultado .= ', Calle/Carrera: '. $d->calle_carrera;
-				$resultado .= ', Casa/Urb: '. $d->casa_urb;
-				$resultado .= ', Numero Casa/Apto: '. $d->numeroCasaApto;
-				$resultado .= ', Lugar de Referencia: '. $d->lugarreferencia;
-				$resultado .= '</span>';
-				$resultado .= '<div class="opciones-dir">';
-				$resultado .= '<img src="'.base_url().'application/img/icon/edit-icon.png" />';
-				$resultado .= '<img src="'.base_url().'application/img/icon/delete-icon.png" />';
-				$resultado .= '</div></li>';				
+				$data['resultado'] = '<li><div class="direcciones">Ciudad: '. $d->ciudad->get()->nombreCiudad;
+				$data['resultado'] .= ', Zona: '. $d->zona->get()->nombreZona;
+				$data['resultado'] .= ', Calle/Carrera: '. $d->calle_carrera;
+				$data['resultado'] .= ', Casa/Urb: '. $d->casa_urb;
+				$data['resultado'] .= ', Numero Casa/Apto: '. $d->numeroCasaApto;
+				$data['resultado'] .= ', Lugar de Referencia: '. $d->lugarreferencia;
+				$data['resultado'] .= '</div>';
+				$data['resultado'] .= '<div class="opciones-dir">';
+				$data['resultado'] .= '<img src="'.base_url().'application/img/icon/edit-icon.png" />';				
+				$data['resultado'] .= '</div></li>';				
 			}						
 			
-			echo json_encode($resultado);			
+			echo json_encode($data);			
 		}
 	}
 	

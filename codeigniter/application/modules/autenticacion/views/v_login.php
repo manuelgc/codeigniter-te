@@ -1,4 +1,7 @@
-<div id="form_container">
+<?php if (isset($error)): ?>
+	<div class="message"><?php echo $error;?></div>
+<?php endif;?>
+<div id="form_container_login">
 
 <?php 
 $oculto = array('oculto'=>'1');
@@ -9,30 +12,30 @@ echo form_open('autenticacion/c_login','id="form-login"',$oculto);?>
 	</div>
 	<ul>
 
-		<li id="li_1">		
-			<!-- <label class="description" for="element_1">Nombre de usuario o Correo electronico </label>  -->
-		<?php echo lang('logincliente_usuario','element_1','descripcion');?>
+		<li id="nombre-correo">					
+		<?php echo lang('logincliente_usuario','nombre_usuario','descripcion');?>
 			<div>
-				<input id="element_1" name="nombre_usuario" class="element text medium"
+				<input id="nombre_usuario" name="nombre_usuario" class="element text medium"
 					type="text" maxlength="255"
 					value="<?php echo set_value('nombre_usuario');?>" />
 					<?php echo form_error('nombre_usuario','<p class="error">','</p>');?>
 			</div>
-			<small class="guidelines" id="guide_1">Ingresa tu nombre de usuario o
+			<small class="guidelines" id="guide_nombre_usuario">Ingresa tu nombre de usuario o
 				correo electronico</small></li>
-		<li id="li_2">
+		<li id="contrasena">
 			<!-- <label class="description" for="element_2">Contrasena </label>  -->
-		<?php echo lang('logincliente_pass','element_2','description');?>
+		<?php echo lang('logincliente_pass','contrasena','description');?>
 			<div>
-				<input id="element_2" name="contrasena" class="element text medium"
+				<input id="contrasena" name="contrasena" class="element text medium"
 					type="password" maxlength="255" value="" />
 					<?php echo form_error('contrasena','<p class="error">','</p>');?>
 			</div>
 			<small class="guidelines" id="guide_2">Ingresa tu contrasena</small>
 		</li>
-		<li class="buttons"><input id="saveForm"
+		<li class="buttons"><input id="ingresar"
 			class="button_text art-button" type="submit" name="submit"
 			value="Ingresar" /></li>
+			<?php echo anchor('autenticacion/c_recordar_password','Problemas para acceder a tu cuenta?');?>
 	</ul>
 	<?php echo form_close();?>
 </div>

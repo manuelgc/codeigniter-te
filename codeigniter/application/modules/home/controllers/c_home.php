@@ -35,18 +35,15 @@ class C_home extends MX_Controller {
 				}
 			break;*/
 			case 'block':{
-				if ($this->view_respuesta == NULL) {
-					log_message('debug','EN EL IF DE VIEW_RESPUESTA');
-					$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
-				}else {
-					log_message('debug','EN EL ELSE DE VIEW_RESPUESTA');
-					log_message('debug',$this->view_respuesta);
+				if ($this->view_respuesta == NULL) {					
+					$data['output_block'] = Modules::run('autenticacion/c_login/getHtmlSesion');
+				}else {										
 					$data['output_block'] = $this->view_respuesta;
 				}
 			}
 			break;
 			case FALSE:{								
-				$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
+				$data['output_block'] = Modules::run('autenticacion/c_login/getHtmlSesion');
 			}
 			break;
 		}
@@ -61,7 +58,7 @@ class C_home extends MX_Controller {
 		$this->template->set_partial('post','web/layouts/two_columns/partials/post');
 		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
 		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
-		$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
+		//$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');					
 		$this->template->build('home/home');				
 	}

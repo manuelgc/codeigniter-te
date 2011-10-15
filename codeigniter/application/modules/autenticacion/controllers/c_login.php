@@ -22,10 +22,11 @@ class C_login extends MX_Controller {
 	}
 	
 	function index() {
-		if ($this->input->post('oculto')) {				
+		if ($this->input->post('oculto')) {			
+			echo 'en el post oculto';	
 			$this->ejecutarLogin();
-		}else {													
-			return $this->load->view('v_login',$data,true);
+		}else {												
+			return $this->load->view('v_login',$data,true);								
 		}		
 	}
 	
@@ -45,7 +46,16 @@ class C_login extends MX_Controller {
 			$resultado = $this->load->view('v_login',null,true);
 			$this->respuestaLogin($resultado);				
 		}else {
-			$this->template->build('v_registro_exitoso');
+			$resultado_logueo = $this->verificarDatosUsuario($this->input->post('nombre_usuario'), $this->input->post('contrasena'));
+			if ($resultado_logueo) {
+				$data['nombre'] = $this->session->userdata('nombreusuario');
+				$resultado = $this->load->view('v_datos_logueado',$data,true);
+				$this->respuestaLogin($resultado);
+			}else{
+				$data['error'] = 'El usuario o la contrasena introducidos no son correctos';
+				$resultado = $this->load->view('v_login',$data,true);
+				$this->respuestaLogin($resultado);
+			}			
 		}
 	}
 	
@@ -65,6 +75,7 @@ class C_login extends MX_Controller {
 		
 		if ($u->exists()) {
 			$this->crearSesion($u);
+			return TRUE;
 		}else{
 			return FALSE;
 		}
@@ -87,5 +98,17 @@ class C_login extends MX_Controller {
 		}		
 	}
 		
+	function getHtmlSesion(){
+		log_message('error','HIZO EL GETHTMLSESION');
+		if ($this->session->userdata('nombreusuario') === FALSE) {
+			echo 'en el if de la sesion';
+			return $this->load->view('v_login',$data,true);
+		}else {
+			echo 'en el else de la sesion';
+			$data['nombre'] = $this->session->userdata('nombreusuario');
+			return $this->load->view('v_datos_logueado',$data,true);
+		}		
+	}
+	
 }
 ?>

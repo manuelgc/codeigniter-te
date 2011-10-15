@@ -330,7 +330,7 @@ h2.art-logo-text {
 
 .art-content-layout .art-layout-cell,.art-content-layout .art-layout-cell .art-content-layout .art-layout-cell
 	{
-	display: block;
+	display: table-cell;
 }
 
 .art-layout-cell .art-layout-cell {
@@ -1983,4 +1983,22 @@ ul.link li{
 	float: left;
 	margin: 4px;
 	height: 5px; 
+}
+
+ul.direcciones-content li{
+	width: 100%;
+	padding-bottom: 10px;
+}
+
+div.direcciones{
+	width: 80%;
+	display: table-cell;
+	text-align: justify;
+	vertical-align: middle;
+}
+
+div.opciones-dir{
+	width: 20%;	
+	display:table-cell;
+	text-align: center;
 }
