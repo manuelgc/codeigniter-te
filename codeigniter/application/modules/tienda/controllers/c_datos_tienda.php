@@ -18,19 +18,22 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery.spinbox.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.spinbox.js'));		
+		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
-	
+		$data['output_block'] = $this->load->view('carrito/v_carrito','',true);	
+		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
 		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
-//		$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
+		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
 
 		if($this->input->post('id_tienda')){
 			$data=$this->getDatosTienda($this->input->post('id_tienda'));
 			$data+=$this->getCiudadZona();
+			
 			$this->template->build('v_datos_tienda',$data);
 		}
 		
@@ -203,8 +206,7 @@ class C_datos_tienda extends MX_Controller{
 			$attr = array(
               'name'        => 'cantidad',
               'id'          => 'cantidad',
-//              'maxlength'   => '2',
-//              'size'        => '2',
+              'size'        => '3',
 
 			);
 			$data['html'].=form_input($attr,1).'</div>';
