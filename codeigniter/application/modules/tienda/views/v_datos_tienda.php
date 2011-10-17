@@ -28,6 +28,19 @@
 			$("#nombre_zona").html('<b>'+nombreZona+'</b>');
 			
 		}
+
+		function agregarPlato(id_plato,nombre) {
+			var cantidad = $("#cantidad").val(),
+			instrucciones= $("#instrucciones").val();
+			
+			 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
+					  { 'id_plato': id_plato,'nombre':nombre, 'cantidad': cantidad, 'instrucciones': instrucciones },
+	  			function(data){
+	  				$("#carrito").html(data.html);	
+	 		 },
+				'json'); 
+			
+		}
 		
 		function cargarPopupplato(id_plato){
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
@@ -44,7 +57,9 @@
 				hide:"explode",
 				buttons: {
 				'Aceptar' : function(){
+					agregarPlato(id_plato, data.nombrePlato);
 					$(this).dialog('close');
+					
 				},
 				'Cancelar': function() {
 					$(this).dialog('close');
