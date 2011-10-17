@@ -11,7 +11,7 @@ class C_datos_usuario extends MX_Controller {
 		$this->load->library('table');
 		$this->load->library('pagination');
 		$this->load->module('busqueda/c_busqueda');
-		
+				
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));

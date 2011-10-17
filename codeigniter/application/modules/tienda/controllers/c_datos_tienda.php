@@ -6,7 +6,6 @@ class C_datos_tienda extends MX_Controller{
 		$this->load->helper('date');
 		$this->load->helper('language');
 		$this->load->helper('form');
-		$this->load->helper('language');
 		$this->load->helper('cookie');
 		$this->load->library('qtip2');
 		$this->load->module('busqueda/c_busqueda');
