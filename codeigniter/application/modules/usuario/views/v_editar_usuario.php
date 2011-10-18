@@ -76,7 +76,12 @@ $(document).ready(function(){
 		<li id="li_1"><?php echo lang('regcliente_usuario','element_1','description');?>
 			<div>
 				<span>Datos de <?php echo $nombre_usuario;?> </span>
-			</div>
+			</div>			
+		</li>
+		<li id="li_5"><?php echo lang('regcliente_email','element_5','description');?>
+			<div>		
+			 <?php echo $correo;?>					
+			</div> 
 		</li>
 		<li id="li_7"><?php echo lang('regcliente_contrasena','element_7','description');?>
 			<div>
@@ -126,25 +131,7 @@ $(document).ready(function(){
 					<?php echo form_error('apellidos','<p class="error">','</p>');?>
 			</div> <small class="guidelines" id="guide_3">Ingresa tus apellidos</small>
 
-		</li>
-		<li id="li_5"><?php echo lang('regcliente_email','element_5','description');?>
-			<div>
-				<input id="element_5" name="correo" class="element text medium"
-					type="text" maxlength="255"
-					value="<?php 
-					if (form_error('correo','<p class="error">','</p>') == '') {
-						if (set_value('correo') == '') {
-							echo $correo;
-						}else {
-							echo set_value('correo');
-						}
-					}
-					?>" />
-					<?php echo form_error('correo','<p class="error">','</p>');?>
-			</div> <small class="guidelines" id="guide_5">Es importante que
-				ingreses una direccion de correo electronico valida ya que a traves
-				de esta te enviaremos informacion de tus pedidos.</small>
-		</li>
+		</li>		
 		<li id="li_9"><?php echo lang('regcliente_tlf_fijo','element_9','description');?>
 			<span> <input id="element_9_1" name="tlf_fijo_1" class="element text"
 				size="3" maxlength="3"

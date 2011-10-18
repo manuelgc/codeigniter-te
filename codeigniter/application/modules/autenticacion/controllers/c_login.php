@@ -17,13 +17,13 @@ class C_login extends MX_Controller {
 	function __construct() {
 		parent::__construct();
 		$this->load->helper('language');	
-		$this->load->library('form_validation');		
+		$this->load->library('form_validation');	
+		$this->load->library('encrypt');	
 		$this->form_validation->CI =& $this;	
 	}
 	
 	function index() {
-		if ($this->input->post('oculto')) {			
-			echo 'en el post oculto';	
+		if ($this->input->post('oculto')) {							
 			$this->ejecutarLogin();
 		}else {												
 			return $this->load->view('v_login',$data,true);								
@@ -34,13 +34,14 @@ class C_login extends MX_Controller {
 		return $this->load->view('v_login');
 	}		
 	
-	function respuestaLogin($resultado) {
-		$this->session->set_userdata('respuesta_block','1');			
-		Modules::run('respuesta_modulos/c_procesar_respuesta/redirectRespuesta',$resultado);
+	function respuestaLogin($resultado) {		
+		//$this->session->set_userdata('respuesta_block','1');			
+		Modules::run('respuesta_modulos/c_procesar_respuesta/redirectRespuesta',$resultado,'block');
 	}
 	
 	function ejecutarLogin() {
 		$this->form_validation->set_rules($this->config);		
+		$this->input->set_cookie('respuesta_block','1',0);
 		
 		if ($this->form_validation->run($this) == FALSE) {									
 			$resultado = $this->load->view('v_login',null,true);
@@ -90,21 +91,27 @@ class C_login extends MX_Controller {
 		$this->session->set_userdata($usuario_logueado);
 	}
 	
-	function verificarExisteSesion() {
+	function cerrarSesion() {
+		$id_usuario = $this->verificarExisteSesion();
+		if (!FALSE) {
+			$this->session->unset_userdata('nombreusuario');
+			$this->session->unset_userdata('id');
+			redirect('home/c_home/index/'.$this->encrypt->sha1('cerrada'));
+		}
+	}
+	
+	function verificarExisteSesion($mensaje = '') {
 		if ($this->session->userdata('nombreusuario') === FALSE) {
-			return FALSE;
+			redirect('home/c_home/index/'.$this->encrypt->sha1($mensaje));
 		}else {
 			return $this->session->userdata('id');
 		}		
 	}
 		
 	function getHtmlSesion(){
-		log_message('error','HIZO EL GETHTMLSESION');
-		if ($this->session->userdata('nombreusuario') === FALSE) {
-			echo 'en el if de la sesion';
+		if ($this->session->userdata('nombreusuario') === FALSE) {			
 			return $this->load->view('v_login',$data,true);
-		}else {
-			echo 'en el else de la sesion';
+		}else {			
 			$data['nombre'] = $this->session->userdata('nombreusuario');
 			return $this->load->view('v_datos_logueado',$data,true);
 		}		
