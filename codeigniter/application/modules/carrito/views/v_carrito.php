@@ -1,3 +1,3 @@
 <div id="carrito">
-	<h3>Carrito de compras</h3>
+	<h3>Pedido</h3>
 </div>

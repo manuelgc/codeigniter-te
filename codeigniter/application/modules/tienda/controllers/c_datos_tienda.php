@@ -220,11 +220,9 @@ class C_datos_tienda extends MX_Controller{
 			$data['html'].=form_textarea($attr2).'</div>';
 			$data['html'].='</form>';
 			$data['nombrePlato']=$plato->nombre;
+			$data['precio']=$plato->precio;
 		}else{
-			$data['plato']=false;
-			$data['html']='<p>error</p>';
-			$data['nombrePlato']=$plato->nombre;
-			
+			$data['plato']=false;	
 		}
 		echo json_encode($data);
 	}
