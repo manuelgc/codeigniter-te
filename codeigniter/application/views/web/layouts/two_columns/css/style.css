@@ -2002,3 +2002,8 @@ div.opciones-dir{
 	display:table-cell;
 	text-align: center;
 }
+
+h5{
+	font-size: 16px;
+	font-family: verdana;
+}

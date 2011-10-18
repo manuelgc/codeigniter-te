@@ -5,7 +5,7 @@ class C_datos_usuario extends MX_Controller {
 	function __construct() {
 		
 		parent::__construct();
-		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion');
+		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion','nosesion');								
 		$this->load->helper('language');
 		$this->load->helper('cookie');
 		$this->load->library('table');
@@ -67,7 +67,12 @@ class C_datos_usuario extends MX_Controller {
 			'Mas Detalles',
 			'Reordenar'
 		);
-		$data['lista_ped'] = $this->table->generate($pedidos);
+		if (empty($pedidos)) {
+			$data['lista_ped'] = 'Aun no tienes pedidos registrados, te invitamos '.
+			'a visitar todos nuestros restaurantes presionando '.anchor('home/c_home','aqui');
+		}else{
+			$data['lista_ped'] = $this->table->generate($pedidos);	
+		}		
 		if ($this->input->is_ajax_request()) {
 			$this->table->set_heading('Tienda de Comida',
 			'Cantidad Total del Pedido', 
@@ -245,7 +250,7 @@ class C_datos_usuario extends MX_Controller {
 
 	function getDatosUsuario() {
 		$u = new Usuario();
-		$usuario_actual = $u->getUsuarioById(2); //$this->id_usuario
+		$usuario_actual = $u->getUsuarioById($this->id_usuario); //$this->id_usuario
 		if ($usuario_actual === FALSE) {
 			return NULL;
 		}else {
@@ -255,7 +260,7 @@ class C_datos_usuario extends MX_Controller {
 
 	function getDireccionesUsuario() {
 		$u = new Usuario();
-		$usuario_actual = $u->getDireccionesEnvio(2); //$this->id_usuario
+		$usuario_actual = $u->getDireccionesEnvio($this->id_usuario); //$this->id_usuario
 		if ($usuario_actual === FALSE) {
 			return NULL;
 		}else {
@@ -286,13 +291,13 @@ class C_datos_usuario extends MX_Controller {
 
 	function cargarPedidos($limit,$offset) {
 		$pedidos_usuario = new Pedido();
-		$resultado = $pedidos_usuario->getPedidosUsuario(2,$limit,$offset);
+		$resultado = $pedidos_usuario->getPedidosUsuario($this->id_usuario,$limit,$offset);
 		return $resultado;
 	}
 
 	function getCantPedidos($param_pedidos = array(),$order = '') {
 		$p = new Pedido();		
-		return $p->getCantPedUsuario(2,$param_pedidos,$order); //$this->id_usuario
+		return $p->getCantPedUsuario($this->id_usuario,$param_pedidos,$order); //$this->id_usuario
 	}
 
 	function getPedidoPorId($id_pedido) {
@@ -318,7 +323,7 @@ class C_datos_usuario extends MX_Controller {
 		$p = new Pedido();
 
 		$param_usuario = array(
-				'id' => 2,	//$this->id_usuario
+				'id' => $this->id_usuario,	//$this->id_usuario
 				'estatus' => 1
 		);
 
@@ -382,9 +387,9 @@ class C_datos_usuario extends MX_Controller {
 		//si esta seleccionado solo fecha
 		}elseif (($ped_fecha != FALSE) && ($estado_ped == FALSE) && ($tipo_ped == FALSE)){						
 			if ($ped_fecha == '1') {				
-				return $p->getPedidosUsuario(2,$limit,$offset); //$this->id_usuario
+				return $p->getPedidosUsuario($this->id_usuario,$limit,$offset); //$this->id_usuario
 			}else {				
-				return $p->getPedidosUsuario(2,$limit,$offset,'fechaPedido asc, horaPedido asc'); //$this->id_usuario
+				return $p->getPedidosUsuario($this->id_usuario,$limit,$offset,'fechaPedido asc, horaPedido asc'); //$this->id_usuario
 			}
 		}
 	}	

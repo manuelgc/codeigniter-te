@@ -4,6 +4,7 @@ class C_home extends MX_Controller {
 	private $partial_respuesta;
 	function __construct() {
 		parent::__construct();		
+		$this->load->library('encrypt');	
 		$this->view_respuesta == NULL;
 		$this->partial_respuesta == FALSE;
 		//$this->load->module('banner_principal/c_banner_principal');
@@ -13,17 +14,13 @@ class C_home extends MX_Controller {
 		delete_cookie('categoria');
 		delete_cookie('tipo_orden');
 		$this->load->module('busqueda/c_busqueda');	
-		
-			
 		//Eliminar cookie creadas al hacer busquedas
-		
-		
 	}
 		
-	function index() {				
-				
+	function index($param_mensaje = '') {								
 		$msg = $this->encrypt->encode('home/c_home');
-		$this->session->set_userdata('caller_block',$msg);			
+		$this->input->set_cookie('caller_block',$msg,0);
+		//$this->session->set_userdata('caller_block',$msg);			
 		switch ($this->partial_respuesta) {
 			//el breadcrumb no se esta usando aun porque hay que cambiar algunas cosas de sergio
 			//se mantiene como estaba antes
@@ -55,12 +52,15 @@ class C_home extends MX_Controller {
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
 		$this->template->set_partial('header','web/layouts/two_columns/partials/header',$data);
 		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
-		$this->template->set_partial('post','web/layouts/two_columns/partials/post');
-		$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
+		//$this->template->set_partial('post','web/layouts/two_columns/partials/post');
+		//$this->template->set_partial('menu','web/layouts/two_columns/partials/menu');
 		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		//$this->template->set_partial('menu','web/layouts/two_columns/partials/footer');
-		$this->template->set_layout('two_columns/theme');					
-		$this->template->build('home/home');				
+		$this->template->set_layout('two_columns/theme');
+
+		$data['mensaje'] = $this->setMensaje($param_mensaje);
+		
+		$this->template->build('home/home',$data);				
 	}
 	
 	function setViewRespuesta($param) {
@@ -69,6 +69,16 @@ class C_home extends MX_Controller {
 	
 	function setPartialRespuesta($param) {		
 		$this->partial_respuesta = $param;
+	}
+	
+	function setMensaje($mensaje = '') {
+		if (empty($mensaje)) {
+			return ;
+		}elseif ($mensaje == $this->encrypt->sha1('cerrada')){
+			return 'Haz salido de tu cuenta';
+		}elseif ($mensaje == $this->encrypt->sha1('nosesion')){
+			return 'Debes iniciar sesion para poder consultar tu informacion';
+		}
 	}
 }
 ?>

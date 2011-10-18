@@ -19,11 +19,6 @@ class C_editar_usuario extends MX_Controller {
 				'rules'=>'trim|required|max_length[40]|xss_clean'
 				),
 				array(
-				'field'=>'correo',
-				'label'=>'lang:regcliente_email',
-				'rules'=>'trim|required|valid_email|xss_clean'
-				),
-				array(
 				'field'=>'tlf_fijo_1',
 				'label'=>'lang:regcliente_tlf_fijo',
 				'rules'=>'trim|max_length[3]|required|callback_validar_fijo'
@@ -38,7 +33,7 @@ class C_editar_usuario extends MX_Controller {
 	
 	function __construct() {
 		parent::__construct();
-		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion');
+		$this->id_usuario = Modules::run('autenticacion/c_login/verificarExisteSesion','nosesion');
 		$this->load->module('busqueda/c_busqueda');
 		//$this->load->library('form_validation');
 		
@@ -99,12 +94,11 @@ class C_editar_usuario extends MX_Controller {
 		$cant_direcciones = $this->input->post('cant_dir');
 		$resultado = TRUE;
 		$u = new Usuario();
-		$u->id = 2; //$this->id_usuario;
+		$u->id = $this->id_usuario; //$this->id_usuario;
 		$u->nombre = $this->input->post('nombre');
 		$u->apellidos = $this->input->post('apellidos');
 		$u->telfijo = $this->input->post('tlf_fijo_1').$this->input->post('tlf_fijo_2').$this->input->post('tlf_fijo_3');		
-		$u->telefonoCel = $this->input->post('celular_1').$this->input->post('celular_2').$this->input->post('celular_3');
-		$u->correo = $this->input->post('correo');
+		$u->telefonoCel = $this->input->post('celular_1').$this->input->post('celular_2').$this->input->post('celular_3');		
 		if ($this->input->post('password') != '') {
 			$u->password = $this->input->post('password');
 		}				
@@ -152,7 +146,7 @@ class C_editar_usuario extends MX_Controller {
 	}
 	
 	function getDatosDireccionUsuario() {
-		$id_usuario = 2;//$this->id_usuario;
+		$id_usuario = $this->id_usuario;//$this->id_usuario;
 		$u = new Usuario();
 		
 		if ($usuario = $u->getUsuarioById($id_usuario)) {
@@ -163,12 +157,12 @@ class C_editar_usuario extends MX_Controller {
 			$datos['apellidos'] = $usuario->apellidos;
 			$datos['correo'] = $usuario->correo;
 			
-			$datos['tlf_fijo_1'] = substr($usuario->telfijo, -8, 3);
-			$datos['tlf_fijo_2'] = substr($usuario->telfijo, -5, 3);
+			$datos['tlf_fijo_1'] = substr($usuario->telfijo, -10, 3);
+			$datos['tlf_fijo_2'] = substr($usuario->telfijo, -7, 3);
 			$datos['tlf_fijo_3'] = substr($usuario->telfijo, -4);				 
 			 
-			$datos['celular_1'] = substr($usuario->telefonoCel, -8, 3);
-			$datos['celular_2'] = substr($usuario->telefonoCel, -5, 3);
+			$datos['celular_1'] = substr($usuario->telefonoCel, -10, 3);
+			$datos['celular_2'] = substr($usuario->telefonoCel, -7, 3);
 			$datos['celular_3'] = substr($usuario->telefonoCel, -4);
 			
 			$datos['ciudades'] = $this->cargarCiudad();
@@ -269,14 +263,14 @@ class C_editar_usuario extends MX_Controller {
 	}
 	
 	function mostrarFormDireccion() {
-		$id_usuario = 2;//$this->id_usuario
+		$id_usuario = $this->id_usuario;//$this->id_usuario
 		$data['ciudades'] = $this->cargarCiudad();	
 		$data['formulario'] = $this->load->view('v_form_direccion',$data,true); 	
 		echo json_encode($data);
 	}
 	
 	function guardarDireccion() {
-		$id_usuario = 2;//$this->id_usuario
+		$id_usuario = $this->id_usuario;//$this->id_usuario
 		if ($this->input->is_ajax_request()) {
 			$data = array();
 			$d = new Direccionesenvio();
@@ -306,7 +300,9 @@ class C_editar_usuario extends MX_Controller {
 				$data['resultado'] .= ', Lugar de Referencia: '. $d->lugarreferencia;
 				$data['resultado'] .= '</div>';
 				$data['resultado'] .= '<div class="opciones-dir">';
-				$data['resultado'] .= '<img src="'.base_url().'application/img/icon/edit-icon.png" />';				
+				$data['resultado'] .= anchor('usuario/c_editar_usuario/index/'.
+									$d->id,img(base_url().'application/img/icon/edit-icon.png'),
+									array('title'=>'Editar Direccion'));				
 				$data['resultado'] .= '</div></li>';				
 			}						
 			
