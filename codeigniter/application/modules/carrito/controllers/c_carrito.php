@@ -10,27 +10,62 @@
 		
 		function index() {
 			if($this->input->is_ajax_request()){
-				$this->agregarPlato();
-				$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+				$data['carrito']=$this->agregarPlato();
+				if($data['carrito']){
+					$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+				}
 				 echo json_encode($data); 
 			}
 		}
 		
 		function agregarPlato(){
-			
-			$data = array(
-               'id'      => $this->input->post('id_plato'),
-               'qty'     => $this->input->post('cantidad'),
-               'price'   => 1000,
-               'name'    => $this->input->post('nombre'),
-			'instrucciones'  =>$this->input->post('instrucciones')
-			//               'options' => array('Size' => 'L', 'Color' => 'Red')
-			
-            );
-			$this->cart->insert($data);
-//			print_r($data);
-//			print_r($this->cart->contents());
-			
+				
+			$plato= new Plato();
+			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+
+			if ($plato->exists()) {
+				$encontrado=false;
+				foreach ($this->cart->contents() as $items){
+					if($items['id']==$plato->id){
+						$encontrado=true;
+						$rowid=$items['rowid'];
+						break;
+						
+					}
+				}
+				if($encontrado){
+					$data = array(
+			               'rowid'      => $rowid,
+			               'qty'     => $items['qty']+$this->input->post('cantidad')
+					);
+					$this->cart->update($data);
+					
+				}else{
+					$data = array(
+			               'id'      => $this->input->post('id_plato'),
+			               'qty'     => $this->input->post('cantidad'),
+			               'price'   => $plato->precio,
+			               'name'    => $plato->nombre,
+					'instrucciones'  =>	$this->input->post('instrucciones'),
+					);
+					$this->cart->insert($data);
+					
+				}
+				return true;
+			}else{
+				return false;
+			}
 		}
+		
+		function actualizarPlato() {
+			$data = array(
+			        'rowid'   => $this->input->post('rowid'),
+			        'qty'     =>    $this->input->post('cantidad')
+			);
+			$this->cart->update($data);
+			$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+			echo json_encode($data);		
+		}
+
 	}
 ?>
