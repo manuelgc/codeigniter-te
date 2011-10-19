@@ -38,6 +38,17 @@ class Usuario extends DataMapper {
 		return $usuario->exists();
 	}
 	
+	function buscarPorCorreo($correo) {
+		$u = new Usuario();
+		$u->where('estatus',1);
+		$u->where('correo',$correo);
+		if (!$u->exists()) {
+			return FALSE;
+		}else {
+			return $u;
+		}
+	}
+	
 	function getUsuarioById($id_usuario) {
 		$usuario = new Usuario();
 		$usuario->where('id',$id_usuario);
