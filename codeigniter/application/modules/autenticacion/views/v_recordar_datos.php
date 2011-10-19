@@ -1,24 +1,21 @@
 <div id="form_container">
-	<form id="form_272007" class="appnitro" method="post" action="">
-		<div class="form_description">
-			<h2>Recordar Contrasena</h2>
-			<p></p>
-		</div>
-		<ul>
-			<li id="li_1"><label class="description" for="element_1">Correo </label>
+<?php echo form_open('autenticacion/c_recordar_datos','id="recordar-datos"',array('oculto'=>'1'));?>
+	<div class="form_description">
+		<h2>Recordar Contrasena</h2>
+	</div>
+	<ul>
+		<li id="li_1"><label class="description" for="correo">Correo </label>
+			<div>				
+				<input id="correo" name="correo" class="element text medium"
+					type="text" maxlength="255" value="<?php echo set_value('correo');?>" />
+			</div>
+			<p class="guidelines" id="guide_correo">
+				<small>Ingresa tu direccion de correo electronico</small>
+			</p>
+		</li>
 
-				<div>
-					<input id="element_1" name="element_1" class="element text medium"
-						type="text" maxlength="255" value="" />
-				</div>
-				<p class="guidelines" id="guide_1">
-					<small>Ingresa tu direccion de correo electronico</small>
-				</p></li>
+		<li class="buttons"></li>
+	</ul>
 
-			<li class="buttons"><input type="hidden" name="form_id"
-				value="272007" /> <input id="saveForm" class="button_text"
-				type="submit" name="submit" value="Submit" /></li>
-		</ul>
-
-	</form>
+	<?php echo form_close();?>
 </div>
