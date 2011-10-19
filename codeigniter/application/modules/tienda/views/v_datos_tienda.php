@@ -114,10 +114,6 @@
 					'json'
 				);
 		}
-
-		function validarNumero(valor) {
-			
-		}			
 				
 		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
 
@@ -145,7 +141,7 @@
 			}	
 		});
 		
-		$(".a-plato").click(function(event){	
+		$("a.a-plato").click(function(event){	
 			event.preventDefault();
 			var id_tienda = $("#id_tienda").val(),
 				id_plato = $(this).attr('id') ;

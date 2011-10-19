@@ -1,30 +1,100 @@
 <script type="text/javascript">
 <!--
 
+function cargarPopupEditar(id_plato,cantidad,instrucciones){
+	$.post("<?php echo base_url();?>index.php/carrito/c_carrito/cargarPopupEditarAjax",
+			{'id_plato':id_plato,'cantidad':cantidad,'instrucciones':instrucciones},
+			function(data){
+				if(data.plato){			
+					$("#popup-tienda").html(data.html)
+					.dialog({
+						title:"Editar "+data.nombrePlato,
+						autoOpen: false,
+						modal:true,
+						resizable: false,
+						width:400,
+						show:"blind",
+						hide:"explode",
+						buttons: {
+						'Aceptar' : function(){
+//							if (validarCantidad()){
+//							agregarPlato(id_plato, data.nombrePlato);
+							$(this).dialog('close');
+//							}
+						},
+						'Cancelar': function() {
+							$(this).dialog('close');
+						}
+						}
+		
+										
+					});
+					$("input#cantidad").spinbox({
+						  min: 1,    
+						  max: 10,  
+						  step: 1 
+						});
+					$("#popup-tienda").dialog('open');
+				}
+//				else{
+//					mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+//				}
+			},
+			'json'
+		);
+}
+
 $("input.cantidad").spinbox({
 	  min: 1,    
 	  max: 10,  
 	  step: 1 
 	});
-$("input.cantidad").change(
+
+$("input.cantidad").focusout(
 		function(event){	
 			event.preventDefault();
-			var id="#"+$(this).attr("name")+"[rowid]";
-			console.log(id);
-			var rowid = $(id).val(),
+			var rowid = $(this).attr("name"),
 			cantidad=$(this).val();
-			console.log("valor"+rowid);
+			objeto=$(this);
 			if(cantidad != ''){
 			$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
 					{'cantidad':cantidad,'rowid':rowid},
 					function(data){
-						$("carrito").html(data.html);	
+						$("#carrito").html(data.html);	
 					},
 					'json'
 				);
+
 			}	
+		});
+
+$("a.a-eliminar").click(
+		function(event){	
+			event.preventDefault();
+			var rowid = $(this).attr("name");
+
+			$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
+					{'cantidad':0,'rowid':rowid},
+					function(data){
+						$("#carrito").html(data.html);	
+					},
+					'json'
+				);
+	
 		}
-		);
+);
+
+$("a.a-editar").click(function(event){	
+	event.preventDefault();
+	var id_plato = $(this).attr('name'),
+	instrucciones= $("#"+$(this).attr('id')+"instrucciones").val(),
+	cantidad= $("#"+$(this).attr('id')+"cantidad").val();
+
+	cargarPopupEditar(id_plato,cantidad,instrucciones);
+	
+});
+
+
 //-->
 </script>
 
@@ -34,7 +104,7 @@ $("input.cantidad").change(
 <div class="titulo-carrito" align="center">
 	<h3>Pedido</h3>
 </div>
-<!--<table cellpadding="6" cellspacing="1" style="width:100%" border="0">-->
+
 
 <div class="cabecera-carrito">
   <span>Cantidad</span>
@@ -49,11 +119,21 @@ $("input.cantidad").change(
 		
 		<li class="plato-carrito">
 		  <div>
-		  <?php echo form_hidden($i.'[rowid]', $items['rowid']); ?>
-		  <span> <?php echo form_input(array('id' => $i.'[qty]','name' => $i, 'value' => $items['qty'], 'maxlength' => '2', 'size' => '3','class' => 'cantidad')); ?></span>
-		  <span><?php echo $items['name']; ?></span>
-		  <span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
-		  <span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['subtotal']); ?></span>
+		  		<div>
+					<?php echo form_hidden($i.'rowid', $items['rowid']); ?>
+					<?php echo form_hidden($i.'instrucciones', $items['instrucciones']); ?>
+					<span> <?php echo form_input(array('id' => $i.'cantidad','name' => $items['rowid'], 'value' => $items['qty'], 'maxlength' => '2', 'size' => '3','class' => 'cantidad')); ?></span>
+					<span><?php echo $items['name']; ?></span>
+					<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
+					<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['subtotal']); ?></span>
+					<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>	
+				</div>
+				
+				<div class="eliminar-plato">
+						<?php echo anchor('',
+						img(array( 'src'=> base_url().'application/img/icon/delete-icon.png','width' => '15px','height' => '15px')),
+						array('title' => 'Eliminar Plato','class' => 'a-eliminar','name' => $items['rowid']));?>														
+				</div>
 		  </div>
 		</li>
 	<?php $i++; ?>
@@ -66,6 +146,5 @@ $("input.cantidad").change(
 	  </div>
 	</li>
 </ul>
-<!--</table>-->
 
 <!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->
