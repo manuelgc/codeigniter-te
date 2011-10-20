@@ -10,7 +10,7 @@ class Recordardato extends DataMapper {
 	function setRecordarDato($correo) {
 		$rd = new Recordardato();
 		$rd->correo = $correo;
-		$rd->string = $this->encrypt->sha1($correo);
+		$rd->string = $correo;
 		$rd->tiempo = date('H:i:s',time()+(60*60*2));
 		if ($rd->save()) {
 			return $rd->string;

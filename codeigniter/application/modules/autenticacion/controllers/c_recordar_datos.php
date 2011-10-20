@@ -12,6 +12,7 @@ class C_recordar_datos extends MX_Controller {
 		$this->load->library('form_validation');
 		$this->load->library('qtip2');
 		$this->load->library('email');
+		$this->form_validation->CI =& $this;	
 		//plantilla				
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/view.js'));
@@ -25,26 +26,55 @@ class C_recordar_datos extends MX_Controller {
 	}
 	
 	function index($param_mensaje = '') {
-		$this->template->build('v_recordar_datos');
+		if ($this->input->post('oculto')) {
+			$this->form_validation->set_rules($this->config);
+			if ($this->form_validation->run($this) == FALSE) {
+				$this->template->build('v_recordar_datos');		
+			}else {
+				$data['mensaje'] = $this->procesarForm($this->input->post('correo'));
+				$this->template->build('v_dato_recordado',$data);
+			}
+		}else {
+			$this->template->build('v_recordar_datos');
+		}				
 	}
 	
-	function procesarForm() {
-		$correo = $this->input->post('correo');
+	function procesarForm($correo) {		
 		$u = new Usuario();
 		$resultado_busqueda = $u->buscarPorCorreo($correo);
 		if ($resultado_busqueda == FALSE) {
-			return 'Lo sentimos, el correo ingresado no se encuentra registrado, '.
-			'para crear una nueva cuenta presione '.anchor('autenticacion/c_registro_usuario','aqui');
+			return 'Lo sentimos, el correo ingresado no se encuentra registrado, si desea intentar nuevamente presione '.
+			anchor('autenticacion/c_recordar_datos','aqui').', para crear una nueva cuenta presione '.anchor('autenticacion/c_registro_usuario','aqui');
 		}else{
-			
+			if ($this->enviarCorreo($resultado_busqueda) == TRUE) {
+				return 'Te hemos enviado un correo electronico indicando los pasos que debes seguir para recuperar tu contrasena';
+			}
 		}
 	}
 	
 	function enviarCorreo($usuario) {
 		$rd = new Recordardato();
 		if ($rd->setRecordarDato($usuario->correo) == FALSE) {
-			
-		}		
+			return FALSE;
+		}else {
+			$data['vinculo'] = $rd->string;
+			$data['tiempo'] = $rd->tiempo;
+			$resultado = $this->load->view('v_correo_recordar_datos',$data,TRUE);
+			return $this->__enviar_correo($usuario->correo, $resultado);
+		}
+	}
+	
+	function __enviar_correo($correo,$mensaje) {
+		$this->email->from('admingmail@binaural.com.ve','Todo Express');
+		$this->email->to($correo);
+		$this->email->subject('Todo Express - Recordar Contrasena');
+		$this->email->message($mensaje);
+		$this->email->send();		
+		if (!$this->email->send()) {
+			return FALSE;
+		}else {
+			return TRUE;
+		}
 	}
 }
 ?>
