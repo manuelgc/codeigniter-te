@@ -964,11 +964,20 @@ class CI_Email {
 	 */
 	private function _write_headers()
 	{
-		if ($this->protocol == 'mail')
+		/*if ($this->protocol == 'mail')
 		{
 			$this->_subject = $this->_headers['Subject'];
 			unset($this->_headers['Subject']);
-		}
+		}*/
+		//fix bug
+		if ($this->protocol == 'mail')
+		{
+    			if (array_key_exists('Subject', $this->_headers))
+    			{
+				        $this->_subject = $this->_headers['Subject'];
+				        unset($this->_headers['Subject']);
+    			}
+		}  
 
 		reset($this->_headers);
 		$this->_header_str = "";
