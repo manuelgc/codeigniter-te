@@ -1,7 +1,7 @@
 <script type="text/javascript">
 <!--
 
-function cargarPopupEditar(id_plato,cantidad,instrucciones){
+function cargarPopupEditar(id_plato,cantidad,instrucciones,rowid){
 	$.post("<?php echo base_url();?>index.php/carrito/c_carrito/cargarPopupEditarAjax",
 			{'id_plato':id_plato,'cantidad':cantidad,'instrucciones':instrucciones},
 			function(data){
@@ -18,7 +18,7 @@ function cargarPopupEditar(id_plato,cantidad,instrucciones){
 						buttons: {
 						'Aceptar' : function(){
 //							if (validarCantidad()){
-//							agregarPlato(id_plato, data.nombrePlato);
+							editarPlato(id_plato,rowid);
 							$(this).dialog('close');
 //							}
 						},
@@ -42,6 +42,24 @@ function cargarPopupEditar(id_plato,cantidad,instrucciones){
 			},
 			'json'
 		);
+}
+
+function editarPlato(id_plato,rowid) {
+	var cantidad = $("#cantidad").val(),
+	instrucciones= $("#instrucciones").val();
+	
+	 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/editarPlato",
+			  { 'id_plato': id_plato,'cantidad': cantidad, 'instrucciones': instrucciones,'rowid':rowid },
+			function(data){
+//		  	if (data.carrito) {
+		  		$("#carrito").html(data.html);	
+//			} else {
+//				mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+//			}		
+					
+		 },
+		'json'); 
+	
 }
 
 $("input.cantidad").spinbox({
@@ -88,9 +106,10 @@ $("a.a-editar").click(function(event){
 	event.preventDefault();
 	var id_plato = $(this).attr('name'),
 	instrucciones= $("#"+$(this).attr('id')+"instrucciones").val(),
-	cantidad= $("#"+$(this).attr('id')+"cantidad").val();
+	cantidad= $("#"+$(this).attr('id')+"cantidad").val()
+	rowid= $("#"+$(this).attr('id')+"rowid").val();
 
-	cargarPopupEditar(id_plato,cantidad,instrucciones);
+	cargarPopupEditar(id_plato,cantidad,instrucciones,rowid);
 	
 });
 
