@@ -90,7 +90,7 @@
 								buttons: {
 								'Aceptar' : function(){
 									if (validarCantidad()){
-									agregarPlato(id_plato, data.nombrePlato);
+									agregarPlato(id_plato);
 									$(this).dialog('close');
 									}
 								},

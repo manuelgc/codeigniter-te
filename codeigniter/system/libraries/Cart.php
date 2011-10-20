@@ -339,10 +339,12 @@ class CI_Cart {
 
 		// Is the new quantity different than what is already saved in the cart?
 		// If it's the same there's nothing to do
-		if ($this->_cart_contents[$items['rowid']]['qty'] == $items['qty'])
-		{
-			return FALSE;
-		}
+		
+		//Se Omite la validación
+//		if ($this->_cart_contents[$items['rowid']]['qty'] == $items['qty'])
+//		{
+//			return FALSE;
+//		}
 
 		// Is the quantity zero?  If so we will remove the item from the cart.
 		// If the quantity is greater than zero we are updating
@@ -352,7 +354,18 @@ class CI_Cart {
 		}
 		else
 		{
-			$this->_cart_contents[$items['rowid']]['qty'] = $items['qty'];
+		// Esta es la instrución original del metodo _update 		
+//			$this->_cart_contents[$items['rowid']]['qty'] = $items['qty'];
+			
+		// 	Nueva instrucción para guardar todo los atributos pasados 
+		//	por el parametro items, a excepción del "rowid" 
+			foreach ($items as $key => $val)
+			{
+				if($key!='rowid'){
+					$this->_cart_contents[$items['rowid']][$key] = $val;
+				}
+			}
+			
 		}
 
 		return TRUE;

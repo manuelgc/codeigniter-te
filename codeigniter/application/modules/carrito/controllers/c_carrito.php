@@ -34,21 +34,21 @@
 					}
 				}
 				if($encontrado){
-					$data = array(
+					$data1 = array(
 			               'rowid'      => $rowid,
 			               'qty'     => $items['qty']+$this->input->post('cantidad')
 					);
-					$this->cart->update($data);
+					$this->cart->update($data1);
 					
 				}else{
-					$data = array(
+					$data1 = array(
 			               'id'      => $this->input->post('id_plato'),
 			               'qty'     => $this->input->post('cantidad'),
 			               'price'   => $plato->precio,
 			               'name'    => $plato->nombre,
 					'instrucciones'  =>	$this->input->post('instrucciones'),
 					);
-					$this->cart->insert($data);
+					$this->cart->insert($data1);
 					
 				}
 				return true;
@@ -56,58 +56,69 @@
 				return false;
 			}
 		}
-		
+
 		function actualizarPlato() {
-			$data = array(
+			$data1 = array(
+			        'rowid'   => $this->input->post('rowid'),
+			        'qty'     =>    $this->input->post('cantidad'),
+			);
+			$this->cart->update($data1);
+			$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+			echo json_encode($data);
+		}
+
+
+		function editarPlato() {
+			$data1 = array(
 			        'rowid'   => $this->input->post('rowid'),
 			        'qty'     =>    $this->input->post('cantidad'),
 			 'instrucciones'  =>	$this->input->post('instrucciones')
 			);
-			$this->cart->update($data);
+			$this->cart->update($data1);
 			$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
-			echo json_encode($data);		
+			echo json_encode($data);
 		}
-		
-	function cargarPopupEditarAjax(){
-		$plato = new Plato();
-		$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
-		
-		if($plato->exists()){
-			$data['plato']=true;
-			$data['html']='<form>';
-			$img=$plato->getImagen();
-			if($img!=false){
-				$data['html'].='<div align="center" class="imagene_plato">	<img height="auto" width="350px" src="'.base_url().$img->rutaImagen.'"></div>';
-			}else {
-				$data['html'].='<div class="imagene_plato">	<img src=""></div>';
-			}
-			$data['html'].='<div><p class="error" id="mensaje_plato"></p></div>';
-			$data['html'].='<div><p>Precio: '.$plato->precio.' Bs.</p></div>';
-			$data['html'].='<div><p>'.$plato->descripcion.'</p></div>';
-			$data['html'].='<div>'.form_label('Cantidad', 'cantidad');
-			$attr = array(
+			
+		function cargarPopupEditarAjax(){
+			$plato = new Plato();
+			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+
+			if($plato->exists()){
+				$data['plato']=true;
+				$data['html']='<form>';
+				$img=$plato->getImagen();
+				if($img!=false){
+					$data['html'].='<div align="center" class="imagene_plato">	<img height="auto" width="350px" src="'.base_url().$img->rutaImagen.'"></div>';
+				}else {
+					$data['html'].='<div class="imagene_plato">	<img src=""></div>';
+				}
+				$data['html'].='<div><p class="error" id="mensaje_plato"></p></div>';
+				$data['html'].='<div><p>Precio: '.$plato->precio.' Bs.</p></div>';
+				$data['html'].='<div><p>'.$plato->descripcion.'</p></div>';
+				$data['html'].='<div>'.form_label('Cantidad', 'cantidad');
+				$attr = array(
               'name'        => 'cantidad',
               'id'          => 'cantidad',
               'size'        => '3',
 
-			);
-			$data['html'].=form_input($attr,$this->input->post('cantidad')).'</div>';
-			$data['html'].='<div>'.form_label('Instrucciones Extra', 'instrucciones');
-			$attr2 = array(
+				);
+				$data['html'].=form_input($attr,$this->input->post('cantidad')).'</div>';
+				$data['html'].='<div>'.form_label('Instrucciones Extra', 'instrucciones');
+				$attr2 = array(
               'name'        => 'instrucciones',
               'id'          => 'instrucciones',
               'rows'   		=> '2',
               'cols'        => '40',
-              
-            );
-			$data['html'].=form_textarea($attr2,$this->input->post('instrucciones')).'</div>';
-			$data['html'].='</form>';
-			$data['nombrePlato']=$plato->nombre;
-			$data['precio']=$plato->precio;
-		}else{
-			$data['plato']=false;	
+
+				);
+				$data['html'].=form_textarea($attr2,$this->input->post('instrucciones')).'</div>';
+				$data['html'].='</form>';
+				$data['nombrePlato']=$plato->nombre;
+				$data['precio']=$plato->precio;
+			}else{
+				$data['plato']=false;
+			}
+			echo json_encode($data);
 		}
-		echo json_encode($data);
 	}
-	}
-?>
+	?>
