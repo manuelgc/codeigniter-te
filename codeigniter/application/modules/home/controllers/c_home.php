@@ -10,15 +10,11 @@ class C_home extends MX_Controller {
 		//$this->load->module('banner_principal/c_banner_principal');
 		$this->load->helper('cookie');
 		$this->load->module('busqueda/c_busqueda');		
+		//Eliminar cookie creadas al hacer busquedas
 		delete_cookie('ciudad');
 		delete_cookie('zona');
 		delete_cookie('categoria');
-		delete_cookie('tipo_orden');		
-		unset($_COOKIE['ciudad']);
-		unset($_COOKIE['zona']);
-		unset($_COOKIE['categoria']);
-		unset($_COOKIE['tipo_orden']);				
-		//Eliminar cookie creadas al hacer busquedas
+		delete_cookie('tipo_orden');				
 	}
 		
 	function index($param_mensaje = '') {								

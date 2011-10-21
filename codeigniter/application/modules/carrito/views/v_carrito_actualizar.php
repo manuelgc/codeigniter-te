@@ -1,9 +1,9 @@
 <script type="text/javascript">
 <!--
 
-function cargarPopupEditar(id_plato,cantidad,instrucciones,rowid){
+function cargarPopupEditar(id_plato,cantidad,observacion,rowid){
 	$.post("<?php echo base_url();?>index.php/carrito/c_carrito/cargarPopupEditarAjax",
-			{'id_plato':id_plato,'cantidad':cantidad,'instrucciones':instrucciones},
+			{'id_plato':id_plato,'cantidad':cantidad,'observacion':observacion},
 			function(data){
 				if(data.plato){			
 					$("#popup-tienda").html(data.html)
@@ -46,10 +46,10 @@ function cargarPopupEditar(id_plato,cantidad,instrucciones,rowid){
 
 function editarPlato(id_plato,rowid) {
 	var cantidad = $("#cantidad").val(),
-	instrucciones= $("#instrucciones").val();
+	observacion= $("#observacion").val();
 	
 	 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/editarPlato",
-			  { 'id_plato': id_plato,'cantidad': cantidad, 'instrucciones': instrucciones,'rowid':rowid },
+			  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'rowid':rowid },
 			function(data){
 //		  	if (data.carrito) {
 		  		$("#carrito").html(data.html);	
@@ -105,11 +105,11 @@ $("a.a-eliminar").click(
 $("a.a-editar").click(function(event){	
 	event.preventDefault();
 	var id_plato = $(this).attr('name'),
-	instrucciones= $("#"+$(this).attr('id')+"instrucciones").val(),
+	observacion= $("#"+$(this).attr('id')+"observacion").val(),
 	cantidad= $("#"+$(this).attr('id')+"cantidad").val()
 	rowid= $("#"+$(this).attr('id')+"rowid").val();
 
-	cargarPopupEditar(id_plato,cantidad,instrucciones,rowid);
+	cargarPopupEditar(id_plato,cantidad,observacion,rowid);
 	
 });
 
@@ -140,7 +140,7 @@ $("a.a-editar").click(function(event){
 		  <div>
 		  		<div>
 					<?php echo form_hidden($i.'rowid', $items['rowid']); ?>
-					<?php echo form_hidden($i.'instrucciones', $items['instrucciones']); ?>
+					<?php echo form_hidden($i.'observacion', $items['observacion']); ?>
 					<span> <?php echo form_input(array('id' => $i.'cantidad','name' => $items['rowid'], 'value' => $items['qty'], 'maxlength' => '2', 'size' => '3','class' => 'cantidad')); ?></span>
 					<span><?php echo $items['name']; ?></span>
 					<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>

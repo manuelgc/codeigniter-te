@@ -209,10 +209,10 @@ class C_datos_tienda extends MX_Controller{
 
 			);
 			$data['html'].=form_input($attr,1).'</div>';
-			$data['html'].='<div>'.form_label('Instrucciones Extra', 'instrucciones');
+			$data['html'].='<div>'.form_label('Observaci&oacute;n', 'observacion');
 			$attr2 = array(
-              'name'        => 'instrucciones',
-              'id'          => 'instrucciones',
+              'name'        => 'observacion',
+              'id'          => 'observacion',
               'rows'   		=> '2',
               'cols'        => '40',
               

@@ -1,6 +1,6 @@
 <?php
 	class c_carrito extends MX_Controller {
-		
+		private $limite =10;
 		function __construct(){
 			parent::__construct(); 
 			$this->load->library('cart'); 
@@ -34,10 +34,21 @@
 					}
 				}
 				if($encontrado){
-					$data1 = array(
-			               'rowid'      => $rowid,
-			               'qty'     => $items['qty']+$this->input->post('cantidad')
-					);
+					$valor= $items['qty'] + $this->input->post('cantidad');
+					
+					if($this->input->post('observacion')==''){
+						$data1 = array(
+				               'rowid'   => $rowid,
+				               'qty'     => (($valor>$this->limite)?$this->limite:$valor)
+						);
+					}else{
+						$data1 = array(
+				               'rowid'   => $rowid,
+				               'qty'     => (($valor>$this->limite)?$this->limite:$valor),
+						  'observacion'  =>	$this->input->post('observacion')
+						);
+						
+					}
 					$this->cart->update($data1);
 					
 				}else{
@@ -46,7 +57,7 @@
 			               'qty'     => $this->input->post('cantidad'),
 			               'price'   => $plato->precio,
 			               'name'    => $plato->nombre,
-					'instrucciones'  =>	$this->input->post('instrucciones'),
+					  'observacion'  =>	$this->input->post('observacion'),
 					);
 					$this->cart->insert($data1);
 					
@@ -72,7 +83,7 @@
 			$data1 = array(
 			        'rowid'   => $this->input->post('rowid'),
 			        'qty'     =>    $this->input->post('cantidad'),
-			 'instrucciones'  =>	$this->input->post('instrucciones')
+			 'observacion'  =>	$this->input->post('observacion')
 			);
 			$this->cart->update($data1);
 			$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
@@ -103,15 +114,15 @@
 
 				);
 				$data['html'].=form_input($attr,$this->input->post('cantidad')).'</div>';
-				$data['html'].='<div>'.form_label('Instrucciones Extra', 'instrucciones');
+				$data['html'].='<div>'.form_label('Observacion', 'observacion');
 				$attr2 = array(
-              'name'        => 'instrucciones',
-              'id'          => 'instrucciones',
+              'name'        => 'observacion',
+              'id'          => 'observacion',
               'rows'   		=> '2',
               'cols'        => '40',
 
 				);
-				$data['html'].=form_textarea($attr2,$this->input->post('instrucciones')).'</div>';
+				$data['html'].=form_textarea($attr2,$this->input->post('observacion')).'</div>';
 				$data['html'].='</form>';
 				$data['nombrePlato']=$plato->nombre;
 				$data['precio']=$plato->precio;
