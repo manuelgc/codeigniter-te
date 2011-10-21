@@ -11,49 +11,7 @@
 				
 		}
 		
-		function validarSeleccion(){
-			if($("#cmbx_ciudad").val()=='' || $("#cmbx_zona").val()==''){
-				mostrarError($("#mensaje_error"), 'Debe seleccionar Ciudad y Zona');
-				return false;
-			}else {
-				return true;
-			}		
-		}
-		function validarCantidad(){
-			if($("#cantidad").val()==''){
-				mostrarError($("#mensaje_error"), 'Debe seleccionar una cantidad mayor a cero');
-				return false;
-			}else {
-				return true;
-			}		
-		}
-		function actualizarCiudadZona(id_ciudad,id_zona,nombreCiudad,nombreZona) {
-		
-			$.cookie('ciudad', id_ciudad,{path: '/'});
-			$("#nombre_ciudad").html('<b>'+nombreCiudad+'</b>');
-			$.cookie('zona', id_zona,{path: '/'});
-			$("#nombre_zona").html('<b>'+nombreZona+'</b>');
-			
-		}
-
-		function agregarPlato(id_plato) {
-			var cantidad = $("#cantidad").val(),
-			instrucciones= $("#instrucciones").val();
-			
-			 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
-					  { 'id_plato': id_plato,'cantidad': cantidad, 'instrucciones': instrucciones },
-	  			function(data){
-				  	if (data.carrito) {
-				  		$("#carrito").html(data.html);	
-					} else {
-						mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
-					}		
-	  					
-	 		 },
-				'json'); 
-			
-		}
-		function mostrarError(div,titulo,mensaje) {
+		function dialogError(div,titulo,mensaje) {
 			div.html('<p>'+mensaje+'</p>')
 			.dialog({
 				title:titulo,
@@ -72,7 +30,49 @@
 								
 			}).dialog('open');
 		}
+		function validarSeleccion(){
+			if($("#cmbx_ciudad").val()=='' || $("#cmbx_zona").val()==''){
+				mostrarError($("#mensaje_error"), 'Debe seleccionar Ciudad y Zona');
+				return false;
+			}else {
+				return true;
+			}		
+		}
+		function validarCantidad(inputCant,pError){
+			if(inputCant.val()==''){
+				dialogError(pError, 'Debe seleccionar una cantidad mayor a cero');
+				return false;
+			}else {
+				return true;
+			}		
+		}
+		function actualizarCiudadZona(id_ciudad,id_zona,nombreCiudad,nombreZona) {
 		
+			$.cookie('ciudad', id_ciudad,{path: '/'});
+			$("#nombre_ciudad").html('<b>'+nombreCiudad+'</b>');
+			$.cookie('zona', id_zona,{path: '/'});
+			$("#nombre_zona").html('<b>'+nombreZona+'</b>');
+			
+		}
+
+		function agregarPlato(id_plato) {
+			var cantidad = $("#cantidad").val(),
+			observacion= $("#observacion").val();
+			
+			 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
+					  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion },
+	  			function(data){
+				  	if (data.carrito) {
+				  		$("#carrito").html(data.html);	
+					} else {
+						dialogError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+					}		
+	  					
+	 		 },
+				'json'); 
+			
+		}
+				
 		function cargarPopupplato(id_plato){
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
 					{'id_plato':id_plato},
@@ -89,7 +89,7 @@
 								hide:"explode",
 								buttons: {
 								'Aceptar' : function(){
-									if (validarCantidad()){
+									if (validarCantidad($("#cantidad"),$("#mensaje_error"))){
 									agregarPlato(id_plato);
 									$(this).dialog('close');
 									}
@@ -108,7 +108,7 @@
 								});
 							$("#popup-tienda").dialog('open');
 						}else{
-							mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+							dialogError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
 						}
 					},
 					'json'
@@ -150,7 +150,7 @@
 					{'id_tienda':id_tienda},
 					function(data){
 						if(!data.abierto){
-							mostrarError($("#popup-tienda"),'Cerrado', data.html);
+							dialogError($("#popup-tienda"),'Cerrado', data.html);
 						}else if(!data.zona){
 							$("#popup-tienda").html(data.html_zona)
 							.dialog({

@@ -95,6 +95,8 @@ if ( ! function_exists('delete_cookie'))
 	function delete_cookie($name = '', $domain = '', $path = '/', $prefix = '')
 	{
 		set_cookie($name, '', '', $domain, $path, $prefix);
+		//Eliminar la variable $_cookie de Php
+		unset($_COOKIE[$name]);
 	}
 }
 
