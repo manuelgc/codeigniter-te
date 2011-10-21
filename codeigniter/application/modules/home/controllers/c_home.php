@@ -8,12 +8,16 @@ class C_home extends MX_Controller {
 		$this->view_respuesta == NULL;
 		$this->partial_respuesta == FALSE;
 		//$this->load->module('banner_principal/c_banner_principal');
-		$this->load->helper('cookie');	
+		$this->load->helper('cookie');
+		$this->load->module('busqueda/c_busqueda');		
 		delete_cookie('ciudad');
 		delete_cookie('zona');
 		delete_cookie('categoria');
-		delete_cookie('tipo_orden');
-		$this->load->module('busqueda/c_busqueda');	
+		delete_cookie('tipo_orden');		
+		unset($_COOKIE['ciudad']);
+		unset($_COOKIE['zona']);
+		unset($_COOKIE['categoria']);
+		unset($_COOKIE['tipo_orden']);				
 		//Eliminar cookie creadas al hacer busquedas
 	}
 		

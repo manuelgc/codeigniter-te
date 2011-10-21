@@ -11,7 +11,8 @@ class C_recordar_datos extends MX_Controller {
 		parent::__construct();
 		$this->load->library('form_validation');
 		$this->load->library('qtip2');
-		$this->load->library('email');
+		$this->load->library('email');		
+		$this->load->helper('date');
 		$this->form_validation->CI =& $this;	
 		//plantilla				
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/view.css'));
@@ -54,6 +55,7 @@ class C_recordar_datos extends MX_Controller {
 	
 	function enviarCorreo($usuario) {
 		$rd = new Recordardato();
+		
 		if ($rd->setRecordarDato($usuario->correo) == FALSE) {
 			return FALSE;
 		}else {
