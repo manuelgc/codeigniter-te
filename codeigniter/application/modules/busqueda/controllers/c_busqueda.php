@@ -32,7 +32,7 @@ class c_busqueda extends MX_Controller{
 		$this->config['last_tag_close'] = '</li>';
 		
 	}
-	function index($offset = '',$desde ='') {
+	function index($offset = '',$desde ='') {				
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/view.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.blockUI.js'));
@@ -383,8 +383,7 @@ class c_busqueda extends MX_Controller{
 		$options= array();
 		if (!$ciudad->exists()) {
 			return FALSE;
-		}else{
-
+		}else{				
 			foreach ($ciudad as $ci) {
 				$options[$ci->id] = $ci->nombreCiudad;
 			}
