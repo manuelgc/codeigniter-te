@@ -27,6 +27,11 @@ class Plato extends DataMapper {
 	'favoritosusuario'=> array(
             'class' => 'favoritosusuario',
             'other_field' => 'plato'),
+	'plato_extra' => array(
+            'class' => 'plato_extra',
+            'other_field' => 'plato',
+			'join_other_as' => 'plato_extra',
+			'join_self_as' => 'plato')
 	'pedido'=> array(
 						'class'=>'pedido',
 						'other_field' => 'plato',		
