@@ -78,6 +78,10 @@ class C_home extends MX_Controller {
 			return 'Haz salido de tu cuenta';
 		}elseif ($mensaje == $this->encrypt->sha1('nosesion')){
 			return 'Debes iniciar sesion para poder consultar tu informacion';
+		}elseif ($mensaje == $this->encrypt->sha1('nuevopassok')){
+			return 'Hemos guardado tu nueva contrasena';
+		}elseif ($mensaje == $this->encrypt->sha1('nuevopasserror')){
+			return 'Disculpa pero hemos tenido un problema para guardar contrasena, por favor intenta de nuevo mas tarde';
 		}
 	}
 }

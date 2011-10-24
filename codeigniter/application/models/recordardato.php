@@ -20,35 +20,40 @@ class Recordardato extends DataMapper {
 	}
 	
 	function setRecordarDato($correo) {
-		$rd = new Recordardato();
+		$rd = new Recordardato();				
 		$rd->where('correo',$correo)->get();
-		$rd->check_last_query();		
-		if ($rd->exists()) {
-			$rd->where('tiempo <= DATE_SUB(CURDATE(),INTERVAL 2 HOUR_SECOND)')->order_by('tiempo','desc')->get();
-			$rd->check_last_query();			
-			if ($rd->exists()) {
+		if (!$rd->exists()) {
+			$rd->correo = $correo;
+			$rd->string = sha1($correo);				
+			$rd->tiempo = date('Y:m:d:H:i:s',now()+(60*60*2));
+			if ($rd->save()) {
 				return $rd;
 			}else {
-				$rd->delete_all();
+				return FALSE;
+			}
+		}else {
+			$rd->query('select 1 AS diferencia_tiempo
+						FROM (`recordardatos`) 
+						where 
+						correo = "'.$correo.'" and 
+						timediff(`recordardatos`.`tiempo`, now()) > "00:00:00"');
+					
+			if ($rd->diferencia_tiempo == '1') {
+				$rd->where('correo',$correo)->get();				
+				return $rd;
+			}else {
+				$rd->where('correo',$correo)->get();				
+				$rd->delete();
 				$rd->correo = $correo;
 				$rd->string = sha1($correo);				
 				$rd->tiempo = date('Y:m:d:H:i:s',now()+(60*60*2));
 				if ($rd->save()) {
-					return $rd->string;
+					return $rd;
 				}else {
 					return FALSE;
 				}
-			}
-		}else {
-			$rd->correo = $correo;
-			$rd->string = sha1($correo);			
-			$rd->tiempo = date('Y:m:d:H:i:s',now()+(60*60*2));
-			if ($rd->save()) {
-				return $rd->string;
-			}else {
-				return FALSE;
-			}
-		}				
+			}	
+		}
 	}
 }
 ?>
