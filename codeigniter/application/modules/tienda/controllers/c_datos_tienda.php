@@ -201,23 +201,110 @@ class C_datos_tienda extends MX_Controller{
 			$data['html'].='<div><p class="error" id="mensaje_plato"></p></div>';
 			$data['html'].='<div><p>Precio: '.$plato->precio.' Bs.</p></div>';
 			$data['html'].='<div><p>'.$plato->descripcion.'</p></div>';
+			
+			$opciones= $plato->getOpciones();
+			if($opciones!=false){
+				foreach ($opciones as $opcion) {
+					$items=$opcion->getOpcionesDetalle();
+					if($items!=false){
+						$requerido=($opcion->requerido==1)?'(*)':'';
+						$data['html'].='<div class="titulo-opciones"><strong><p>'.$opcion->nombre.'<span class="requerido"> '.$requerido.'</span></p></strong></div>';
+						$data['html'].='<div class="contenido-extras"><ul>';
+						if($opcion->maximo==1){
+							foreach ($items as $item) {
+								$data['html'].='<li>';
+								$attrRadio = array(
+							    'name'        => $opcion->id,
+							    'id'          => $item->id,
+							    'value'       => $item->id,
+								);
+
+								$data['html'].= form_radio($attrRadio);
+								$data['html'].=form_label($item->nombre, $item->id);
+								$data['html'].='</li>';
+							}
+						}else{
+							foreach ($items as $item) {
+								$data['html'].='<li>';
+								$attrCheck = array(
+							    'name'        => $item->id,
+							    'id'          => $item->id,
+							    'value'       => $item->id,
+								);
+
+								$data['html'].= form_checkbox($attrCheck);
+								$data['html'].=form_label($item->nombre, $item->id);
+								$data['html'].='</li>';
+							}
+						}
+						$data['html'].='</div"></ul>';
+					}
+				}
+
+			}
+				
+			$extras= $plato->getExtras();
+			if($extras!=false){
+				foreach ($extras as $extra) {
+					$itemsExt=$extra->getExtrasDetalle();
+					if($itemsExt!=false){
+						$requerido=($extra->requerido==1)?'(*)':'';
+						$data['html'].='<div class="titulo-extras"><strong><p>'.$extra->nombre.'<span class="requerido"> '.$requerido.'</span></p></strong></div>';
+						$data['html'].='<div class="contenido-opciones"><ul>';
+						if($extra->maximo==1){
+							foreach ($itemsExt as $itemExt) {
+								$data['html'].='<li><div class="detalle-extra">';
+								$attrRadio = array(
+							    'name'        => $extra->id,
+							    'id'          => $itemExt->id,
+							    'value'       => $itemExt->id,
+								);
+
+
+								$data['html'].= form_radio($attrRadio);
+								$data['html'].=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
+                    			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);
+								$data['html'].='</div></li>';
+								
+							}
+						}else{
+							foreach ($itemsExt as $itemExt) {
+								$data['html'].='<li><div class="detalle-extra">';
+								$attrCheck = array(
+							    'name'        => $itemExt->id,
+							    'id'          => $itemExt->id,
+							    'value'       => $itemExt->id,
+								);
+								$data['html'].= form_checkbox($attrCheck);
+								$data['html'].=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
+                    			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);
+								$data['html'].='</div></li>';
+
+							}
+						}
+						$data['html'].='</div><ul>';
+					}
+				}
+
+			}
+			
 			$data['html'].='<div>'.form_label('Cantidad', 'cantidad');
-			$attr = array(
+			$attrText = array(
               'name'        => 'cantidad',
               'id'          => 'cantidad',
               'size'        => '3',
 
 			);
-			$data['html'].=form_input($attr,1).'</div>';
+			$data['html'].=form_input($attrText,1).'</div>';
 			$data['html'].='<div>'.form_label('Observaci&oacute;n', 'observacion');
-			$attr2 = array(
+			$attrArea = array(
               'name'        => 'observacion',
               'id'          => 'observacion',
               'rows'   		=> '2',
               'cols'        => '40',
               
             );
-			$data['html'].=form_textarea($attr2).'</div>';
+			$data['html'].=form_textarea($attrArea).'</div>';
 			$data['html'].='</form>';
 			$data['nombrePlato']=$plato->nombre;
 			$data['precio']=$plato->precio;

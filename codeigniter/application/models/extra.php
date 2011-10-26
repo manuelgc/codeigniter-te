@@ -18,5 +18,30 @@ class Extra extends DataMapper{
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}
+	
+	function getExtrasDetalle() {
+		$detalles= $this->extrasdetalle->where('estatus',1)->get();
+		if ($detalles->exists()) {
+			return $detalles;
+		}else {
+			return false;
+		}
+		
+	}
+	
+	function getExtrasDetalleById($id_extra) {
+		$extra= new Extra();
+		$extra->where('estatus',1)->get_by_id($id_extra);
+		if ($extra->exists()){
+			$detalles= $extra->extrasdetalle->where('estatus',1)->get();
+			if ($detalles->exists()) {
+				return $detalles;
+			}else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
 }
 ?>

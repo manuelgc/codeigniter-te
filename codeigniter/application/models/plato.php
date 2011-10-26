@@ -1,6 +1,7 @@
 <?php 
 class Plato extends DataMapper {
 	var $table = 'platos';
+	
 	var $has_one= array(
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
@@ -13,6 +14,7 @@ class Plato extends DataMapper {
 			'join_other_as' => 'categoriaplatos',
 			'join_self_as' => 'plato')
 	); 
+	
 	var $has_many = array(
 	'promocion'=> array(
             'class' => 'promocion',
@@ -54,6 +56,58 @@ class Plato extends DataMapper {
 		}else {
 			return false;
 		}
+	}
+	
+	function getExtras(){
+		$extra= $this->extra->where('estatus',1)->get();
+		if ($extra->exists()) {
+			return $extra;
+		}else{
+			return false;
+		}
+	}
+
+	function getExtrasbyId($id_plato){
+		$plato= new Plato();
+		$plato->where('estatus',1)->get_by_id($id_plato);
+		
+		if ($plato->exists()) {
+			$extra= $plato->extra->where('estatus',1)->get();
+			if ($extra->exists()) {
+				return $extra;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+
+	}
+	
+	function getOpciones(){
+		$opciones= $this->opcionesplato->where('estatus',1)->get();
+		if ($opciones->exists()) {
+			return $opciones;
+		}else{
+			return false;
+		}
+	}
+
+	function getOpcionesbyId($id_plato){
+		$plato= new Plato();
+		$plato->where('estatus',1)->get_by_id($id_plato);
+		
+		if ($plato->exists()) {
+			$opciones= $plato->opcionesplato->where('estatus',1)->get();
+			if ($opciones->exists()) {
+				return $opciones;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+
 	}
 	
 }
