@@ -18,5 +18,31 @@ class Opcionesplato extends DataMapper{
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}
+
+	function getOpcionesDetalle() {
+		$detalles= $this->opcionesdetalle->where('estatus',1)->get();
+		if ($detalles->exists()) {
+			return $detalles;
+		}else {
+			return false;
+		}
+		
+	}
+	
+	function getOpcionesDetalleById($id_opciones) {
+		$opciones= new Opcionesplato();
+		$opciones->where('estatus',1)->get_by_id($id_opciones);
+		if ($opciones->exists()){
+			$detalles= $opciones->opcionesdetalle->where('estatus',1)->get();
+			if ($detalles->exists()) {
+				return $detalles;
+			}else {
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+
 }
 ?>

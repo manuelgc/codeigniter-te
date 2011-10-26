@@ -57,7 +57,7 @@ class C_login extends MX_Controller {
 				$data['error'] = 'Para entrar a tu cuenta administrativa debes seleccionar '.anchor('admin/c_login_admin','aqui');
 				$resultado = $this->load->view('v_login',$data,true);
 				$this->respuestaLogin($resultado);
-			}else {
+			}else {				
 				$this->crearSesion($resultado_logueo);
 				$data['nombre'] = $this->session->userdata('nombreusuario');
 				$resultado = $this->load->view('v_datos_logueado',$data,true);
