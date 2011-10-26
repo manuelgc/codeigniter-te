@@ -48,19 +48,25 @@ class C_login extends MX_Controller {
 			$this->respuestaLogin($resultado);				
 		}else {
 			$resultado_logueo = $this->verificarDatosUsuario($this->input->post('nombre_usuario'), $this->input->post('contrasena'));
-			if ($resultado_logueo) {
-				$data['nombre'] = $this->session->userdata('nombreusuario');
-				$resultado = $this->load->view('v_datos_logueado',$data,true);
-				$this->respuestaLogin($resultado);
-			}else{
+			if ($resultado_logueo == FALSE) {
 				$data['error'] = 'El usuario o la contrasena introducidos no son correctos';
 				$resultado = $this->load->view('v_login',$data,true);
 				$this->respuestaLogin($resultado);
-			}			
+			}
+			if ($resultado_logueo === 1) {
+				$data['error'] = 'Para entrar a tu cuenta administrativa debes seleccionar '.anchor('admin/c_login_admin','aqui');
+				$resultado = $this->load->view('v_login',$data,true);
+				$this->respuestaLogin($resultado);
+			}else {
+				$this->crearSesion($resultado_logueo);
+				$data['nombre'] = $this->session->userdata('nombreusuario');
+				$resultado = $this->load->view('v_datos_logueado',$data,true);
+				$this->respuestaLogin($resultado);
+			}							
 		}
 	}
 	
-	function verificarDatosUsuario($usuario_email,$contrasena) {
+	function verificarDatosUsuario($usuario_email,$contrasena,$tipo_usuario = 3) {
 		$campo_busqueda = '';
 		if ($this->form_validation->valid_email($usuario_email)) {
 			$campo_busqueda = 'correo';
@@ -69,23 +75,14 @@ class C_login extends MX_Controller {
 		}
 		
 		$u = new Usuario();
-		$u->where($campo_busqueda,$usuario_email);
-		$u->where('password',md5($contrasena));
-		$u->where('estatus',1);
-		$u->get();
-		
-		if ($u->exists()) {
-			$this->crearSesion($u);
-			return TRUE;
-		}else{
-			return FALSE;
-		}
+		return $u->getUsuarioLogueo($usuario_email,$contrasena,$tipo_usuario,$campo_busqueda);				
 	}
 	
 	function crearSesion($usuario) {
 		$usuario_logueado = array(
 			'nombreusuario' => $usuario->nombreusuario,
-			'id' => $usuario->id
+			'id' => $usuario->id,
+			'tipousuario' => $usuario->tipousuarios_id
 		);
 		
 		$this->session->set_userdata($usuario_logueado);
