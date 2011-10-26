@@ -32,6 +32,45 @@ class Usuario extends DataMapper {
 		parent::__construct($id);
 	}
 	
+	function getUsuarioLogueoAdmin($usuario_email = '',$contrasena = '',$campo_busqueda = 'nombreusuario') {
+		$u = new Usuario();
+		
+		$u->where($campo_busqueda,$usuario_email);
+		$u->where('password',md5($contrasena));
+		$u->where('estatus',1)->get();
+		
+		if ($u->exists()) {
+			return $u;
+		}else {
+			return FALSE;
+		}
+	}
+	
+	function getUsuarioLogueo($usuario_email = '',$contrasena = '',$tipo_usuario,$campo_busqueda = 'nombreusuario') {
+		$u = new Usuario();
+		$tipusuario = new Tipousuario();
+		
+		$u->where($campo_busqueda,$usuario_email);
+		$u->where('password',md5($contrasena));
+		$u->where('estatus',1);			
+
+		$tipusuario->where('estatus',1);
+		$tipusuario->where('id',$tipo_usuario);
+		
+		$u->get();
+		$tipusuario->get();
+				
+		if ($u->exists()) {			
+			if ($u->tipousuarios_id == $tipusuario->id) {
+				return $u;
+			}else {
+				return 1;
+			}			
+		}else{
+			return FALSE;
+		}
+	}
+	
 	function buscarPorNombreUsuario($nombre_usuario) {
 		$usuario = new Usuario();
 		$usuario->where('nombreusuario',$nombre_usuario)->get();			
