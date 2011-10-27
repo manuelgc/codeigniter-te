@@ -17,6 +17,8 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery.spinbox.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.spinbox.js'));		
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/ui.checkbox.css'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/ui.checkbox.js'));
 		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		$data['output_block'] = $this->load->view('carrito/v_carrito','',true);	
@@ -190,128 +192,116 @@ class C_datos_tienda extends MX_Controller{
 		$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 		
 		if($plato->exists()){
-			$data['plato']=true;
-			$data['html']='<form>';
+			$dataAjax['plato']=true;
 			$img=$plato->getImagen();
 			if($img!=false){
-				$data['html'].='<div align="center" class="imagene_plato">	<img height="auto" width="350px" src="'.base_url().$img->rutaImagen.'"></div>';
+				$data['imagen']=base_url().$img->rutaImagen;
 			}else {
-				$data['html'].='<div class="imagene_plato">	<img src=""></div>';
+				$data['imagen']="";
 			}
-			$data['html'].='<div><p class="error" id="mensaje_plato"></p></div>';
-			$data['html'].='<div><p>Precio: '.$plato->precio.' Bs.</p></div>';
-			$data['html'].='<div><p>'.$plato->descripcion.'</p></div>';
+			$data['precio']=$plato->precio;
+			$data['descripcion']=$plato->descripcion;
 			
 			$opciones= $plato->getOpciones();
+			$arrOpciones= array();
 			if($opciones!=false){
 				foreach ($opciones as $opcion) {
 					$items=$opcion->getOpcionesDetalle();
 					if($items!=false){
-						$requerido=($opcion->requerido==1)?'(*)':'';
-						$data['html'].='<div class="titulo-opciones"><strong><p>'.$opcion->nombre.'<span class="requerido"> '.$requerido.'</span></p></strong></div>';
-						$data['html'].='<div class="contenido-extras"><ul>';
+						$arrOpciones[$opcion->id]['nombre']=$opcion->nombre;
+						$arrOpciones[$opcion->id]['requerido']=($opcion->requerido==1)?'(*)':'';
+						$arrOpciones[$opcion->id]['minimo']=$opcion->minimo;
+						$arrOpciones[$opcion->id]['maximo']=$opcion->maximo;
 						if($opcion->maximo==1){
+							$arrItem= array();
 							foreach ($items as $item) {
-								$data['html'].='<li>';
+								
 								$attrRadio = array(
 							    'name'        => $opcion->id,
 							    'id'          => $item->id,
 							    'value'       => $item->id,
 								);
-
-								$data['html'].= form_radio($attrRadio);
-								$data['html'].=form_label($item->nombre, $item->id);
-								$data['html'].='</li>';
+								$arrItem[$item->id]['id']=$item->id;
+								$arrItem[$item->id]['input']= form_radio($attrRadio);
+								$arrItem[$item->id]['label']=form_label($item->nombre, $item->id);
+								
 							}
+							$arrOpciones[$opcion->id]['opcion_item']=$arrItem;
 						}else{
+							$arrItem= array();
 							foreach ($items as $item) {
-								$data['html'].='<li>';
+								
 								$attrCheck = array(
 							    'name'        => $item->id,
 							    'id'          => $item->id,
 							    'value'       => $item->id,
 								);
-
-								$data['html'].= form_checkbox($attrCheck);
-								$data['html'].=form_label($item->nombre, $item->id);
-								$data['html'].='</li>';
+								$arrItem[$item->id]['id']=$item->id;
+								$arrItem[$item->id]['input']= form_checkbox($attrCheck);
+								$arrItem[$item->id]['label']= form_label($item->nombre, $item->id);
+								
 							}
+							$arrOpciones[$opcion->id]['opccion_item']=$arrItem;
 						}
-						$data['html'].='</div"></ul>';
 					}
 				}
-
+				$data['opciones']=$arrOpciones;
 			}
 				
 			$extras= $plato->getExtras();
+			$arrExtras= array();
 			if($extras!=false){
 				foreach ($extras as $extra) {
 					$itemsExt=$extra->getExtrasDetalle();
 					if($itemsExt!=false){
-						$requerido=($extra->requerido==1)?'(*)':'';
-						$data['html'].='<div class="titulo-extras"><strong><p>'.$extra->nombre.'<span class="requerido"> '.$requerido.'</span></p></strong></div>';
-						$data['html'].='<div class="contenido-opciones"><ul>';
+						$arrExtras[$extra->id]['nombre']=$extra->nombre;
+						$arrExtras[$extra->id]['requerido']=($extra->requerido==1)?'(*)':'';
+						$arrExtras[$extra->id]['minimo']=$extra->minimo;
+						$arrExtras[$extra->id]['maximo']=$extra->maximo;
 						if($extra->maximo==1){
+							$arrItem= array();
 							foreach ($itemsExt as $itemExt) {
-								$data['html'].='<li><div class="detalle-extra">';
+							
 								$attrRadio = array(
 							    'name'        => $extra->id,
 							    'id'          => $itemExt->id,
 							    'value'       => $itemExt->id,
 								);
-
-
-								$data['html'].= form_radio($attrRadio);
-								$data['html'].=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
+								$arrItem[$itemExt->id]['id']=$itemExt->id;
+								$arrItem[$itemExt->id]['input']= form_radio($attrRadio);
+								$arrItem[$itemExt->id]['label']=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
                     			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);
-								$data['html'].='</div></li>';
-								
+								$arrExtras[$extra->id]['extra_item']=$arrItem;							
 							}
+							$arrExtras[$extra->id]['extra_item']=$arrItem;	
 						}else{
+							$arrItem= array();
 							foreach ($itemsExt as $itemExt) {
-								$data['html'].='<li><div class="detalle-extra">';
+								
 								$attrCheck = array(
 							    'name'        => $itemExt->id,
 							    'id'          => $itemExt->id,
 							    'value'       => $itemExt->id,
 								);
-								$data['html'].= form_checkbox($attrCheck);
-								$data['html'].=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
-                    			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);
-								$data['html'].='</div></li>';
-
+								$arrItem[$itemExt->id]['id']=$itemExt->id;
+								$arrItem[$itemExt->id]['input']= form_checkbox($attrCheck);
+								$arrItem[$itemExt->id]['label']=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
+                    			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);															
 							}
+							$arrExtras[$extra->id]['extra_item']=$arrItem;
 						}
-						$data['html'].='</div><ul>';
-					}
 				}
-
+				}
+				$data['extras']=$arrExtras;
 			}
+			$dataAjax['html']=$this->load->view('tienda/v_popup_plato',$data,true);
+			$dataAjax['nombrePlato']=$plato->nombre;
+			$dataAjax['precio']=$plato->precio;
 			
-			$data['html'].='<div>'.form_label('Cantidad', 'cantidad');
-			$attrText = array(
-              'name'        => 'cantidad',
-              'id'          => 'cantidad',
-              'size'        => '3',
-
-			);
-			$data['html'].=form_input($attrText,1).'</div>';
-			$data['html'].='<div>'.form_label('Observaci&oacute;n', 'observacion');
-			$attrArea = array(
-              'name'        => 'observacion',
-              'id'          => 'observacion',
-              'rows'   		=> '2',
-              'cols'        => '40',
-              
-            );
-			$data['html'].=form_textarea($attrArea).'</div>';
-			$data['html'].='</form>';
-			$data['nombrePlato']=$plato->nombre;
-			$data['precio']=$plato->precio;
 		}else{
-			$data['plato']=false;	
+			$dataAjax['plato']=false;	
 		}
-		echo json_encode($data);
+		echo json_encode($dataAjax);
 	}
 	
 	function cargarCiudad($id_tienda){
