@@ -18,7 +18,11 @@ class Opcionesplato extends DataMapper{
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}
-
+	/* Al registrasr opciones:
+	 *  maximo 0 Sin Limite
+	 * 	minimo debe ser >= 1 cuando se requiere y 0 si no es requerido
+	 */
+	
 	function getOpcionesDetalle() {
 		$detalles= $this->opcionesdetalle->where('estatus',1)->get();
 		if ($detalles->exists()) {

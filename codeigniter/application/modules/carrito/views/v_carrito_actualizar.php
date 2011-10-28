@@ -106,7 +106,7 @@ $("a.a-editar").click(function(event){
 	event.preventDefault();
 	var id_plato = $(this).attr('name'),
 	observacion= $("#"+$(this).attr('id')+"observacion").val(),
-	cantidad= $("#"+$(this).attr('id')+"cantidad").val()
+	cantidad= $("#"+$(this).attr('id')+"cantidad").val(),
 	rowid= $("#"+$(this).attr('id')+"rowid").val();
 
 	cargarPopupEditar(id_plato,cantidad,observacion,rowid);

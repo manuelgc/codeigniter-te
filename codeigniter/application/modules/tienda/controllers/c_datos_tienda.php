@@ -12,13 +12,14 @@ class C_datos_tienda extends MX_Controller{
 	}
 
 	function index(){
-		$this->template->append_metadata(link_tag(base_url().'/application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
-		$this->template->append_metadata(script_tag(base_url().'/application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery.spinbox.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.spinbox.js'));		
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/ui.checkbox.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/ui.checkbox.js'));
+		
 		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		$data['output_block'] = $this->load->view('carrito/v_carrito','',true);	
@@ -209,7 +210,7 @@ class C_datos_tienda extends MX_Controller{
 					$items=$opcion->getOpcionesDetalle();
 					if($items!=false){
 						$arrOpciones[$opcion->id]['nombre']=$opcion->nombre;
-						$arrOpciones[$opcion->id]['requerido']=($opcion->requerido==1)?'(*)':'';
+						$arrOpciones[$opcion->id]['requerido']=($opcion->requerido==1)?'(Requerido)':'';
 						$arrOpciones[$opcion->id]['minimo']=$opcion->minimo;
 						$arrOpciones[$opcion->id]['maximo']=$opcion->maximo;
 						if($opcion->maximo==1){
@@ -217,7 +218,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($items as $item) {
 								
 								$attrRadio = array(
-							    'name'        => $opcion->id,
+							    'name'        => $opcion->id.'opcion',
 							    'id'          => $item->id,
 							    'value'       => $item->id,
 								);
@@ -232,7 +233,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($items as $item) {
 								
 								$attrCheck = array(
-							    'name'        => $item->id,
+							    'name'        => $opcion->id.'opcion',
 							    'id'          => $item->id,
 							    'value'       => $item->id,
 								);
@@ -255,7 +256,7 @@ class C_datos_tienda extends MX_Controller{
 					$itemsExt=$extra->getExtrasDetalle();
 					if($itemsExt!=false){
 						$arrExtras[$extra->id]['nombre']=$extra->nombre;
-						$arrExtras[$extra->id]['requerido']=($extra->requerido==1)?'(*)':'';
+						$arrExtras[$extra->id]['requerido']=($extra->requerido==1)?'(Requerido)':'';
 						$arrExtras[$extra->id]['minimo']=$extra->minimo;
 						$arrExtras[$extra->id]['maximo']=$extra->maximo;
 						if($extra->maximo==1){
@@ -263,7 +264,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($itemsExt as $itemExt) {
 							
 								$attrRadio = array(
-							    'name'        => $extra->id,
+							    'name'        => $extra->id.'extra',
 							    'id'          => $itemExt->id,
 							    'value'       => $itemExt->id,
 								);
@@ -279,7 +280,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($itemsExt as $itemExt) {
 								
 								$attrCheck = array(
-							    'name'        => $itemExt->id,
+							    'name'        => $extra->id.'extra',
 							    'id'          => $itemExt->id,
 							    'value'       => $itemExt->id,
 								);
