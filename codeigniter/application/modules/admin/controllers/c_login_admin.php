@@ -45,7 +45,7 @@ class C_login_admin extends MX_Controller {
 					$this->template->build('v_login_admin',$data);
 				}else {
 					$this->c_login->crearSesion($resultado);
-					redirect('admin/c_admin_home');
+					redirect('admin/c_home_admin');
 				}
 			}
 		}else {
