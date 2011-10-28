@@ -52,8 +52,7 @@ class C_login extends MX_Controller {
 				$data['error'] = 'El usuario o la contrasena introducidos no son correctos';
 				$resultado = $this->load->view('v_login',$data,true);
 				$this->respuestaLogin($resultado);
-			}
-			if ($resultado_logueo === 1) {
+			}elseif ($resultado_logueo === 1) {
 				$data['error'] = 'Para entrar a tu cuenta administrativa debes seleccionar '.anchor('admin/c_login_admin','aqui');
 				$resultado = $this->load->view('v_login',$data,true);
 				$this->respuestaLogin($resultado);
@@ -90,9 +89,10 @@ class C_login extends MX_Controller {
 	
 	function cerrarSesion() {
 		$id_usuario = $this->verificarExisteSesion();
-		if (!FALSE) {
+		if (!empty($id_usuario)) {
 			$this->session->unset_userdata('nombreusuario');
 			$this->session->unset_userdata('id');
+			$this->session->unset_userdata('tipousuario');
 			redirect('home/c_home/index/'.$this->encrypt->sha1('cerrada'));
 		}
 	}

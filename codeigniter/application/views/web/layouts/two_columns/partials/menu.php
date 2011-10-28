@@ -1,4 +1,4 @@
-<div class="art-vmenublock">
+<!--<div class="art-vmenublock">
 	<div class="art-vmenublock-body">
 		<div class="art-vmenublockheader">
 			<div class="l"></div>
@@ -34,3 +34,5 @@
 		</div>
 	</div>
 </div>
+ -->
+ <?php echo (isset($output_menu)) ? $output_menu : '' ;?>

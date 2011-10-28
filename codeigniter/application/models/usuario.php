@@ -100,6 +100,15 @@ class Usuario extends DataMapper {
 		}
 	}
 	
+	function getTipoUsuarioById($id_usuario) {
+		$u = new Usuario();
+		$u->where('estatus',1);
+		$u->where('id',$id_usuario);
+		$u->get();
+		$tipo_usuario = $u->tipousuario->where('estatus',1)->get();		
+		return $tipo_usuario->nombre;
+	}
+	
 	function getDireccionesEnvio($id_usuario) {
 		$u = new Usuario();
 		$resultadoDireccion = array();
