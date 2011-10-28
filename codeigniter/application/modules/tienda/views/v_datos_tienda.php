@@ -101,11 +101,6 @@
 				
 												
 							});
-//							$("input#cantidad").spinbox({
-//								  min: 1,    
-//								  max: 10,  
-//								  step: 1 
-//								});
 							$("#popup-tienda").dialog('open');
 						}else{
 							dialogError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");

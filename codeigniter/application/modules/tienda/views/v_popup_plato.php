@@ -1,7 +1,26 @@
 <script type="text/javascript">
 <!--
 $(function(){
-//	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
+
+	function countChecked() {
+		  var n = $('input[name="1extra"]:checkbox:checked').length;
+		  $("#mensaje_plato").text(n + (n <= 1 ? " is" : " are") + " checked!");
+		}
+		
+		$(":checkbox").click(countChecked);
+			
+
+	function validarCheck(objeto,maximo,minimo) {
+//		var $();
+		
+	}
+	
+	function validarRadio(objeto,maximo,minimo) {
+		
+		
+	}
+	
+	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
 	
 	$("input#cantidad").spinbox({
 		  min: 1,    
@@ -31,6 +50,8 @@ $(function(){
 	<?php if (isset($opciones) && is_array($opciones)):?>		
 		<?php foreach ($opciones as $key => $opcion):?>			
 			<div class="titulo-opciones">
+				<?php echo form_hidden($key.'max_ops', $opcion['maximo']);?>
+				<?php echo form_hidden($key.'min_ops', $opcion['minimo']);?>
 				<strong>
 					<p><?php echo $opcion['nombre'];?>
 					<span class="requerido"><?php echo $opcion['requerido']?></span>
@@ -38,7 +59,8 @@ $(function(){
 				</strong>
 			</div>
 			<div class="contenido-extras">
-				<ul>
+<!--				<fieldset class="ui-widget ui-widget-content ui-corner-all">-->
+				<ul class="ui-widget ui-widget-content ui-corner-all">
 					<?php foreach ($opcion['opcion_item'] as $item):?>
 						<li>
 							<?php echo $item['input']?>
@@ -46,6 +68,7 @@ $(function(){
 						</li>
 					<?php endforeach;?>
 				</ul>
+<!--				</fieldset>-->
 			</div>
 		<?php endforeach;?>
 	<?php endif;?>	
@@ -54,6 +77,8 @@ $(function(){
 	
 	<?php foreach ($extras as $key => $extra):?>	
 		<div class="titulo-extras">
+			<?php echo form_hidden($key.'max_ext', $extra['maximo']);?>
+			<?php echo form_hidden($key.'min_ext', $extra['minimo']);?>
 			<strong>
 				<p><?php echo $extra['nombre'];?>
 				<span class="requerido"><?php echo $extra['requerido']?></span>
@@ -61,11 +86,10 @@ $(function(){
 			</strong>
 		</div>
 		<div class="contenido-extras">
-			<ul>
+			<ul class="ui-widget ui-widget-content ui-corner-all">
 <!--			<fieldset class="ui-widget ui-widget-content ui-corner-all">-->
 				<?php foreach ($extra['extra_item'] as $item):?>
 					<li>
-					
 						<div class="detalle-extra">
 							<?php echo $item['input']?>
 							<?php echo $item['label']?>

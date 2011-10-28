@@ -19,6 +19,10 @@ class Extra extends DataMapper{
 		parent::__construct($id);
 	}
 	
+	/* Al registrasr extras:
+	 *  maximo 0 Sin Limite
+	 * 	minimo debe ser >= 1 cuando se requiere y 0 si no es requerido
+	 */
 	function getExtrasDetalle() {
 		$detalles= $this->extrasdetalle->where('estatus',1)->get();
 		if ($detalles->exists()) {
