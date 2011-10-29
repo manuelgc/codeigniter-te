@@ -50,7 +50,7 @@
 					<li><a class="desplegable" href="#" title="Maestros">Gestionar
 							Maestros</a>
 						<ul class="subnavegador">
-							<li><a href="#" title="Tiendas de comida">Tiendas de comida</a>
+							<li><?php echo anchor('admin/c_tienda_com_admin','Tienda de comida');?>
 							</li>
 							<li><a href="#" title="Platos">Platos</a>
 							</li>
