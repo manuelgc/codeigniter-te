@@ -196,12 +196,20 @@ form li .datepicker {
 
 .form_description h2 {
 	clear: left;
+	float:left;
 	font-size: 160%;
 	font-weight: 400;
 	margin: 0 0 3px;
+	width: 80%;
+}
+
+.form_description div{
+	width: 20%;
+	float: right;
 }
 
 .form_description p {
+	float:left;
 	font-size: 95%;
 	line-height: 130%;
 	margin: 0 0 12px;
