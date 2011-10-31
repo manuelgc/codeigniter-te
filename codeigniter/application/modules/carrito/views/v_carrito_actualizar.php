@@ -41,8 +41,8 @@ function cargarPopupEditar(id_plato,cantidad,observacion,rowid){
 //				}
 			},
 			'json'
-		);
-}
+		)
+};
 
 function editarPlato(id_plato,rowid) {
 	var cantidad = $("#cantidad").val(),

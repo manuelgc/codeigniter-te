@@ -218,7 +218,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($items as $item) {
 								
 								$attrRadio = array(
-							    'name'        => $opcion->id.'opcion',
+							    'name'        => $opcion->id.'-opcion',
 							    'id'          => $item->id,
 							    'value'       => $item->id,
 								);
@@ -233,7 +233,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($items as $item) {
 								
 								$attrCheck = array(
-							    'name'        => $opcion->id.'opcion',
+							    'name'        => $opcion->id.'-opcion',
 							    'id'          => $item->id,
 							    'value'       => $item->id,
 								);
@@ -264,7 +264,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($itemsExt as $itemExt) {
 							
 								$attrRadio = array(
-							    'name'        => $extra->id.'extra',
+							    'name'        => $extra->id.'-extra',
 							    'id'          => $itemExt->id,
 							    'value'       => $itemExt->id,
 								);
@@ -280,7 +280,7 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($itemsExt as $itemExt) {
 								
 								$attrCheck = array(
-							    'name'        => $extra->id.'extra',
+							    'name'        => $extra->id.'-extra',
 							    'id'          => $itemExt->id,
 							    'value'       => $itemExt->id,
 								);

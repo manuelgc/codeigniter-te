@@ -19,7 +19,6 @@
 		}
 		
 		function agregarPlato(){
-				
 			$plato= new Plato();
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 

@@ -2,25 +2,88 @@
 <!--
 $(function(){
 
-	function countChecked() {
-		  var n = $('input[name="1extra"]:checkbox:checked').length;
+
+	function mostrarError(objeto,texto){
+		objeto.text( texto ).addClass( "ui-state-highlight" );
+		setTimeout(function() {
+			objeto.removeClass( "ui-state-highlight", 1500 );
+		}, 500 );
+	}
+	
+	function ocultarError(objeto){
+		setTimeout(function() {
+			objeto.removeClass( "ui-state-highlight", 1500 ).text("");
+		}, 500 );
+	}
+	function contarCheckbox(nombre) {
+		  var n = $('input[name="'+nombre+'"]:checkbox:checked').length;
 		  $("#mensaje_plato").text(n + (n <= 1 ? " is" : " are") + " checked!");
+		  return n;
 		}
 		
-		$(":checkbox").click(countChecked);
+		
 			
 
-	function validarCheck(objeto,maximo,minimo) {
-//		var $();
-		
+	function validarCheck(nombre,maximo,minimo,mensaje) {
+		var n=contarCheckbox(nombre);
+
+		if(maximo!=0){
+			if( n >= minimo && n<= maximo){
+				return true;	
+			}else {
+				return false;
+			}
+		}else {
+			return true;
+		}
 	}
 	
 	function validarRadio(objeto,maximo,minimo) {
 		
 		
 	}
+
+	$("input:checkbox").click(
+			function(event) {
+//				event.preventDefault();
+				var nombre = $(this).attr("name"),
+				cadena_id=nombre.split("-");
+
+				if(cadena_id[1]=="opcion"){
+					var maximo=$("#"+cadena_id[0]+"-max_ops").val(),
+					minimo=$("#"+cadena_id[0]+"-min_ops").val(),
+					mensaje=$("#"+cadena_id[0]+"-msj_ops");
+				}else{
+					var maximo=$("#"+cadena_id[0]+"-max_ext").val(),
+					minimo=$("#"+cadena_id[0]+"-min_ext").val(),
+					mensaje=$("#"+cadena_id[0]+"-msj_ext");
+				}	
+				console.log("cadena split: "+cadena_id[0]+cadena_id[1]);
+				console.log("mensaje: "+mensaje.attr("id"));
+				console.log("maximo: "+maximo);
+				console.log("minimo: "+minimo);
+				console.log("checked: "+$(this).attr("checked"));
+					if(!validarCheck(nombre,maximo, minimo,mensaje)){
+//						mensaje.text("fallo");
+						mostrarError(mensaje, "fallo");
+//						$(this).checkbox('uncheck');
+//						$(this).removeClass( "ui-icon ui-icon-check");
+//						$(this).addClass( "ui-icon ui-icon-empty" );
+						$(this).attr('checked',false);
+						console.log("checked2: "+$(this).attr("checked"));
+//						return false;
+					}else{
+//						ocultarError(mensaje);
+						mensaje.text("");
+//						return true;
+					}
+//				validarCheck($(this),maximo, minimo,mensaje);
+					
+			}
+				
+	);
 	
-	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
+//	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
 	
 	$("input#cantidad").spinbox({
 		  min: 1,    
@@ -48,10 +111,11 @@ $(function(){
 	</div>
 	
 	<?php if (isset($opciones) && is_array($opciones)):?>		
-		<?php foreach ($opciones as $key => $opcion):?>			
+		<?php foreach ($opciones as $key => $opcion):?>
+		<div><p class="error" id=<?php echo $key."-msj_ops";?>></p></div>			
 			<div class="titulo-opciones">
-				<?php echo form_hidden($key.'max_ops', $opcion['maximo']);?>
-				<?php echo form_hidden($key.'min_ops', $opcion['minimo']);?>
+				<?php echo form_hidden($key.'-max_ops', $opcion['maximo']);?>
+				<?php echo form_hidden($key.'-min_ops', $opcion['minimo']);?>
 				<strong>
 					<p><?php echo $opcion['nombre'];?>
 					<span class="requerido"><?php echo $opcion['requerido']?></span>
@@ -76,9 +140,10 @@ $(function(){
 	<?php if (isset($extras)&& is_array($extras)):?>
 	
 	<?php foreach ($extras as $key => $extra):?>	
+		<div><p class="error" id=<?php echo $key."-msj_ext";?>></p></div>	
 		<div class="titulo-extras">
-			<?php echo form_hidden($key.'max_ext', $extra['maximo']);?>
-			<?php echo form_hidden($key.'min_ext', $extra['minimo']);?>
+			<?php echo form_hidden($key.'-max_ext', $extra['maximo']);?>
+			<?php echo form_hidden($key.'-min_ext', $extra['minimo']);?>
 			<strong>
 				<p><?php echo $extra['nombre'];?>
 				<span class="requerido"><?php echo $extra['requerido']?></span>

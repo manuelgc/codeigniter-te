@@ -191,7 +191,7 @@ form li .datepicker {
 }
 
 .form_description[class] {
-	display: block;
+	/*display: block;*/
 }
 
 .form_description h2 {
