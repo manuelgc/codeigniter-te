@@ -9,6 +9,7 @@
 		}
 		
 		function index() {
+			print_r($this->input->post());
 			if($this->input->is_ajax_request()){
 				$data['carrito']=$this->agregarPlato();
 				if($data['carrito']){
