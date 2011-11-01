@@ -1,5 +1,5 @@
 
-<script>
+<script><!--
 	$(function() {
 		
 		function mostrarError(objeto,texto){
@@ -57,7 +57,8 @@
 
 		function agregarPlato(id_plato) {
 			var cantidad = $("#cantidad").val(),
-			observacion= $("#observacion").val();
+			observacion= $("#observacion").val()
+			
 			
 			 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
 					  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion },
@@ -182,10 +183,13 @@
 				);
 				
 		});
-		
+
+
+		/* 
 		$("#cambiar_ubicacion").click(function(event){
 			event.preventDefault();
 			var id_tienda = $("#id_tienda").val();
+			
 			
 			
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupActualizarAjax",
@@ -217,7 +221,8 @@
 					},
 					'json'
 				);
-		});
+		}); 
+		*/
 			
 	});
 </script>
@@ -230,7 +235,7 @@
 		<span>Usted ha seleccionado Ciudad: </span>
 		<span id="nombre_ciudad"><b><?php echo $nombreCiudad;?></b></span><span>, Zona: </span>
 		<span id="nombre_zona"><b><?php echo $nombreZona;?></b></span>
-		<a id="cambiar_ubicacion" href="">Cambiar</a>
+<!--		<a id="cambiar_ubicacion" href="">Cambiar</a>-->
 	</p>
 </div>
 
