@@ -38,14 +38,7 @@
 				return true;
 			}		
 		}
-		function validarCantidad(inputCant,pError){
-			if(inputCant.val()==''){
-				dialogError(pError, 'Debe seleccionar una cantidad mayor a cero');
-				return false;
-			}else {
-				return true;
-			}		
-		}
+		
 		function actualizarCiudadZona(id_ciudad,id_zona,nombreCiudad,nombreZona) {
 		
 			$.cookie('ciudad', id_ciudad,{path: '/'});
@@ -55,24 +48,7 @@
 			
 		}
 
-		function agregarPlato(id_plato) {
-			var cantidad = $("#cantidad").val(),
-			observacion= $("#observacion").val()
-			
-			
-			 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
-					  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion },
-	  			function(data){
-				  	if (data.carrito) {
-				  		$("#carrito").html(data.html);	
-					} else {
-						dialogError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
-					}		
-	  					
-	 		 },
-				'json'); 
-			
-		}
+		
 				
 		function cargarPopupplato(id_plato){
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
@@ -90,10 +66,8 @@
 								hide:"explode",
 								buttons: {
 								'Aceptar' : function(){
-									if (validarCantidad($("#cantidad"),$("#mensaje_error"))){
-									agregarPlato(id_plato);
-									$(this).dialog('close');
-									}
+									$("#form_popup_plato").submit();
+//									$(this).dialog('close');
 								},
 								'Cancelar': function() {
 									$(this).dialog('close');
@@ -113,6 +87,12 @@
 				
 		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
 
+		$("input.cantidad").spinbox({
+			  min: 1,    
+			  max: 10,  
+			  step: 1 
+			});
+		
 						
 		$("#cmbx_ciudad").live('change',function(event){	
 			event.preventDefault();
@@ -159,7 +139,6 @@
 								buttons: {
 								'Aceptar' : function(){
 									if(validarSeleccion()){
-										
 										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
 										cargarPopupplato(id_plato);
 //										$(this).dialog('close');

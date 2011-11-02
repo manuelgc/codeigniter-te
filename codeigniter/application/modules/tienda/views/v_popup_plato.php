@@ -10,29 +10,71 @@ $(function(){
 			objeto.removeClass( "ui-state-highlight", 1000 );
 		}, 500 );
 	}
-	
+
 	function ocultarError(objeto){		
 		objeto.fadeOut(1500).text("");	
 	}
-						
-	function validarCheck(nombre,maximo,minimo) {
-		var n=$('input[name="'+nombre+'"]:checkbox:checked').length;
+
+	function dialogError(div,titulo,mensaje) {
+		div.html('<p>'+mensaje+'</p>')
+		.dialog({
+			title:titulo,
+			autoOpen: false,
+			modal:true,
+			resizable: false,
+			width:400,
+			show:"blind",
+			hide:"explode",
+			buttons: {
+			'Cerrar': function() {
+				$(this).dialog('close');
+			}
+			}
+
+							
+		}).dialog('open');
+	}
+	
+	function validarCantidad(inputCant,Error){
+		if(inputCant.val()==''){
+			mostrarError(Error, 'Debe seleccionar una cantidad mayor a cero');
+			return false;
+		}else {
+			return true;
+		}		
+	}
+				
+	function validarCheck(objeto) {
+		var nombre = objeto.attr("name"),
+		cadena_id= nombre.split("-"),
+		maximo=$("#"+cadena_id[0]+"-max_"+cadena_id[1]).val(),
+		minimo=$("#"+cadena_id[0]+"-min_"+cadena_id[1]).val(),
+		mensaje=$("#"+cadena_id[0]+"-msj_"+cadena_id[1]), 
+		n=$('input[name="'+nombre+'"]:checkbox:checked').length;
 		
 		$("#mensaje_plato").text(n + (n <= 1 ? " is" : " are") + " checked!");
 
-		if(maximo!=0){
-			if( n >= minimo && n<= maximo){
-				return true;	
+		if( n < minimo ){
+			mostrarError(mensaje, "Debe seleccionar al menos "+minimo+" opciones");
+			return false;
+		}else if(maximo!=0){
+			if( n> maximo){
+				objeto.attr('checked',false);
+				mostrarError(mensaje, "No debe seleccionar mas "+maximo+" opciones");
+				return false;	
 			}else if((maximo==minimo) && (n !=maximo)){
-				mostrarError(msj_obj, "Debe seleccionar "+minimo+" opciones");
-
-				return true;
-			}else{
+				mostrarError(objeto, "Debe seleccionar "+maximo+" opciones");
 				return false;
+			}else{
+				if(mensaje.text()!=""){
+					ocultarError(mensaje);
+				}
+				return true;
 			}
-				
-			
 		}else {
+			if(mensaje.text()!=""){
+				ocultarError(mensaje);
+			}
 			return true;
 		}
 	}
@@ -41,20 +83,12 @@ $(function(){
 		var respuesta= true;
 		
 		$("#form_popup_plato ul").each(function (i) {
-			console.log($(this));
-	        console.log("id: "+$(this).attr("id"));
-	        console.log("nombre: "+$(this).attr("name"));
-	        var n= $(this).attr("id").split("-");
-	        console.log("#"+n[0]+'-min_'+n[1]);
-	        console.log("min:"+$("#"+n[0]+'-min_'+n[1]).val());
-	        console.log("max:"+$("#"+n[0]+'-max_'+n[1]).val());
-	        console.log("cheked: "+ $('input[name="'+n[0]+'-'+n[1]+'"]:checked').length);
 
-			var cadena= $(this).attr("id").split("-"),
-			maximo=$("#"+n[0]+'-max_'+n[1]).val(),
-			minimo=$("#"+n[0]+'-min_'+n[1]).val(),
-			msj_obj=$("#"+n[0]+'-msj_'+n[1]),
-			num_checked=$('input[name="'+n[0]+'-'+n[1]+'"]:checked').length;
+			var cadena= $(this).attr("id").split("-"),			
+			num_checked=$('input[name="'+cadena[0]+'-'+cadena[1]+'"]:checked').length,
+			maximo=$("#"+cadena[0]+'-max_'+cadena[1]).val(),
+			minimo=$("#"+cadena[0]+'-min_'+cadena[1]).val(),
+			msj_obj=$("#"+cadena[0]+'-msj_'+cadena[1]);
 			
 			
 			if(num_checked < minimo){
@@ -62,18 +96,38 @@ $(function(){
 				respuesta=false;
 			}else if(maximo!=0){
 				if(num_checked > maximo){
-					mostrarError(msj_obj, "No puede seleccionar mas de "+maximo+" opciones");
+					mostrarError(msj_obj, "No debe seleccionar mas de "+maximo+" opciones");
 					respuesta=false;
 				}else if((maximo==minimo) && (num_checked !=maximo)){
 					mostrarError(msj_obj, "Debe seleccionar "+minimo+" opciones");
 					respuesta=false;
 				}
 			}	
-			return respuesta;		
-				
-			
-	      });
 
+			
+					
+					
+	      });
+		return respuesta;
+
+	}
+
+	function agregarPlato(id_plato) {
+		var cantidad = $("#cantidad").val(),
+		observacion= $("#observacion").val();
+		
+		
+		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
+				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion ,'checked':checked},
+  			function(data){
+			  	if (data.carrito) {
+			  		$("#carrito").html(data.html);	
+				} else {
+					dialogError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+				}		
+  					
+ 		 },
+			'json'); 
 	}
 	
 //	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
@@ -85,48 +139,30 @@ $(function(){
 			});
 
 	$("input:checkbox").click(
-			function(event) {
-				var nombre = $(this).attr("name"),
-				cadena_id=nombre.split("-");
-
-				if(cadena_id[1]=="opcion"){
-					var maximo=$("#"+cadena_id[0]+"-max_opcion").val(),
-					minimo=$("#"+cadena_id[0]+"-min_opcion").val(),
-					mensaje=$("#"+cadena_id[0]+"-msj_opcion");
-				}else{
-					var maximo=$("#"+cadena_id[0]+"-max_extra").val(),
-					minimo=$("#"+cadena_id[0]+"-min_extra").val(),
-					mensaje=$("#"+cadena_id[0]+"-msj_extra");
-				}	
-				if(!validarCheck(nombre,maximo, minimo)){
-					$(this).attr('checked',false);	
-					mostrarError(mensaje, "Debe seleccionar entre "+minimo+" a "+maximo+" opciones");					
-//						return false;
-				}else{
-					if(mensaje.text()!=""){
-						ocultarError(mensaje);
-					}
-//						return true;
-					}
-
-					
+			function(event) {	
+				validarCheck($(this));					
 			}
 				
 	);
 
 	$("#form_popup_plato").submit(function(event){
-		event.preventDefault();
-		validarTodo();
-		
+		var id_plato=$("#form_popup_plato > input#id_plato").val();			
+		if( validarTodo() && validarCantidad($("#cantidad"), $("#msj_cant"))){	
+			agregarPlato(id_plato);
+			$("#popup-tienda").dialog('close');
+			return false;
+		}else{
+			return false;
+		}
 		});
 	
 	
 });
 //-->
 </script>	
-<?php echo form_open('carrito/c_carrito','id="form_popup_plato"');?>
+<?php echo form_open('','id="form_popup_plato"');?>
 
-		
+	<?php echo form_hidden('id_plato', $id_plato);?>	
 	<div align="center" class="imagene_plato">	
 		<img height="auto" width="350px" src="<?php echo $imagen;?>">
 	</div>
@@ -197,6 +233,7 @@ $(function(){
 	<?php endif;?>
 			
 	<div>
+		<div><p class="error" id="msj_cant"></p></div>
 		<?php echo form_label('Cantidad', 'cantidad');?>
 		<?php echo form_input(array('name' => 'cantidad','id' => 'cantidad','size' => '3'),1);?>
 	</div>

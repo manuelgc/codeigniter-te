@@ -9,11 +9,10 @@
 		}
 		
 		function index() {
-			print_r($this->input->post());
 			if($this->input->is_ajax_request()){
 				$data['carrito']=$this->agregarPlato();
 				if($data['carrito']){
-					$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+					$data['html']=$this->load->view('carrito/v_carrito','',true);
 				}
 				 echo json_encode($data); 
 			}
@@ -22,7 +21,7 @@
 		function agregarPlato(){
 			$plato= new Plato();
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
-
+			print_r($this->input->post('checked'));
 			if ($plato->exists()) {
 				$encontrado=false;
 				foreach ($this->cart->contents() as $items){
@@ -74,7 +73,7 @@
 			        'qty'     =>    $this->input->post('cantidad'),
 			);
 			$this->cart->update($data1);
-			$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+			$data['html']=$this->load->view('carrito/v_carrito','',true);
 			echo json_encode($data);
 		}
 
@@ -86,7 +85,7 @@
 			 'observacion'  =>	$this->input->post('observacion')
 			);
 			$this->cart->update($data1);
-			$data['html']=$this->load->view('carrito/v_carrito_actualizar','',true);
+			$data['html']=$this->load->view('carrito/v_carrito','',true);
 			echo json_encode($data);
 		}
 			

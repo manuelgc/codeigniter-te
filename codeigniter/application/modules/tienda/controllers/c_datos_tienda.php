@@ -7,6 +7,7 @@ class C_datos_tienda extends MX_Controller{
 		$this->load->helper('language');
 		$this->load->helper('form');
 		$this->load->helper('cookie');
+		$this->load->library('cart'); 
 		$this->load->library('qtip2');
 		$this->load->module('busqueda/c_busqueda');
 	}
@@ -194,6 +195,7 @@ class C_datos_tienda extends MX_Controller{
 		
 		if($plato->exists()){
 			$dataAjax['plato']=true;
+			$data['id_plato']=$plato->id;
 			$img=$plato->getImagen();
 			if($img!=false){
 				$data['imagen']=base_url().$img->rutaImagen;
