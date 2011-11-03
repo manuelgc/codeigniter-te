@@ -10,6 +10,7 @@
 		
 		function index() {
 			if($this->input->is_ajax_request()){
+//				print_r($this->input->post('seleccion'));
 				$data['carrito']=$this->agregarPlato();
 				if($data['carrito']){
 					$data['html']=$this->load->view('carrito/v_carrito','',true);
@@ -21,7 +22,6 @@
 		function agregarPlato(){
 			$plato= new Plato();
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
-			print_r($this->input->post('checked'));
 			if ($plato->exists()) {
 				$encontrado=false;
 				foreach ($this->cart->contents() as $items){
@@ -32,7 +32,8 @@
 						
 					}
 				}
-				if($encontrado){
+				
+				if(false /*$encontrado*/){
 					$valor= $items['qty'] + $this->input->post('cantidad');
 					
 					if($this->input->post('observacion')==''){
@@ -51,13 +52,59 @@
 					$this->cart->update($data1);
 					
 				}else{
+					$total_extra=0;
+					if($this->input->post('seleccion')){
+						$opciones = array();
+						$extras = array();
+						foreach ($this->input->post('seleccion') as $seleccion) {
+
+							foreach ($seleccion as $detalle){
+								$cadena_id= explode("-", $detalle["name"]);
+								if($cadena_id[1]=="opcion"){
+									$opciones[]= array(
+									'opcion_id'=> $cadena_id[0],
+									'det_opc_id' => $detalle['value']);
+									
+								}else{
+									$extra_detalle = new Extrasdetalle();
+									$extra_detalle->where('estatus',1)->where('extras_id',$cadena_id[0])->get_by_id($detalle['value']);
+									if($extra_detalle->exists()){
+										$extras[]= array(
+										'extra_id' => $cadena_id[0],
+										'det_ext_id' => $detalle['value'],
+										'extra_precio' => $extra_detalle->precio);
+										$total_extra += $extra_detalle->precio;
+										
+									}
+								}
+																
+							
+							}
+							
+						}
+					}
+					
+					$iva = $plato->getImpuesto();
+						
+					if($iva!=false){
+						$total_iva = ($plato->precio + $total_extra)  * $iva->porcentaje / 100;
+					}else{
+						$total_iva = 0;
+					}
+					
+					
 					$data1 = array(
 			               'id'      => $this->input->post('id_plato'),
 			               'qty'     => $this->input->post('cantidad'),
-			               'price'   => $plato->precio,
+			               'price'   => $plato->precio + $total_extra,
 			               'name'    => $plato->nombre,
 					  'observacion'  =>	$this->input->post('observacion'),
+						 'opciones'	 => $opciones,
+						  'extras'	 =>	$extras,
+					'precio_extra'	 => $total_extra,
+					'precio_iva'	 =>	$total_iva,
 					);
+					
 					$this->cart->insert($data1);
 					
 				}

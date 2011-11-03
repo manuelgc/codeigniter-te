@@ -12,6 +12,11 @@ class Plato extends DataMapper {
             'class' => 'categoriaplato',
             'other_field' => 'plato',
 			'join_other_as' => 'categoriaplatos',
+			'join_self_as' => 'plato'),
+	'impuesto'=> array(
+            'class' => 'impuesto',
+            'other_field' => 'plato',
+			'join_other_as' => 'impuesto',
 			'join_self_as' => 'plato')
 	); 
 	
@@ -108,6 +113,15 @@ class Plato extends DataMapper {
 			return false;
 		}
 
+	}
+	
+	function getImpuesto() {
+		$impuesto = $this->impuesto->where('estatus',1)->get();
+		if($impuesto->exists()){
+			return $impuesto;
+		}else{
+			return false;
+		}
 	}
 	
 }

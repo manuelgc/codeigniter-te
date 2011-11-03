@@ -114,11 +114,19 @@ $(function(){
 
 	function agregarPlato(id_plato) {
 		var cantidad = $("#cantidad").val(),
-		observacion= $("#observacion").val();
+		observacion= $("#observacion").val(),
+		seleccion= new Array();
 		
+		$("#form_popup_plato ul").each(function (i) {
+
+			var cadena= $(this).attr("id").split("-");
+
+			seleccion.push($('input[name="'+cadena[0]+'-'+cadena[1]+'"]:checked').serializeArray());
+
+	   	});
 		
 		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
-				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion ,'checked':checked},
+				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'seleccion':seleccion},
   			function(data){
 			  	if (data.carrito) {
 			  		$("#carrito").html(data.html);	
