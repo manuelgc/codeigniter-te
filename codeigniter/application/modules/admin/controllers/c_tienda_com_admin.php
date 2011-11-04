@@ -4,14 +4,16 @@ class C_tienda_com_admin extends MX_Controller {
 		parent::__construct();
 		
 		$this->load->library('qtip2');
+		$this->load->library('table');
+		$this->load->library('pagination');
 		
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip();
 		$data['output_menu'] = Modules::run('admin/c_menu_admin/index');
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/view.css'));
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
-		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/demo-page.css'));
-		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/demo-table.css'));
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/page.css'));
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/table.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/view.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.blockUI.js'));		
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
@@ -26,6 +28,7 @@ class C_tienda_com_admin extends MX_Controller {
 	
 	function index() {
 		$data['ciudades'] = $this->cargarCiudad();
+		$data['catalogo_default'] = $this->catalogoTienda();
 		$this->template->build('v_tienda_com_admin',$data);
 	}
 	
@@ -61,6 +64,63 @@ class C_tienda_com_admin extends MX_Controller {
 			echo json_encode($data);
 				
 		}
+	}
+	
+	function cargarTiendas($limit,$offset) {
+		$tiendas_comida = new Tiendascomida();
+		$resultado = $tiendas_comida->getTiendasComida($limit,$offset);
+		return $resultado;
+	}
+	
+	function getCantTiendas() {
+		$filtro = array();
+		$tienda_comida = new Tiendascomida();
+		return $tienda_comida->getCantTiendasComida($filtro);
+	}
+	
+	function catalogoTienda($offset = '') {
+	//paginador
+		$limite = 2;												
+		$tiendas = $this->cargarTiendas($limite,$offset);		
+		$config['base_url'] = site_url().'/admin/c_tienda_com_admin/catalogoTienda/';					
+		$config['total_rows'] = $this->getCantTiendas();
+		$config['per_page'] = $limite;
+		$config['uri_segment'] = 4;		
+		$config['next_tag_open'] = '<li>';
+		$config['next_tag_close'] = '</li>';
+		$config['prev_tag_open'] = '<li>';
+		$config['prev_tag_close'] = '</li>';
+		$config['num_tag_open'] = '<li>';
+		$config['num_tag_close'] = '</li>';
+		$config['cur_tag_open'] = '<li>';
+		$config['cur_tag_close'] = '</li>';		
+
+		$this->pagination->initialize($config);
+
+		$data['link_pag'] = $this->pagination->create_links();		
+
+		//tabla
+		$this->table->set_heading('Nombre',
+			'Razon Social',
+			'CI/RIF', 
+			'Descripcion',
+			'Ciudad',
+			'Zona'			
+		);
+		if (empty($tiendas)) {
+			$data['lista_ped'] = 'Aun no existen tiendas registradas';
+		}else{
+			$data['lista_ped'] = $this->table->generate($tiendas);	
+		}				
+		$data['link_pag'] = $this->pagination->create_links();
+		$data['ciudades'] = $this->cargarCiudad();
+		$catalogo_html = $this->load->view('v_catalogo_tienda',$data,true);
+		
+		if ($this->input->is_ajax_request()) {
+			echo json_encode($catalogo_html);
+		}else {
+			return $catalogo_html;
+		}						
 	}
 }
 ?>
