@@ -10,12 +10,15 @@
 		
 		function index() {
 			if($this->input->is_ajax_request()){
+				
 //				print_r($this->input->post('seleccion'));
-				$data['carrito']=$this->agregarPlato();
-				if($data['carrito']){
-					$data['html']=$this->load->view('carrito/v_carrito','',true);
-				}
-				 echo json_encode($data); 
+//				$data['carrito']=$this->agregarPlato();
+//				if($data['carrito']){
+//					$data['html']=$this->load->view('carrito/v_carrito','',true);
+//				}
+//				 echo json_encode($data);
+
+ 				$this->agregarPlato();
 			}
 		}
 		
@@ -24,6 +27,16 @@
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 			if ($plato->exists()) {
 				$encontrado=false;
+				$tienda = $plato->tiendascomida->where('estatus',1)->get();
+				$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
+				$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0; 
+				
+				if ($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
+					$data['costo_envio'] = $tienda->costoenvio;
+				}else{
+					$data['costo_envio'] = 0;
+				}
+											
 				foreach ($this->cart->contents() as $items){
 					if($items['id']==$plato->id){
 						$encontrado=true;
@@ -33,22 +46,13 @@
 					}
 				}
 				
-				if(false /*$encontrado*/){
+				if($encontrado){
 					$valor= $items['qty'] + $this->input->post('cantidad');
-					
-					if($this->input->post('observacion')==''){
 						$data1 = array(
 				               'rowid'   => $rowid,
 				               'qty'     => (($valor>$this->limite)?$this->limite:$valor)
 						);
-					}else{
-						$data1 = array(
-				               'rowid'   => $rowid,
-				               'qty'     => (($valor>$this->limite)?$this->limite:$valor),
-						  'observacion'  =>	$this->input->post('observacion')
-						);
-						
-					}
+					
 					$this->cart->update($data1);
 					
 				}else{
@@ -101,6 +105,7 @@
 					  'observacion'  =>	$this->input->post('observacion'),
 						 'opciones'	 => $opciones,
 						  'extras'	 =>	$extras,
+					'precio_base'	 => $plato->precio,
 					'precio_extra'	 => $total_extra,
 					'precio_iva'	 =>	$total_iva,
 					);
@@ -108,10 +113,13 @@
 					$this->cart->insert($data1);
 					
 				}
-				return true;
+				$dataAjax['carrito'] = true;
+				$dataAjax['html'] = $data['html']=$this->load->view('carrito/v_carrito',$data,true);
 			}else{
-				return false;
+				$dataAjax['carrito'] = false;
 			}
+			
+			echo json_encode($dataAjax);
 		}
 
 		function actualizarPlato() {

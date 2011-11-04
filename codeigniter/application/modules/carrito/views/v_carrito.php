@@ -139,6 +139,7 @@
 		</div>
 		
 		<?php $i = 1; ?>
+		<?php $total_iva=0;?>
 		<ul class="contenido-carrito">
 			<?php foreach ($this->cart->contents() as $items): ?>
 				
@@ -151,7 +152,8 @@
 							<span><?php echo $items['name']; ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['subtotal']); ?></span>
-							<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>	
+							<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>
+							<?php $total_iva +=($items['precio_iva']*$items['qty']);?>	
 						</div>
 						
 						<div class="eliminar-plato">
@@ -166,10 +168,22 @@
 		
 			<li class="total-carrito">	  
 			  <div align="right">
-			  	<span><strong>Total</strong></span>
+			  	<span><strong>Sub-Total</strong></span>
 			  	<span> Bs.<?php echo $this->cart->format_number($this->cart->total()); ?></span>
 			  </div>
 			</li>
+			<li class="total-carrito">	
+			  <div align="right">
+			  	<span><strong>IVA</strong></span>
+			  	<span> Bs.<?php echo $total_iva; ?></span>
+			 </div>
+			</li>
+			<li class="total-carrito">	
+			  <div align="right">
+			  	<span><strong>Total</strong></span>
+			  	<span> Bs.<?php echo  $this->cart->format_number($this->cart->total())+ $total_iva; ?></span>
+			  </div>
+			</li>  
 		</ul>
 		
 		<!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->  
