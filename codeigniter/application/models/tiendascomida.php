@@ -449,5 +449,35 @@ class Tiendascomida extends DataMapper{
 			return false;
 		}
 	}
+	
+	function getCantTiendasComida($filtro = array()) {
+		$tc = new Tiendascomida();
+		$tc->where('estatus',1);
+		if (!empty($filtro)) {
+			$tc->where($filtro);
+		}		
+		return $tc->count();
+	}
+	
+	function getTiendasComida($limit = '',$offset = '',$ordenacion = 'nombre asc') {
+		$tc = new Tiendascomida();
+		$arr_tiendas = array();
+		$contador = 0;
+		$tc->where('estatus',1);
+		$tc->get_iterated($limit,$offset);
+		if (!$tc->exists()) {
+			return FALSE;
+		}else {
+			foreach ($tc as $fila_tienda) {
+				$arr_tiendas[$contador]['nombre'] = $fila_tienda->nombre;
+				$arr_tiendas[$contador]['razon_social'] = $fila_tienda->razonsocial;
+				$arr_tiendas[$contador]['descripcion'] = $fila_tienda->descripcion;
+				$arr_tiendas[$contador]['ci_rif'] = $fila_tienda->ci_rif;
+				$arr_tiendas[$contador]['ciudad'] = $fila_tienda->ciudad->nombreCiudad;
+				$arr_tiendas[$contador]['zona'] = $fila_tienda->zona->nombreZona;
+			}
+			return $arr_tiendas;
+		}
+	}
 }
 ?>
