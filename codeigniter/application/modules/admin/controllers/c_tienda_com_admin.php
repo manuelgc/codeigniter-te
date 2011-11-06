@@ -78,11 +78,23 @@ class C_tienda_com_admin extends MX_Controller {
 		return $tienda_comida->getCantTiendasComida($filtro);
 	}
 	
+	function getNombreTiendas() {
+		$tiendas_comida = new Tiendascomida();		
+		//si no se consigue nada devuelve falso por defecto				
+		if ($nombres = $tiendas_comida->getNombreTiendas($this->input->post('term'))) {						
+			//$campo['response'] = true;
+			$campo = $nombres;
+		}else {			
+			$campo = '';
+		}		
+		echo json_encode($campo);
+	}
+	
 	function catalogoTienda($offset = '') {
 	//paginador
 		$limite = 2;												
 		$tiendas = $this->cargarTiendas($limite,$offset);		
-		$config['base_url'] = site_url().'/admin/c_tienda_com_admin/catalogoTienda/';					
+		$config['base_url'] = site_url().'/admin/c_tienda_com_admin/catalogoTienda/';						
 		$config['total_rows'] = $this->getCantTiendas();
 		$config['per_page'] = $limite;
 		$config['uri_segment'] = 4;		
@@ -116,8 +128,8 @@ class C_tienda_com_admin extends MX_Controller {
 		$data['ciudades'] = $this->cargarCiudad();
 		$catalogo_html = $this->load->view('v_catalogo_tienda',$data,true);
 		
-		if ($this->input->is_ajax_request()) {
-			echo json_encode($catalogo_html);
+		if ($this->input->is_ajax_request()) {			
+			echo json_encode($data);
 		}else {
 			return $catalogo_html;
 		}						

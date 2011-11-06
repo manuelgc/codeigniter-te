@@ -19,6 +19,11 @@ $(document).ready(function(){
 			'Cerrar' : function(){
 				$(this).dialog('close');
 			}
+		},
+		close: function(){
+			$('#form-filtro-tiendas').each (function(){
+				this.reset();
+			});
 		}	
 	});
 	
@@ -43,9 +48,13 @@ $(document).ready(function(){
 				$("#zona").empty().append('<option value="">Seleccione</option>;').attr("disabled",true);
 		}
 	});	
+		
+	$('#boton-catalogo').live('click',function(e){
+		e.preventDefault();		
+		$('#popup').dialog('open');
+	});
 
-	$('#ciudad-popup').change(function(e){		
-		e.preventDefault();
+	$('#ciudad_popup').live('change',function(e){						
 		var id_ciudad = $(this).val();	
 		
 		if(id_ciudad != ''){
@@ -65,11 +74,56 @@ $(document).ready(function(){
 				$("#zona").empty().append('<option value="">Seleccione</option>;').attr("disabled",true);
 		}
 	});	
-	
-	$('#boton-catalogo').live('click',function(e){
-		e.preventDefault();		
-		$('#popup').dialog('open');
+
+	$('ul.link > li a').live('click', function(e){
+		e.preventDefault();
+		var vinculo = $(this).attr('href');
+		 $.ajax({
+			url: vinculo,
+			type: 'GET',
+			dataType: 'json',
+			beforeSend: function(data){
+				preCargador('.content-tiendas');
+			},				
+			success: function (data) {					
+				cargarTablaTienda(data);
+			}				
+		});			
 	});
+
+	function preCargador(selector){
+		$(selector).block({ //'.content-pedidos'
+			message: 'Cargando ...'		
+		});
+	}
+
+	function cargarTablaTienda(html){
+		window.setTimeout( function(){
+			$('div.content-tiendas').html(html.lista_ped);
+			$('ul.link').html(html.link_pag);
+		}, 1000);
+	}
+	
+	$('#nombre_tienda_catalogo').live('keyup', function(){
+		$(this).autocomplete({
+			source:function(req,resp){
+				$.ajax({
+					url:'<?php echo base_url()?>index.php/admin/c_tienda_com_admin/getNombreTiendas',
+					dataType:'json',
+					type:'POST',
+					data:{term : req.term},
+					success:function(data){
+						resp($.map(data,function(item){
+							return {
+								value: item.label							
+							}
+						}));
+					}
+				});
+			},
+			minLength: 2
+		});
+	});		
 });
 </script>
 <div id="form_container">
