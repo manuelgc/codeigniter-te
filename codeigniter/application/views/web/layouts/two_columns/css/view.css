@@ -808,3 +808,10 @@ legend.collapsed {
         color:#4D8BAF;
         cursor: pointer;
 }
+
+/*  formulario catalogo */
+li.item-catalogo{
+	width: 20%;
+	float: left;
+}
+/*  fin formulario catalogo */

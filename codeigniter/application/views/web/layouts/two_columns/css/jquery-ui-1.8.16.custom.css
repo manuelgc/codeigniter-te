@@ -348,6 +348,7 @@
 
 /* workarounds */
 * html .ui-autocomplete { width:1px; } /* without this, the menu expands to 100% in IE6 */
+.ui-autocomplete-loading { background: white url('../images/ajax-loader.gif') right center no-repeat; }
 
 /*
  * jQuery UI Menu 1.8.16
@@ -571,3 +572,4 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	width: 100%;
 	display: inline-block;
 }
+

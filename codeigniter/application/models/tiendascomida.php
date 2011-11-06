@@ -460,19 +460,41 @@ class Tiendascomida extends DataMapper{
 		$arr_tiendas = array();
 		$contador = 0;
 		$tc->where('estatus',1);
-		$tc->get_iterated($limit,$offset);
+		$tc->get_iterated($limit,$offset);		
 		if (!$tc->exists()) {
 			return FALSE;
 		}else {
-			foreach ($tc as $fila_tienda) {
+			foreach ($tc as $fila_tienda) {				
 				$arr_tiendas[$contador]['nombre'] = $fila_tienda->nombre;
 				$arr_tiendas[$contador]['razon_social'] = $fila_tienda->razonsocial;
 				$arr_tiendas[$contador]['descripcion'] = $fila_tienda->descripcion;
 				$arr_tiendas[$contador]['ci_rif'] = $fila_tienda->ci_rif;
-				$arr_tiendas[$contador]['ciudad'] = $fila_tienda->ciudad->nombreCiudad;
-				$arr_tiendas[$contador]['zona'] = $fila_tienda->zona->nombreZona;
+				$arr_tiendas[$contador]['ciudad'] = $fila_tienda->ciudad->get()->nombreCiudad;
+				$arr_tiendas[$contador]['zona'] = $fila_tienda->zona->get()->nombreZona;
+				$contador++;
 			}
 			return $arr_tiendas;
+		}
+	}
+	
+	function getNombreTiendas($caracter) {
+		$tc = new Tiendascomida();
+		$contador = 0;
+		$arr_resultado = array();
+		$tc->select('id,nombre');		
+		$tc->where('estatus',1);
+		$tc->like('upper(nombre)',strtoupper($caracter));
+		$tc->get_iterated();		
+		if ($tc->exists()) {
+			foreach ($tc as $fila_nombre) {
+				$arr_resultado[$contador]['value'] = $fila_nombre->id;
+				$arr_resultado[$contador]['label'] = $fila_nombre->nombre;
+				$arr_resultado[$contador]['id'] = $fila_nombre->id;
+				$contador++;
+			}
+			return $arr_resultado;			
+		}else {
+			return FALSE;
 		}
 	}
 }
