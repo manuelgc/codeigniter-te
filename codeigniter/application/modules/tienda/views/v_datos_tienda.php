@@ -127,7 +127,7 @@
 					function(data){
 						if(!data.abierto){
 							dialogError($("#popup-tienda"),'Cerrado', data.html);
-						}else if(!data.zona){
+						}else if(!data.zona && data.envio){
 							$("#popup-tienda").html(data.html_zona)
 							.dialog({
 								title:'Seleccionar Zona',

@@ -10,6 +10,7 @@ class C_datos_tienda extends MX_Controller{
 		$this->load->library('cart'); 
 		$this->load->library('qtip2');
 		$this->load->module('busqueda/c_busqueda');
+		$this->load->module('carrito/c_carrito');
 	}
 
 	function index(){
@@ -23,7 +24,10 @@ class C_datos_tienda extends MX_Controller{
 		
 		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
-		$data['output_block'] = $this->load->view('carrito/v_carrito','',true);	
+		
+		if($this->input->post('id_tienda')){
+			$data['output_block'] = $this->c_carrito->index($this->input->post('id_tienda'));
+		}
 		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
@@ -156,22 +160,28 @@ class C_datos_tienda extends MX_Controller{
 			$data['html']='<p>El Restaurante esta cerrado, En este momento no puede realizar pedidos</p>';
 		
 		}
-		
-		if (!$this->input->cookie('zona') || !$this->input->cookie('ciudad') ){
-			$data['zona']=false;
-			
-			$data['html_zona']='<form>';
-			$data['html_zona'].='<p>Aun no ha seleccionado la zona donde se encuentra</p>';
-			$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
-			$data['html_zona'].=lang('busqueda_ciudad','cmb_ciudad','description');
-			$data['html_zona'].=$this->cargarCiudad($this->input->post('id_tienda'));
-			$data['html_zona'].=lang('busqueda_zona','cmb_zona','description');
-			$data['html_zona'].=$this->cargarZona((($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),$this->input->post('id_tienda'));
-			$data['html_zona'].='</form>';	
+		if($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
+			$data['envio_domicilio'] = true;
 		}else{
-			$data['zona']=true;
+			
+				$data['envio_domicilio'] = false;
+				
+				if (!$this->input->cookie('zona') || !$this->input->cookie('ciudad') ){
+				
+				$data['zona']=false;
+				
+				$data['html_zona']='<form>';
+				$data['html_zona'].='<p>Aun no ha seleccionado la zona donde se encuentra</p>';
+				$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
+				$data['html_zona'].=lang('busqueda_ciudad','cmb_ciudad','description');
+				$data['html_zona'].=$this->cargarCiudad($this->input->post('id_tienda'));
+				$data['html_zona'].=lang('busqueda_zona','cmb_zona','description');
+				$data['html_zona'].=$this->cargarZona((($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),$this->input->post('id_tienda'));
+				$data['html_zona'].='</form>';	
+			}else{
+				$data['zona']=true;
+			}
 		}
-		
 		
 		echo json_encode($data);
 	}

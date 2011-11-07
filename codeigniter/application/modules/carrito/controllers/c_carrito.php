@@ -8,17 +8,26 @@
 			$this->load->helper('form');
 		}
 		
-		function index() {
+		function index($id_tienda = '') {
 			if($this->input->is_ajax_request()){
 				
-//				print_r($this->input->post('seleccion'));
-//				$data['carrito']=$this->agregarPlato();
-//				if($data['carrito']){
-//					$data['html']=$this->load->view('carrito/v_carrito','',true);
-//				}
-//				 echo json_encode($data);
+				$this->agregarPlato();
+				
+			}elseif($id_tienda!='') {
+				
+				$tienda = new Tiendascomida();
+				$tienda->where('estatus',1)->get_by_id($id_tienda);
+				if($tienda->exists()){
+					$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
+					$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0;
 
- 				$this->agregarPlato();
+					if ($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
+						$data['costo_envio'] = $tienda->costoenvio;
+					}else{
+						$data['costo_envio'] = 0;
+					}
+					return $this->load->view('carrito/v_carrito',$data,true);
+				}
 			}
 		}
 		
