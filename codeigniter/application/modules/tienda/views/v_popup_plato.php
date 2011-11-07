@@ -52,8 +52,6 @@ $(function(){
 		mensaje=$("#"+cadena_id[0]+"-msj_"+cadena_id[1]), 
 		n=$('input[name="'+nombre+'"]:checkbox:checked').length;
 		
-		$("#mensaje_plato").text(n + (n <= 1 ? " is" : " are") + " checked!");
-
 		if( n < minimo ){
 			mostrarError(mensaje, "Debe seleccionar al menos "+minimo+" opciones");
 			return false;

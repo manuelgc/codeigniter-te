@@ -29,7 +29,7 @@ class CI_Cart {
 	// These are the regular expression rules that we use to validate the product ID and product name
 	var $product_id_rules	= '\.a-z0-9_-'; // alpha-numeric, dashes, underscores, or periods
 	var $product_name_rules	= '\.\:\-_ a-z0-9'; // alpha-numeric, dashes, underscores, colons or periods
-
+//	var $product_name_rules = '\.\:\'\-_  a-z0-9 ñÑ áÁ éÉ íÍ óÓ úÚ üÜ àÀ èÈ ìÌ òÒ ùÙ'; 
 	// Private variables.  Do not change!
 	var $CI;
 	var $_cart_contents	= array();
@@ -183,11 +183,14 @@ class CI_Cart {
 
 		// Validate the product name. It can only be alpha-numeric, dashes, underscores, colons or periods.
 		// Note: These can be user-specified by setting the $this->product_name_rules variable.
-		if ( ! preg_match("/^[".$this->product_name_rules."]+$/i", $items['name']))
-		{
-			log_message('error', 'An invalid name was submitted as the product name: '.$items['name'].' The name can only contain alpha-numeric characters, dashes, underscores, colons, and spaces');
-			return FALSE;
-		}
+		
+		
+		//Se Omite esta validación
+//		if ( ! preg_match("/^.[".$this->product_name_rules."].+$/i", $items['name']))
+//		{
+//			log_message('error', 'An invalid name was submitted as the product name: '.$items['name'].' The name can only contain alpha-numeric characters, dashes, underscores, colons, and spaces');
+//			return FALSE;
+//		}
 
 		// --------------------------------------------------------------------
 
@@ -532,7 +535,11 @@ class CI_Cart {
 		// Remove anything that isn't a number or decimal point.
 		$n = trim(preg_replace('/([^0-9\.])/i', '', $n));
 
-		return number_format($n, 2, '.', ',');
+//		return number_format($n, 2, '.', ',');
+		
+		//Se asigna el punto como separador de miles, la coma para decimales
+		//Ej: 1.000,05
+		return number_format($n, 2, ',', '.');
 	}
 
 	// --------------------------------------------------------------------

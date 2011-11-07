@@ -68,7 +68,7 @@
 		  step: 1 
 		});
 	
-	$("input.cantidad").focusout(
+	$("input.cantidad").change(
 			function(event){	
 				event.preventDefault();
 				var rowid = $(this).attr("name"),
@@ -124,7 +124,7 @@
 		<h3>Pedido</h3>
 	
 	<?php else:?>  
-		<?php echo print_r($this->cart->contents());?>
+<!--		<?php //echo print_r($this->cart->contents());?>-->
 		<?php echo form_open('carrito/c_carrito'); ?>
 		<div class="titulo-carrito" align="center">
 			<h3>Pedido</h3>
@@ -175,14 +175,27 @@
 			<li class="total-carrito">	
 			  <div align="right">
 			  	<span><strong>IVA</strong></span>
-			  	<span> Bs.<?php echo $total_iva; ?></span>
+			  	<span> Bs.<?php echo number_format($total_iva,2,',','.'); ?></span>
 			 </div>
 			</li>
+			<?php if(isset($costo_envio)):?>
+				<li class="total-carrito">	
+				  <div align="right">
+				  	<span><strong>Costo de envio</strong></span>
+				  	<span> Bs.<?php echo  number_format($costo_envio,2,',','.') ?></span>
+				  </div>
+				</li>
+			<?php endif;?>
 			<li class="total-carrito">	
 			  <div align="right">
 			  	<span><strong>Total</strong></span>
-			  	<span> Bs.<?php echo  $this->cart->format_number($this->cart->total())+ $total_iva; ?></span>
+			  	<?php if(isset($costo_envio)):?>
+			  		<span> Bs.<?php echo  number_format($this->cart->total()+$total_iva + $costo_envio,2,',','.'); ?></span>
+			  	<?php else:?>
+			  		<span> Bs.<?php echo  number_format($this->cart->total()+$total_iva,2,',','.'); ?></span>
+			  	<?php endif;?>
 			  </div>
+			  		
 			</li>  
 		</ul>
 		
