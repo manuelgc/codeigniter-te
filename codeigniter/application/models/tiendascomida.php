@@ -455,11 +455,25 @@ class Tiendascomida extends DataMapper{
 		return $tc->count();
 	}
 	
-	function getTiendasComida($limit = '',$offset = '',$ordenacion = 'nombre asc') {
+	function getTiendaById($id) {
+		$tc = new Tiendascomida();
+		$tc->where('estatus',1);
+		$tc->get_by_id($id);
+		if (!$tc->exists()) {
+			return FALSE;
+		}else {
+			return $tc;
+		}
+	}
+	
+	function getTiendasComida($limit = '',$offset = '',$filtro = array(),$ordenacion = 'nombre asc') {
 		$tc = new Tiendascomida();
 		$arr_tiendas = array();
 		$contador = 0;
 		$tc->where('estatus',1);
+		if (!empty($filtro)) {
+			$tc->where($filtro);
+		}
 		$tc->get_iterated($limit,$offset);		
 		if (!$tc->exists()) {
 			return FALSE;
@@ -471,6 +485,7 @@ class Tiendascomida extends DataMapper{
 				$arr_tiendas[$contador]['ci_rif'] = $fila_tienda->ci_rif;
 				$arr_tiendas[$contador]['ciudad'] = $fila_tienda->ciudad->get()->nombreCiudad;
 				$arr_tiendas[$contador]['zona'] = $fila_tienda->zona->get()->nombreZona;
+				$arr_tiendas[$contador]['seleccionar'] = form_radio('seleccionar',$fila_tienda->id);
 				$contador++;
 			}
 			return $arr_tiendas;

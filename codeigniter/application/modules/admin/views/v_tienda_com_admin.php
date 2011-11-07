@@ -1,5 +1,6 @@
 <script type="text/javascript">
 $(document).ready(function(){
+	var id_tienda = '';
 	
 	$('#popup').dialog({
 		'autoOpen':false,
@@ -103,25 +104,135 @@ $(document).ready(function(){
 			$('ul.link').html(html.link_pag);
 		}, 1000);
 	}
+
+	$('input:checked').live('click',function(){
+		var id_tienda_selec = $(this).val();
+		$.ajax({
+			url:'<?php base_url()?>c_tienda_com_admin/getTiendaById/',
+			dataType:'json',
+			type:'POST',
+			data: {id_tienda : id_tienda_selec},
+			success:function(data){	
+				var tlf_1_1 = data.tlf_1;			
+				$('#nombre_tienda').val(data.nombre);
+				$('#descrip_tienda').val(data.descripcion);
+				$('#tlf_1_1').val(tlf_1_1.substring(1,3));
+			}
+		});
+		$('#popup').dialog('close');
+	});
 	
-	$('#nombre_tienda_catalogo').live('keyup', function(){
+	$('#boton-catalogo-reset').live('click',function(){
+		$('#form-filtro-tiendas').each (function(){
+			this.reset();
+		});
+		$.ajax({
+			url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+			dataType:'json',
+			type:'POST',
+			beforeSend:function(data){
+				preCargador('.content-tiendas');
+			},
+			success:function(data){
+				cargarTablaTienda(data);
+			}
+		});
+	});
+	
+	$('#ciudad_popup').live('change',function(){
+		if($('#ciudad_popup').val() != ''){
+			var id_ciudad = $('#ciudad_popup').val(); 
+		}
+		if($('#zona_popup').val() != ''){
+			var id_zona = $('#zona_popup').val(); 
+		}
+		$.ajax({
+			url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+			dataType:'json',
+			type:'POST',
+			data:{
+				id_tienda : id_tienda ,
+				id_ciudad : id_ciudad,
+				id_zona : id_zona
+			},
+			beforeSend:function(data){
+				preCargador('.content-tiendas');
+			},
+			success:function(data){
+				cargarTablaTienda(data);
+			}
+		});
+	});
+
+	$('#zona_popup').live('change',function(){
+		if($('#ciudad_popup').val() != ''){
+			var id_ciudad = $('#ciudad_popup').val(); 
+		}
+		if($('#zona_popup').val() != ''){
+			var id_zona = $('#zona_popup').val(); 
+		}
+		$.ajax({
+			url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+			dataType:'json',
+			type:'POST',
+			data:{
+				id_tienda : id_tienda ,
+				id_ciudad : id_ciudad,
+				id_zona : id_zona
+			},
+			beforeSend:function(data){
+				preCargador('.content-tiendas');
+			},
+			success:function(data){
+				cargarTablaTienda(data);
+			}
+		});
+	});
+	
+	$('#nombre_tienda_catalogo').live('keyup', function(){		
 		$(this).autocomplete({
 			source:function(req,resp){
 				$.ajax({
-					url:'<?php echo base_url()?>index.php/admin/c_tienda_com_admin/getNombreTiendas',
+					url:'<?php base_url()?>c_tienda_com_admin/getNombreTiendas',
 					dataType:'json',
 					type:'POST',
 					data:{term : req.term},
 					success:function(data){
-						resp($.map(data,function(item){
+						resp($.map(data,function(item){	
+							id_tienda = item.id;						
 							return {
-								value: item.label							
+								value: item.label,
+								label: item.label							
 							}
 						}));
-					}
+					}					
 				});
 			},
-			minLength: 2
+			minLength: 2,
+			select:function(event,ui){		
+				if($('#ciudad_popup').val() != ''){
+					var id_ciudad = $('#ciudad_popup').val(); 
+				}
+				if($('#zona_popup').val() != ''){
+					var id_zona = $('#zona_popup').val(); 
+				}
+						
+				$.ajax({
+					url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+					dataType:'json',
+					type:'POST',
+					data: { id_tienda : id_tienda ,
+							id_ciudad : id_ciudad,
+							id_zona : id_zona
+						},
+					beforeSend:function(data){
+						preCargador('.content-tiendas');
+					},
+					success:function(data){
+						cargarTablaTienda(data);
+					}
+				});
+			}
 		});
 	});		
 });

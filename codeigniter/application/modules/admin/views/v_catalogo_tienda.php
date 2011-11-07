@@ -5,13 +5,7 @@
 					<div>
 					<input type="text" id="nombre_tienda_catalogo" class="element large" maxlength="255" name="nombre_tienda" />
 					</div>
-				</li>
-				<li id="li-descripcion-tienda" class="item-catalogo"><label
-					class="description" for="descripcion_tienda">Descripcion </label>
-					<div>
-					<input type="text" class="element text large" maxlength="255" name="descripcion_tienda" />
-					</div>
-				</li>
+				</li>				
 				<li id="li-ciudad" class="item-catalogo"><label
 					class="description" for="ciudad_tienda">Ciudad</label>
 					<div>
@@ -22,11 +16,15 @@
 					</div>
 				</li>
 				<li id="li-zona" class="item-catalogo"><label
-					class="description" for="zona_tienda">Fecha de Pedido </label>
+					class="description" for="zona_tienda">Zona </label>
 					<div>
 					<?php echo form_dropdown('zona_tienda',array(),null,'class="element select medium" id="zona_popup"');?>
 					</div>
-				</li>				
+				</li>	
+				<li id="li-buttons" class="item-catalogo">
+					<input id="boton-catalogo-reset" class="button_text art-button"
+				type="button" name="boton-catalogo-reset" value="Limpiar" />
+				</li>			
 			</ul>
 			<p class="error" id="error-filtro"></p>
 			<?php echo form_close();?>

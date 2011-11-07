@@ -66,14 +66,33 @@ class C_tienda_com_admin extends MX_Controller {
 		}
 	}
 	
-	function cargarTiendas($limit,$offset) {
+	function getTiendaById() {
+		$id_tienda = $this->input->post('id_tienda');
+		$tienda_comida = new Tiendascomida();
+		$tc = $tienda_comida->getTiendaById($id_tienda);
+		if ($tc == FALSE) {
+			return '';
+		}else {
+			$data['nombre'] = $tc->nombre;
+			$data['descripcion'] = $tc->descripcion;
+			$data['tlf_1'] = $tc->telefono1;
+			$data['tlf_2'] = $tc->telefono2;
+			$data['razonsocial'] = $tc->razonsocial;
+			$data['ci_rif'] = $tc->ci_rif;
+			$data['min_ord_cant'] = $tc->minimoordencant;
+			$data['min_ord_precio'] = $tc->minimoordenprecio;
+			$data['estacionamiento'] = $tc->estacionamiento;
+			echo json_encode($data);
+		}				
+	}
+	
+	function cargarTiendas($limit,$offset,$filtro = array()) {
 		$tiendas_comida = new Tiendascomida();
-		$resultado = $tiendas_comida->getTiendasComida($limit,$offset);
+		$resultado = $tiendas_comida->getTiendasComida($limit,$offset,$filtro);
 		return $resultado;
 	}
 	
-	function getCantTiendas() {
-		$filtro = array();
+	function getCantTiendas($filtro = array()) {		
 		$tienda_comida = new Tiendascomida();
 		return $tienda_comida->getCantTiendasComida($filtro);
 	}
@@ -92,10 +111,32 @@ class C_tienda_com_admin extends MX_Controller {
 	
 	function catalogoTienda($offset = '') {
 	//paginador
-		$limite = 2;												
-		$tiendas = $this->cargarTiendas($limite,$offset);		
+		$limite = 2;
+		$filtro = array();			
+		$bandera = FALSE;
+		if ($this->input->is_ajax_request()) {
+			if (!$this->input->post('id_tienda') && !$this->input->post('id_ciudad') && !$this->input->post('id_zona')) {
+				$tiendas = $this->cargarTiendas($limite,$offset);			
+				$config['total_rows'] = $this->getCantTiendas();					
+			}else {				
+				if ($this->input->post('id_tienda')) {
+					$filtro['id'] = $this->input->post('id_tienda');
+				}
+				if ($this->input->post('id_ciudad')) {
+					$filtro['ciudades_id'] = $this->input->post('id_ciudad');
+				}
+				if ($this->input->post('id_zona')) {
+					$filtro['zonas_id'] = $this->input->post('id_zona');
+				}
+				$tiendas = $this->cargarTiendas($limite, $offset,$filtro);
+				$config['total_rows'] = $this->getCantTiendas($filtro);
+			}
+		}else {
+			$tiendas = $this->cargarTiendas($limite,$offset);
+			$config['total_rows'] = $this->getCantTiendas();
+		}											
 		$config['base_url'] = site_url().'/admin/c_tienda_com_admin/catalogoTienda/';						
-		$config['total_rows'] = $this->getCantTiendas();
+		
 		$config['per_page'] = $limite;
 		$config['uri_segment'] = 4;		
 		$config['next_tag_open'] = '<li>';
@@ -120,7 +161,7 @@ class C_tienda_com_admin extends MX_Controller {
 			'Zona'			
 		);
 		if (empty($tiendas)) {
-			$data['lista_ped'] = 'Aun no existen tiendas registradas';
+			$data['lista_ped'] = 'No existen tiendas';
 		}else{
 			$data['lista_ped'] = $this->table->generate($tiendas);	
 		}				
@@ -128,7 +169,7 @@ class C_tienda_com_admin extends MX_Controller {
 		$data['ciudades'] = $this->cargarCiudad();
 		$catalogo_html = $this->load->view('v_catalogo_tienda',$data,true);
 		
-		if ($this->input->is_ajax_request()) {			
+		if ($this->input->is_ajax_request()) {					
 			echo json_encode($data);
 		}else {
 			return $catalogo_html;
