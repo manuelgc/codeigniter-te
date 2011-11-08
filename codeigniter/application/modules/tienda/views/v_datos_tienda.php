@@ -30,6 +30,7 @@
 								
 			}).dialog('open');
 		}
+
 		function validarSeleccion(){
 			if($("#cmbx_ciudad").val()=='' || $("#cmbx_zona").val()==''){
 				mostrarError($("#mensaje_error"), 'Debe seleccionar Ciudad y Zona');
@@ -39,6 +40,15 @@
 			}		
 		}
 		
+		function validarTipoOrden() {
+			if($("#cmbx_orden").val()==''){
+				mostrarError($("#mensaje_error_orden"), 'Debe seleccionar tipo de orden');
+				return false;
+			}else {
+				return true;
+			}
+		}
+
 		function actualizarCiudadZona(id_ciudad,id_zona,nombreCiudad,nombreZona) {
 		
 			$.cookie('ciudad', id_ciudad,{path: '/'});
@@ -48,7 +58,9 @@
 			
 		}
 
-		
+		function actulizarTipoOrden(tipo_orden){
+			$.cookie('tipo_orden', tipo_orden,{path: '/'});
+		}	
 				
 		function cargarPopupplato(id_plato){
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
@@ -84,7 +96,67 @@
 					'json'
 				);
 		}
-				
+
+		function cargarPopupZona(html,id_plato){
+			$("#popup-tienda").html(html)
+			.dialog({
+				title:'Seleccionar Zona',
+				autoOpen: false,
+				modal:true,
+				resizable: false,
+				show:"blind",
+				hide:"explode",
+				buttons: {
+				'Aceptar' : function(){
+					if(validarSeleccion()){
+						actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
+						cargarPopupplato(id_plato);
+//						$(this).dialog('close');
+						
+					}
+				},
+				'Cancelar': function() {
+					$(this).dialog('close');
+				}
+				}
+
+								
+			})
+			.dialog('open');
+		}
+		
+		function cargarPopupTipoOrden(html,id_plato,zona,html_zona){
+			
+			$("#popup-tienda").html(html)
+			.dialog({
+				title:'Seleccionar Tipo de Orden',
+				autoOpen: false,
+				modal:true,
+				resizable: false,
+				show:"blind",
+				hide:"explode",
+				buttons: {
+				'Aceptar' : function(){
+					if(validarTipoOrden()){
+						actulizarTipoOrden($("#cmbx_orden").val());
+						if($.cookie("tipo_orden")!=null && $.cookie("tipo_orden")==1 && !zona){
+							cargarPopupZona(html_zona,id_plato);
+						}else{
+							cargarPopupplato(id_plato);
+						}
+					}	
+				},
+				'Cancelar': function() {
+					$(this).dialog('close');
+				}
+				}
+
+								
+			})
+			.dialog('open');
+			
+		}		
+			
 		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
 
 		$("input.cantidad").spinbox({
@@ -126,33 +198,13 @@
 					{'id_tienda':id_tienda},
 					function(data){
 						if(!data.abierto){
-							dialogError($("#popup-tienda"),'Cerrado', data.html);
-						}else if(!data.zona && data.envio){
-							$("#popup-tienda").html(data.html_zona)
-							.dialog({
-								title:'Seleccionar Zona',
-								autoOpen: false,
-								modal:true,
-								resizable: false,
-								show:"blind",
-								hide:"explode",
-								buttons: {
-								'Aceptar' : function(){
-									if(validarSeleccion()){
-										actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
-										cargarPopupplato(id_plato);
-//										$(this).dialog('close');
-										
-									}
-								},
-								'Cancelar': function() {
-									$(this).dialog('close');
-								}
-								}
-
-												
-							})
-							.dialog('open');
+							dialogError($("#popup-tienda"),'Cerrado', data.html_cerrado);
+						}else if(!data.envio) {
+							cargarPopupTipoOrden(data.html_orden, id_plato, data.zona, data.html_zona);
+						}else if(!data.envio_domicilio){
+							cargarPopupplato(id_plato);
+						}else if(!data.zona){
+							cargarPopupZona(data.html_zona,id_plato);
 						}else{
 							cargarPopupplato(id_plato);
 						}	
@@ -209,23 +261,24 @@
 
 
 <div class="tienda">
-<div class="message"> 
+<!--<div class="message"> 
 	<p>
 		<span>Usted ha seleccionado Ciudad: </span>
 		<span id="nombre_ciudad"><b><?php echo $nombreCiudad;?></b></span><span>, Zona: </span>
 		<span id="nombre_zona"><b><?php echo $nombreZona;?></b></span>
-<!--		<a id="cambiar_ubicacion" href="">Cambiar</a>-->
+		<a id="cambiar_ubicacion" href="">Cambiar</a>
 	</p>
-</div>
+</div>-->
 
 <div id="cabecera_tienda">
 			<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $id;?>" />
 			<div  class="titulo_tienda">
 				<h2><span class="text"><?php echo $nombre ?> </span></h2>
 				<span class="text"><?php echo $tipo_comida?> </span><br>
-				<span class="text">Telefonos: <?php echo $telefono;?></span><br>
-				<span class="text">Cant. Minima: <?php echo $min_cant;?></span><br>
-				<span class="text">Gasto Minimo: <?php echo $min_cost;?></span><br>
+				<span class="text"><strong>Telefonos:</strong> <?php echo $telefono;?></span><br>
+				<span class="text"><strong>Cant. Minima:</strong> <?php echo $min_cant;?></span><br>
+				<span class="text"><strong>Gasto Minimo:</strong> Bs.<?php echo $min_cost;?></span><br>
+				<span class="text"><strong>Costo de Envio:</strong> Bs.<?php echo $costo_envio;?></span><br>
 				<span class="text"><?php echo $tipo_venta;?></span><br>
 			</div>
 			<div class="imagenes_tienda" >

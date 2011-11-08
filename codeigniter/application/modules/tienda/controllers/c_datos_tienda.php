@@ -57,6 +57,7 @@ class C_datos_tienda extends MX_Controller{
 			$arrTienda['telefono'] = $tienda->telefono1.(($tienda->telefono2!=null)?'/'.$tienda->telefono2:'');
 			$arrTienda['min_cant'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:'Sin limite';
 			$arrTienda['min_cost'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:'Sin limite';
+			$arrTienda['costo_envio'] = ($tienda->costoenvio!=null)?$tienda->minimoordenprecio:0;
 			$arrTienda['descripcion'] = $tienda->descripcion;
 			$arrTienda['direccion'] = $tienda->direccion.'. '.$tienda->getCiudad()->nombreCiudad.', Estado '.$tienda->getEstado()->nombreEstado;
 			$arrTienda['imagen'] = base_url().$tienda->imagen->where('estatus',1)->get()->rutaImagen;
@@ -155,34 +156,45 @@ class C_datos_tienda extends MX_Controller{
 	function validarDatos(){
 			
 		$data['abierto']=$this->validarAbierto();
+
 		if($data['abierto']==false){
-			
-			$data['html']='<p>El Restaurante esta cerrado, En este momento no puede realizar pedidos</p>';
-		
+				
+			$data['html_cerrado']='<p>El Restaurante esta cerrado, En este momento no puede realizar pedidos</p>';
+
 		}
-		if($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
-			$data['envio_domicilio'] = true;
-		}else{
-			
-				$data['envio_domicilio'] = false;
-				
-				if (!$this->input->cookie('zona') || !$this->input->cookie('ciudad') ){
-				
-				$data['zona']=false;
-				
-				$data['html_zona']='<form>';
-				$data['html_zona'].='<p>Aun no ha seleccionado la zona donde se encuentra</p>';
-				$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
-				$data['html_zona'].=lang('busqueda_ciudad','cmb_ciudad','description');
-				$data['html_zona'].=$this->cargarCiudad($this->input->post('id_tienda'));
-				$data['html_zona'].=lang('busqueda_zona','cmb_zona','description');
-				$data['html_zona'].=$this->cargarZona((($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),$this->input->post('id_tienda'));
-				$data['html_zona'].='</form>';	
+
+		if($this->input->cookie('tipo_orden')!=false){
+			$data['envio']=true;
+			if($this->input->cookie('tipo_orden')==1){
+				$data['envio_domicilio'] = true;
 			}else{
-				$data['zona']=true;
+				$data['envio_domicilio'] = false;
 			}
+		}else{
+			$data['envio']=false;
+			$data['html_orden']='<form>';
+			$data['html_orden'].='<p class="error" id="mensaje_error_orden"></p>';
+			$data['html_orden'].=form_label('Tipo Orden', 'cmbx_orden');
+			$data['html_orden'].=$this->cargarTiposVentaTienda($this->input->post('id_tienda'));
+			$data['html_orden'].='</form>';
 		}
-		
+		if (!$this->input->cookie('zona') || !$this->input->cookie('ciudad') ){
+
+			$data['zona']=false;
+
+			$data['html_zona']='<form>';
+			$data['html_zona'].='<p>Aun no ha seleccionado la zona donde se encuentra</p>';
+			$data['html_zona'].='<p class="error" id="mensaje_error"></p>';
+			$data['html_zona'].=lang('busqueda_ciudad','cmb_ciudad','description');
+			$data['html_zona'].=$this->cargarCiudad($this->input->post('id_tienda'));
+			$data['html_zona'].=lang('busqueda_zona','cmb_zona','description');
+			$data['html_zona'].=$this->cargarZona((($this->input->cookie('ciudad')!=false)?$this->input->cookie('ciudad'):''),$this->input->post('id_tienda'));
+			$data['html_zona'].='</form>';
+		}else{
+			$data['zona']=true;
+		}
+
+
 		echo json_encode($data);
 	}
 
@@ -331,7 +343,21 @@ class C_datos_tienda extends MX_Controller{
 		}
 
 	}
+	
+	function cargarTiposVentaTienda($id_tienda){
+		$tienda = new Tiendascomida();
+		$tipoVenta= $tienda->getTiposVentaById($id_tienda);
+		$options= array();
+		if($tipoVenta!=false){
+			foreach ($tipoVenta as $ven){				
+				$options[$ven->id]=$ven->nombre;
+			}
+			return form_dropdown('tipo_orden',$options,'', 'id="cmbx_orden" class="element text medium"');
+		}else{
+			return null;
+		}
 
+	}
 	function cargarZona($id_ciudad,$id_tienda){
 		$tienda = new Tiendascomida();
 		$zona= $tienda->getZonasEntregaById($id_ciudad,$id_tienda);
@@ -405,7 +431,7 @@ class C_datos_tienda extends MX_Controller{
 		}
 
 	}
-
+	
 	function getTiposComidaTienda($tienda) {
 		$tipoComida=$tienda->getTiposComida();
 		if($tipoComida!=false){
