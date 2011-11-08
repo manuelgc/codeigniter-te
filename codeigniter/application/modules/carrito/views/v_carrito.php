@@ -86,7 +86,7 @@
 				}	
 			});
 	
-	$("a.a-eliminar").click(
+	$("#form_carrito a.a-eliminar").click(
 			function(event){	
 				event.preventDefault();
 				var rowid = $(this).attr("name");
@@ -102,7 +102,7 @@
 			}
 	);
 	
-	$("a.a-editar").click(function(event){	
+	$("#form_carrito a.a-editar").click(function(event){	
 		event.preventDefault();
 		var id_plato = $(this).attr('name'),
 		observacion= $("#"+$(this).attr('id')+"observacion").val(),
@@ -125,7 +125,7 @@
 	
 	<?php else:?>  
 <!--		<?php //echo print_r($this->cart->contents());?>-->
-		<?php echo form_open('carrito/c_carrito'); ?>
+		<?php echo form_open('carrito/c_carrito','id="form_carrito"'); ?>
 		<div class="titulo-carrito" align="center">
 			<h3>Pedido</h3>
 		</div>
