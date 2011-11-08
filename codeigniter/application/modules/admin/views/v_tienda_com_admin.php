@@ -10,13 +10,7 @@ $(document).ready(function(){
 		modal:true,
 		show:"blind",
 		hide:"explode",
-		buttons:{
-			'Seleccionar' : function(){
-				//algo
-			},
-			'Cancelar' : function(){
-				$(this).dialog('close');
-			},
+		buttons:{			
 			'Cerrar' : function(){
 				$(this).dialog('close');
 			}
@@ -113,10 +107,24 @@ $(document).ready(function(){
 			type:'POST',
 			data: {id_tienda : id_tienda_selec},
 			success:function(data){	
-				var tlf_1_1 = data.tlf_1;			
+				$('#id_tienda').val(data.id);
 				$('#nombre_tienda').val(data.nombre);
 				$('#descrip_tienda').val(data.descripcion);
-				$('#tlf_1_1').val(tlf_1_1.substring(1,3));
+				$('#tlf_1_1').val(data.tlf_1.substring(1,4));
+				$('#tlf_1_2').val(data.tlf_1.substring(4,7));
+				$('#tlf_1_3').val(data.tlf_1.substring(7,11));
+				$('#tlf_2_1').val(data.tlf_2.substring(1,4));
+				$('#tlf_2_2').val(data.tlf_2.substring(4,7));
+				$('#tlf_2_3').val(data.tlf_2.substring(7,11));
+				$('#razon_social').val(data.razonsocial);
+				$('#ci_rif').val(data.ci_rif);
+				$('#min_ord_cant').val(data.min_ord_cant);
+				$('#min_ord_precio').val(data.min_ord_precio);
+				(data.estacionamiento == 0) ? $('#estacionamiento').removeAttr('checked') : $('#estacionamiento').attr('checked',true);
+				$('#ciudad').val(data.ciudad);
+				$('#zona').replaceWith(data.zona);
+				$('#min_tiempo_ent').val(data.min_tiempo_ent);
+				$('#min_tiempo_esp').val(data.min_tiempo_esp);
 			}
 		});
 		$('#popup').dialog('close');
@@ -237,12 +245,15 @@ $(document).ready(function(){
 	});		
 });
 </script>
+<?php if (isset($mensaje)):?>
+	<div class="message"><?php echo $mensaje;?></div>
+<?php endif;?>
 <div id="form_container">
 
 	<h1>
 		<a>Tienda de Comida</a>
 	</h1>	
-	<?php echo form_open('admin/c_tienda_com_admin',array('oculto'=>'1'));?>
+	<?php echo form_open('admin/c_tienda_com_admin/','id="form_tiendas_comida"',array('oculto'=>'1','id_tienda'=>''));?>
 		<div class="form_description">
 			<h2>Tienda de Comida</h2><div><input id="boton-catalogo" class="button_text art-button"
 				type="button" name="boton-catalogo" value="Buscar" /></div>
@@ -256,7 +267,7 @@ $(document).ready(function(){
 				<div>
 					<input id="nombre_tienda" name="nombre_tienda" class="element text medium"
 						type="text" maxlength="255" value="<?php echo set_value('nombre_tienda');?>" />
-						<?php echo form_error('nombre_tienda','<p>','</p>');?>
+						<?php echo form_error('nombre_tienda','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_1">
 					<small>Ingresa el nombre de la tienda tal como es conocida por el
@@ -267,7 +278,7 @@ $(document).ready(function(){
 				<div>
 					<input id="descrip_tienda" name="descrip_tienda" class="element text medium"
 						type="text" maxlength="255" value="<?php echo set_value('descrip_tienda');?>" />
-						<?php echo form_error('descrip_tienda','<p>','</p>');?>
+						<?php echo form_error('descrip_tienda','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_2">
 					<small>Ingresa una breve descripcion de lo que hace el restaurante</small>
@@ -276,17 +287,17 @@ $(document).ready(function(){
 				<span> 
 					<input id="tlf_1_1" name="tlf_1_1" 
 						class="element text" size="3" maxlength="3" value="<?php echo set_value('tlf_1_1');?>" type="text"> -
-						<label for="tlf_1_1">(###)</label> 
-						<?php echo form_error('tlf_1_1','<p>','</p>');?>
-				</span> 
+						<label for="tlf_1_1">(###)</label> 						
+				</span>			
 				<span> 
 					<input id="tlf_1_2" name="tlf_1_2" class="element text" size="3"
-						maxlength="3" value="<?php echo set_value('tlf_1_2');?>" type="text"> - <label for="tlf_1_2">###</label>						
+						maxlength="3" value="<?php echo set_value('tlf_1_2');?>" type="text"> - <label for="tlf_1_2">###</label>											
 				</span> 
 				<span> 
 					<input id="tlf_1_3" name="tlf_1_3"
 					class="element text" size="4" maxlength="4" value="<?php echo set_value('tlf_1_3');?>" type="text"> <label for="tlf_1_3">####</label> 
 				</span>
+				<?php echo form_error('tlf_1_1','<p class="error">','</p>');?>
 				<p class="guidelines" id="guide_3">
 					<small>Ingresa un numero de telefono valido</small>
 				</p></li>
@@ -294,17 +305,17 @@ $(document).ready(function(){
 				<span> 
 					<input id="tlf_2_1" name="tlf_2_1"
 						class="element text" size="3" maxlength="3" value="<?php echo set_value('tlf_2_1');?>" type="text"> -
-						<label for="tlf_2_1">(###)</label>
-						<?php echo form_error('tlf_2_1','<p>','</p>');?> 
+						<label for="tlf_2_1">(###)</label>						
 				</span> 
 				<span> 
 					<input id="tlf_2_2" name="tlf_2_2" class="element text" size="3"
-					maxlength="3" value="<?php echo set_value('tlf_2_2');?>" type="text"> - <label for="tlf_2_2">###</label>
+					maxlength="3" value="<?php echo set_value('tlf_2_2');?>" type="text"> - <label for="tlf_2_2">###</label>					
 				</span> 
 				<span> 
 					<input id="tlf_2_3" name="tlf_2_3"
 					class="element text" size="4" maxlength="4" value="<?php echo set_value('tlf_2_3');?>" type="text"> <label
 					for="tlf_2_3">####</label> </span>
+					<?php echo form_error('tlf_2_1','<p class="error">','</p>');?>
 				<p class="guidelines" id="guide_4">
 					<small>Ingresa un numero de telefono valido, puedes ingresar numero
 						local o celular</small>
@@ -314,6 +325,7 @@ $(document).ready(function(){
 				<div>
 					<input id="razon_social" name="razon_social" class="element text medium"
 						type="text" maxlength="255" value="<?php echo set_value('razon_social');?>" />
+						<?php echo form_error('razon_social','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_5">
 					<small>Ingresa el nombre juridico del restaurante</small>
@@ -321,7 +333,8 @@ $(document).ready(function(){
 			<li id="li_6"><label class="description" for="ci_rif">Cedula/RIF </label>
 				<div>
 					<input id="ci_rif" name="ci_rif" class="element text medium"
-						type="text" maxlength="255" value="<?php echo set_value('ci_rif');?>" />
+						type="text" maxlength="10" value="<?php echo set_value('ci_rif');?>" />
+						<?php echo form_error('ci_rif','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_6">
 					<small>Ingresa el RIF de la empresa o el numero de cedula del
@@ -332,6 +345,7 @@ $(document).ready(function(){
 				<div>
 					<input id="min_ord_cant" name="min_ord_cant" class="element text medium"
 						type="text" maxlength="255" value="<?php echo set_value('min_ord_cant');?>" />
+						<?php echo form_error('min_ord_cant','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_7">
 					<small>Ingresa la cantidad minima de platos que el restaurante
@@ -341,6 +355,7 @@ $(document).ready(function(){
 				<span class="symbol">Bs</span> 
 				<span> <input id="min_ord_precio" name="min_ord_precio" class="element text currency"
 					size="10" value="<?php echo set_value('min_ord_cant');?>" type="text" /> . <label for="element_8_1">Bolivares</label>
+					<?php echo form_error('min_ord_precio','<p class="error">','</p>');?>
 			</span>
 				<p class="guidelines" id="guide_8">
 					<small>Ingresa el minino en bolivares que el restaurante podra
@@ -357,55 +372,37 @@ $(document).ready(function(){
 			<li id="li_13"><label class="description" for="ciudad">Ciudad </label>
 				<div>
 					<?php echo form_dropdown('ciudad',$ciudades,array(),'class="element select medium" id="ciudad"');?>
+					<?php echo form_error('ciudad','<p class="error">','</p>');?>
 				</div></li>
 			<li id="li_14"><label class="description" for="element_14">Zona </label>
 				<div>
 					<?php echo form_dropdown('zona',array(),null,'class="element select medium" id="zona"');?>
+					<?php echo form_error('zona','<p class="error">','</p>');?>
 				</div></li>
 			<li id="li_9">
 				<label class="description" for="min_tiempo_ent">Minimo tiempo entrega </label> 
-					<span> <input id="min_tiempo_ent_1" name="min_tiempo_ent_1" class="element text " size="2" type="text"
-					maxlength="2" value="<?php echo set_value('min_tiempo_ent_1');?>" /> : <label>HH</label> 
-					</span> 
-					<span> <input id="min_tiempo_ent_2" name="min_tiempo_ent_2" class="element text " size="2" type="text" 
-					maxlength="2" value="<?php echo set_value('min_tiempo_ent_2');?>" /> : <label>MM</label> 
-					</span> 
-					<span> <input id="min_tiempo_ent_3" name="min_tiempo_ent_3" class="element text " size="2" type="text" 
-					maxlength="2" value="<?php echo set_value('min_tiempo_ent_3');?>" /> <label>SS</label> 
-					</span>
-					<span> 
-						<select class="element select" style="width: 4em" id="min_tiempo_ent_4" name="min_tiempo_ent_4">
-							<option value="AM">AM</option>
-							<option value="PM">PM</option>
-						</select> <label>AM/PM</label> 
-					</span>
+					<span> <input id="min_tiempo_ent" name="min_tiempo_ent" class="element text " size="2" type="text"
+					maxlength="2" value="<?php echo set_value('min_tiempo_ent_1');?>" /><label>HH</label> 
+					</span> 					
 			<p class="guidelines" id="guide_9">
 					<small>Ingrese el tiempo minimo para la entrega de un producto</small>
 				</p>
 			</li>
 			<li id="li_10">
 				<label class="description" for="min_tiempo_esp">Minimo tiempo espera </label> 
-					<span> <input id="min_tiempo_esp_1" name="min_tiempo_esp_1" class="element text " size="2" type="text"
-						maxlength="2" value="<?php echo set_value('min_tiempo_esp_1');?>" /> : <label>HH</label> </span> 
-					<span> <input id="min_tiempo_esp_2" name="min_tiempo_esp_2" class="element text " size="2" type="text" 
-						maxlength="2" value="<?php echo set_value('min_tiempo_esp_2');?>" /> : <label>MM</label>
-					</span> 
-					<span> <input id="min_tiempo_esp_3" name="min_tiempo_esp_3" class="element text " size="2" type="text" 
-						maxlength="2" value="<?php echo set_value('min_tiempo_esp_3');?>" />
-					<label>SS</label> </span> 
-					<span> <select class="element select" style="width: 4em" id="min_tiempo_esp_4" name="min_tiempo_esp_4">
-						<option value="AM">AM</option>
-						<option value="PM">PM</option>
-					</select> <label>AM/PM</label> 
-					</span>
+					<span> <input id="min_tiempo_esp" name="min_tiempo_esp" class="element text " size="2" type="text"
+						maxlength="2" value="<?php echo set_value('min_tiempo_esp_1');?>" /><label>HH</label> </span> 					
 			<p class="guidelines" id="guide_10">
 					<small>Tiempo minimo de espera para entregar un pedido tipo "Yo lo
 						Busco"</small>
 				</p></li>
 
 			<li class="buttons"> 
-			<input id="saveForm" class="button_text art-button"
-				type="submit" name="enviar" value="Enviar" /></li>
+			<input id="guardar" class="button_text art-button"
+				type="submit" name="guardar" value="Guardar" />
+			<input id="eliminar" class="button_text art-button"
+				type="button" name="eliminar" value="Eliminar" />
+				</li>
 		</ul>
 	<?php echo form_close();?>
 </div>
