@@ -1,12 +1,70 @@
 <?php
 class C_tienda_com_admin extends MX_Controller {
+	private $id_usuario;
+	private $config = array(
+		array(
+			'field'=>'nombre_tienda',
+			'label'=>'Nombre Tienda',
+			'rules'=>'trim|required|max_length[255]|xss_clean'
+		),
+		array(
+			'field'=>'descrip_tienda',
+			'label'=>'Descripcion de la tienda',
+			'rules'=>'trim|required|max_length[255]|xss_clean'
+		),
+		array(
+			'field'=>'nombre_tienda',
+			'label'=>'Nombre Tienda',
+			'rules'=>'trim|required|max_length[255]|xss_clean'
+		),
+		array(
+			'field'=>'tlf_1_1',
+			'label'=>'Telefono 1',
+			'rules'=>'trim|max_length[3]|required|callback_validar_tlf_1'
+		),
+		array(
+			'field'=>'tlf_2_1',
+			'label'=>'Telefono 2',
+			'rules'=>'trim|required|max_length[3]|callback_validar_tlf_2'
+		),
+		array(
+			'field'=>'razon_social',
+			'label'=>'Razon Social',
+			'rules'=>'trim|required|max_length[255]|xss_clean'
+		),
+		array(
+			'field'=>'ci_rif',
+			'label'=>'Cedula/Rif',
+			'rules'=>'trim|required|max_length[10]|xss_clean'
+		),
+		array(
+			'field'=>'min_ord_cant',
+			'label'=>'Minimo orden (cantidad)',
+			'rules'=>'trim|required|max_length[2]|xss_clean|integer'
+		),
+		array(
+			'field'=>'min_ord_precio',
+			'label'=>'Minimo orden (precio)',
+			'rules'=>'trim|required|max_length[5]|xss_clean'
+		),
+		array(
+			'field'=>'ciudad',
+			'label'=>'Ciudad',
+			'rules'=>'required'
+		),
+		array(
+			'field'=>'zona',
+			'label'=>'Zona',
+			'rules'=>'required'
+		)
+	);
 	function __construct() {
 		parent::__construct();
 		
 		$this->load->library('qtip2');
 		$this->load->library('table');
 		$this->load->library('pagination');
-		
+		$this->load->library('form_validation');
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip();
 		$data['output_menu'] = Modules::run('admin/c_menu_admin/index');
@@ -26,10 +84,74 @@ class C_tienda_com_admin extends MX_Controller {
 		$this->template->set_layout('two_columns/theme');
 	}
 	
+	function validar_tlf_1($campo1) {
+		$campo2 = $this->input->post('tlf_1_2');
+		$campo3 = $this->input->post('tlf_1_3');
+		if (empty($campo1) || empty($campo2) || empty($campo3)) {
+			$this->form_validation->set_message('validar_fijo','Debe ingresar un numero de telefono valido');
+			return FALSE;
+		}else {
+			if (!$this->form_validation->numeric($campo2) && !$this->form_validation->numeric($campo3)) {
+				$this->form_validation->set_message('validar_fijo','Solo se permiten numeros para este campo');
+				return FALSE;
+			}else {
+				return TRUE;
+			}
+		}
+	}
+	
+	function validar_tlf_2($campo1) {
+		$campo2 = $this->input->post('tlf_2_2');
+		$campo3 = $this->input->post('tlf_2_3');
+		if (empty($campo1) || empty($campo2) || empty($campo3)) {
+			$this->form_validation->set_message('validar_fijo','Debe ingresar un numero de telefono valido');
+			return FALSE;
+		}else {
+			if (!$this->form_validation->numeric($campo2) && !$this->form_validation->numeric($campo3)) {
+				$this->form_validation->set_message('validar_fijo','Solo se permiten numeros para este campo');
+				return FALSE;
+			}else {
+				return TRUE;
+			}
+		}
+	}
+	
 	function index() {
-		$data['ciudades'] = $this->cargarCiudad();
-		$data['catalogo_default'] = $this->catalogoTienda();
-		$this->template->build('v_tienda_com_admin',$data);
+		if ($this->input->post('oculto')) {
+			$this->procesarGuardar();
+		}else{
+			$data['ciudades'] = $this->cargarCiudad();
+			$data['catalogo_default'] = $this->catalogoTienda();
+			$this->template->build('v_tienda_com_admin',$data);	
+		}		
+	}
+	
+	function procesarGuardar() {
+		$this->form_validation->set_rules($this->config);
+		
+		if ($this->form_validation->run($this) == FALSE) {
+			$data['ciudades'] = $this->cargarCiudad();
+			$data['catalogo_default'] = $this->catalogoTienda();
+			$this->template->build('v_tienda_com_admin',$data);
+		}else {
+			$tc = new Tiendascomida();
+			$tc->id = $this->input->post('id_tienda');
+			$tc->nombre = $this->input->post('nombre_tienda');
+			$tc->descripcion = $this->input->post('telefono1');
+			$tc->telefono1 = $this->input->post('tlf_1_1').$this->input->post('tlf_1_2').$this->input->post('tlf_1_3');
+			$tc->telefono2 = $this->input->post('tlf_2_1').$this->input->post('tlf_2_2').$this->input->post('tlf_2_3');
+			$tc->razonsocial = $this->input->post('razon_social');
+			$tc->ci_rif = $this->input->post('ci_rif');
+			$tc->minimoordencant = $this->input->post('min_ord_cant');
+			$tc->minimoordenprecio = $this->input->post('min_ord_precio');
+			$tc->estacionamiento = ($this->input->post('estacionamiento')) ? 1 : 0;
+			$tc->minimotiempoentrega = $this->input->post('min_tiempo_ent');
+			$tc->minimotiempoespera = $this->input->post('min_tiempo_esp');
+			$tc->estatus = 1;
+			$tc->guardarActualizar($tc, $this->input->post('ciudad'), $this->input->post('zona'));
+			$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+			$this->template->build('v_tienda_com_admin',$data);
+		}
 	}
 	
 	function cargarCiudad(){
@@ -66,6 +188,22 @@ class C_tienda_com_admin extends MX_Controller {
 		}
 	}
 	
+	function cargarZonaPorCiudad($ciudad){
+		$zona = new Zona();
+		$zona->where('estatus','1');
+		$zona->where('ciudades_id',$ciudad);
+		$zona->order_by('nombreZona','ASD')->get_iterated();
+		if (!$zona->exists()) {
+			return '';
+		}else {
+			foreach ($zona as $z) {
+				$options[$z->id] = $z->nombreZona;
+			}
+			return $options;
+		}
+
+	}
+	
 	function getTiendaById() {
 		$id_tienda = $this->input->post('id_tienda');
 		$tienda_comida = new Tiendascomida();
@@ -73,6 +211,8 @@ class C_tienda_com_admin extends MX_Controller {
 		if ($tc == FALSE) {
 			return '';
 		}else {
+			$opciones_zona = $this->cargarZonaPorCiudad($tc->ciudad->get()->id);
+			$data['id'] = $tc->id;
 			$data['nombre'] = $tc->nombre;
 			$data['descripcion'] = $tc->descripcion;
 			$data['tlf_1'] = $tc->telefono1;
@@ -82,6 +222,10 @@ class C_tienda_com_admin extends MX_Controller {
 			$data['min_ord_cant'] = $tc->minimoordencant;
 			$data['min_ord_precio'] = $tc->minimoordenprecio;
 			$data['estacionamiento'] = $tc->estacionamiento;
+			$data['ciudad'] = $tc->ciudad->get()->id;
+			$data['zona'] = form_dropdown('zona',$opciones_zona,$tc->zona->get()->id,'class="element select medium" id="zona"');
+			$data['min_tiempo_ent'] = $tc->minimotiempoentrega;
+			$data['min_tiempo_esp'] = $tc->minimotiempoespera;
 			echo json_encode($data);
 		}				
 	}
