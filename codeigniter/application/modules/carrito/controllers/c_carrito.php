@@ -11,41 +11,41 @@
 		function index($id_tienda = '') {
 			if($this->input->is_ajax_request()){
 				
-				$this->agregarPlato();
+				$data['html']= $this->actualizarCarrito($this->input->post('id_tienda'));
+				echo json_encode($data);
 				
 			}elseif($id_tienda!='') {
 				
-				$tienda = new Tiendascomida();
-				$tienda->where('estatus',1)->get_by_id($id_tienda);
-				if($tienda->exists()){
-					$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
-					$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0;
-
-					if ($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
-						$data['costo_envio'] = $tienda->costoenvio;
-					}else{
-						$data['costo_envio'] = 0;
-					}
-					return $this->load->view('carrito/v_carrito',$data,true);
-				}
+				return $this->actualizarCarrito($id_tienda);
+				
 			}
 		}
-		
-		function agregarPlato(){
-			$plato= new Plato();
-			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
-			if ($plato->exists()) {
-				$encontrado=false;
-				$tienda = $plato->tiendascomida->where('estatus',1)->get();
+
+		function actualizarCarrito($id_tienda){
+			$tienda = new Tiendascomida();
+			$tienda->where('estatus',1)->get_by_id($id_tienda);
+			if($tienda->exists()){
 				$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
-				$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0; 
-				
+				$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0;
+
 				if ($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
 					$data['costo_envio'] = $tienda->costoenvio;
 				}else{
 					$data['costo_envio'] = 0;
 				}
-											
+					
+				$data['radio_tipo']= $this->cargarRadioOrden($tienda);
+					
+				return $this->load->view('carrito/v_carrito',$data,true);;
+			}
+		}
+
+		function agregarPlato(){
+			$plato= new Plato();
+			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+			if ($plato->exists()) {
+				$encontrado=false;
+				$tienda = $plato->tiendascomida->where('estatus',1)->get();											
 				foreach ($this->cart->contents() as $items){
 					if($items['id']==$plato->id){
 						$encontrado=true;
@@ -123,7 +123,7 @@
 					
 				}
 				$dataAjax['carrito'] = true;
-				$dataAjax['html'] = $data['html']=$this->load->view('carrito/v_carrito',$data,true);
+				$dataAjax['html'] = $this->actualizarCarrito($tienda->id);
 			}else{
 				$dataAjax['carrito'] = false;
 			}
@@ -137,7 +137,7 @@
 			        'qty'     =>    $this->input->post('cantidad'),
 			);
 			$this->cart->update($data1);
-			$data['html']=$this->load->view('carrito/v_carrito','',true);
+			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
 			echo json_encode($data);
 		}
 
@@ -149,7 +149,7 @@
 			 'observacion'  =>	$this->input->post('observacion')
 			);
 			$this->cart->update($data1);
-			$data['html']=$this->load->view('carrito/v_carrito','',true);
+			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
 			echo json_encode($data);
 		}
 			
@@ -193,6 +193,27 @@
 				$data['plato']=false;
 			}
 			echo json_encode($data);
+		}
+		
+		function cargarRadioOrden($tienda) {
+			$tipo_venta = $tienda->getTiposVenta();
+			$respuesta ='';
+			if($tipo_venta!=false){
+				foreach ($tipo_venta as $tipo){
+					
+					if($this->input->cookie('tipo_orden')==$tipo->id){
+						$check=true;
+					}else{
+						$check=false;
+					}
+					$respuesta .='<div>';				
+					$respuesta .= form_radio('radio_tipo_orden', $tipo->id, $check,'id="'.$tipo->id.'-tipo_orden"');
+					$respuesta .= form_label($tipo->nombre);
+					$respuesta .= '</div>';
+				}
+				return $respuesta;
+			}
+			
 		}
 	}
 	?>

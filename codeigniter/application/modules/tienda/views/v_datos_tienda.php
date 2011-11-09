@@ -58,8 +58,8 @@
 			
 		}
 
-		function actulizarTipoOrden(tipo_orden){
-			$.cookie('tipo_orden', tipo_orden,{path: '/'});
+		function actulizarTipoOrden(valor){
+			$.cookie('tipo_orden', valor,{path: '/'});
 		}	
 				
 		function cargarPopupplato(id_plato){
