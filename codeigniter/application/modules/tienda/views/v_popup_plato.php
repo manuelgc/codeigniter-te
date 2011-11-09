@@ -123,7 +123,7 @@ $(function(){
 
 	   	});
 		
-		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito",
+		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/agregarPlato",
 				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'seleccion':seleccion},
   			function(data){
 			  	if (data.carrito) {

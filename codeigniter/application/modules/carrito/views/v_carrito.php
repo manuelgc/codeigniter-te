@@ -17,10 +17,8 @@
 							hide:"explode",
 							buttons: {
 							'Aceptar' : function(){
-	//							if (validarCantidad()){
 								editarPlato(id_plato,rowid);
 								$(this).dialog('close');
-	//							}
 							},
 							'Cancelar': function() {
 								$(this).dialog('close');
@@ -61,22 +59,27 @@
 			'json'); 
 		
 	}
+
+	function actulizarTipoOrden(valor){
+		$.cookie('tipo_orden', valor,{path: '/'});
+	}
 	
-	$("input.cantidad").spinbox({
+	$("#form_carrito input.cantidad").spinbox({
 		  min: 1,    
 		  max: 10,  
 		  step: 1 
 		});
 	
-	$("input.cantidad").change(
+	$("#form_carrito input.cantidad").change(
 			function(event){	
 				event.preventDefault();
 				var rowid = $(this).attr("name"),
-				cantidad=$(this).val();
-				objeto=$(this);
+				cantidad=$(this).val(),
+				id_tienda = $("#id_tienda").val();;
+				
 				if(cantidad != ''){
 				$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
-						{'cantidad':cantidad,'rowid':rowid},
+						{'cantidad':cantidad,'rowid':rowid,'id_tienda':id_tienda},
 						function(data){
 							$("#carrito").html(data.html);	
 						},
@@ -89,10 +92,11 @@
 	$("#form_carrito a.a-eliminar").click(
 			function(event){	
 				event.preventDefault();
-				var rowid = $(this).attr("name");
-	
+				var rowid = $(this).attr("name"),
+				id_tienda = $("#id_tienda").val();
+				
 				$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
-						{'cantidad':0,'rowid':rowid},
+						{'cantidad':0,'rowid':rowid,'id_tienda':id_tienda},
 						function(data){
 							$("#carrito").html(data.html);	
 						},
@@ -101,6 +105,22 @@
 		
 			}
 	);
+
+	$('#form_carrito input[name="radio_tipo_orden"]:radio').click(function(event){	
+//		event.preventDefault();
+		actulizarTipoOrden($(this).val());
+
+		var id_tienda = $("#id_tienda").val();
+		$.post("<?php echo base_url();?>index.php/carrito/c_carrito",
+				  { 'id_tienda':id_tienda},
+ 			function(data){
+
+			  $("#carrito").html(data.html);	
+		
+ 					
+		 },
+			'json'); 		
+	});
 	
 	$("#form_carrito a.a-editar").click(function(event){	
 		event.preventDefault();
@@ -198,6 +218,11 @@
 			  		
 			</li>  
 		</ul>
+		<?php if(isset($radio_tipo)):?>
+			<div>
+				<?php echo $radio_tipo;?>
+			</div>
+		<?php endif;?>
 		
 		<!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->  
 	<?php endif;?>
