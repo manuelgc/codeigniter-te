@@ -15,6 +15,17 @@ $(function(){
 		objeto.fadeOut(1500).text("");	
 	}
 
+	function preCargador(objeto){
+		objeto.block({
+			message: 'Cargando ...'		
+		});
+		
+	}
+
+	function postCargador(objeto) {
+		objeto.unblock();
+	}
+
 	function dialogError(div,titulo,mensaje) {
 		div.html('<p>'+mensaje+'</p>')
 		.dialog({
@@ -114,7 +125,7 @@ $(function(){
 		var cantidad = $("#cantidad").val(),
 		observacion= $("#observacion").val(),
 		seleccion= new Array();
-		
+		preCargador($("#carrito"));
 		$("#form_popup_plato ul").each(function (i) {
 
 			var cadena= $(this).attr("id").split("-");
@@ -127,8 +138,10 @@ $(function(){
 				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'seleccion':seleccion},
   			function(data){
 			  	if (data.carrito) {
+					postCargador($("#carrito"));
 			  		$("#carrito").html(data.html);	
 				} else {
+					postCargador($("#carrito"));
 					dialogError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
 				}		
   					

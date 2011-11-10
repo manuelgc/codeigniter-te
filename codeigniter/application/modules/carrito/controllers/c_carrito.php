@@ -36,7 +36,7 @@
 					
 				$data['radio_tipo']= $this->cargarRadioOrden($tienda);
 					
-				return $this->load->view('carrito/v_carrito',$data,true);;
+				return $this->load->view('carrito/v_carrito',$data,true);
 			}
 		}
 
@@ -45,58 +45,66 @@
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 			if ($plato->exists()) {
 				$encontrado=false;
-				$tienda = $plato->tiendascomida->where('estatus',1)->get();											
-				foreach ($this->cart->contents() as $items){
-					if($items['id']==$plato->id){
-						$encontrado=true;
-						$rowid=$items['rowid'];
-						break;
-						
-					}
-				}
-				
-				if($encontrado){
-					$valor= $items['qty'] + $this->input->post('cantidad');
-						$data1 = array(
-				               'rowid'   => $rowid,
-				               'qty'     => (($valor>$this->limite)?$this->limite:$valor)
-						);
-					
-					$this->cart->update($data1);
-					
-				}else{
-					$total_extra=0;
-					if($this->input->post('seleccion')){
-						$opciones = array();
-						$extras = array();
-						foreach ($this->input->post('seleccion') as $seleccion) {
+				$cont_envontrado=0;
+				$tienda = $plato->tiendascomida->where('estatus',1)->get();
 
-							foreach ($seleccion as $detalle){
-								$cadena_id= explode("-", $detalle["name"]);
-								if($cadena_id[1]=="opcion"){
-									$opciones[]= array(
+				$total_extra=0;
+				$opciones = array();
+				$extras = array();
+				
+				if($this->input->post('seleccion')){
+
+					foreach ($this->input->post('seleccion') as $seleccion) {
+
+						foreach ($seleccion as $detalle){
+							$cadena_id= explode("-", $detalle["name"]);
+							if($cadena_id[1]=="opcion"){
+								$opciones[]= array(
 									'opcion_id'=> $cadena_id[0],
 									'det_opc_id' => $detalle['value']);
-									
-								}else{
-									$extra_detalle = new Extrasdetalle();
-									$extra_detalle->where('estatus',1)->where('extras_id',$cadena_id[0])->get_by_id($detalle['value']);
-									if($extra_detalle->exists()){
-										$extras[]= array(
+
+							}else{
+								$extra_detalle = new Extrasdetalle();
+								$extra_detalle->where('estatus',1)->where('extras_id',$cadena_id[0])->get_by_id($detalle['value']);
+								if($extra_detalle->exists()){
+									$extras[]= array(
 										'extra_id' => $cadena_id[0],
 										'det_ext_id' => $detalle['value'],
 										'extra_precio' => $extra_detalle->precio);
-										$total_extra += $extra_detalle->precio;
-										
-									}
+									$total_extra += $extra_detalle->precio;
+
 								}
-																
-							
 							}
-							
+
+								
 						}
+
 					}
-					
+				}
+
+				
+				foreach ($this->cart->contents() as $items){
+					if($items['id']==$plato->id){
+						$cont_envontrado++; 
+						if($items['opciones']===$opciones && $items['extras']===$extras){
+							$encontrado=true;
+							$rowid=$items['rowid'];
+							break;
+						}	
+					}
+				}
+
+				if($encontrado){
+					$valor= $items['qty'] + $this->input->post('cantidad');
+					$dataCart = array(
+				               'rowid'   => $rowid,
+				               'qty'     => (($valor>$this->limite)?$this->limite:$valor)
+					);
+						
+					$this->cart->update($dataCart);
+						
+				}else{
+						
 					$iva = $plato->getImpuesto();
 						
 					if($iva!=false){
@@ -106,11 +114,12 @@
 					}
 					
 					
-					$data1 = array(
+					$dataCart = array(
 			               'id'      => $this->input->post('id_plato'),
 			               'qty'     => $this->input->post('cantidad'),
 			               'price'   => $plato->precio + $total_extra,
 			               'name'    => $plato->nombre,
+						'options'    => array('contador' => $cont_envontrado++),
 					  'observacion'  =>	$this->input->post('observacion'),
 						 'opciones'	 => $opciones,
 						  'extras'	 =>	$extras,
@@ -119,7 +128,7 @@
 					'precio_iva'	 =>	$total_iva,
 					);
 					
-					$this->cart->insert($data1);
+					$this->cart->insert($dataCart);
 					
 				}
 				$dataAjax['carrito'] = true;
@@ -132,27 +141,34 @@
 		}
 
 		function actualizarPlato() {
-			$data1 = array(
+			$dataCart = array(
 			        'rowid'   => $this->input->post('rowid'),
 			        'qty'     =>    $this->input->post('cantidad'),
 			);
-			$this->cart->update($data1);
+			$this->cart->update($dataCart);
+			
 			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
 			echo json_encode($data);
 		}
 
 
 		function editarPlato() {
-			$data1 = array(
+			$dataCart = array(
 			        'rowid'   => $this->input->post('rowid'),
 			        'qty'     =>    $this->input->post('cantidad'),
 			 'observacion'  =>	$this->input->post('observacion')
 			);
-			$this->cart->update($data1);
+			$this->cart->update($dataCart);
 			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
 			echo json_encode($data);
 		}
-			
+
+		function eliminarCarrito(){
+			$this->cart->destroy();
+			$data['html']= $this->load->view('carrito/v_carrito','',true);
+			echo json_encode($date);
+		}
+		
 		function cargarPopupEditarAjax(){
 			$plato = new Plato();
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
@@ -160,7 +176,7 @@
 			if($plato->exists()){
 				$data['plato']=true;
 				$data['html']='<form>';
-				$img=$plato->getImagen();
+				$img = $plato->getImagen();
 				if($img!=false){
 					$data['html'].='<div align="center" class="imagene_plato">	<img height="auto" width="350px" src="'.base_url().$img->rutaImagen.'"></div>';
 				}else {
@@ -194,6 +210,8 @@
 			}
 			echo json_encode($data);
 		}
+		
+
 		
 		function cargarRadioOrden($tienda) {
 			$tipo_venta = $tienda->getTiposVenta();
