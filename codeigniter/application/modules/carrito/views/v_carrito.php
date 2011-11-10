@@ -1,6 +1,17 @@
 <script type="text/javascript">
 	<!--
 	
+	function preCargador(objeto){
+		objeto.block({
+			message: 'Cargando ...'		
+		});
+		
+	}
+
+	function postCargador(objeto) {
+		objeto.unblock();
+	}
+	
 	function cargarPopupEditar(id_plato,cantidad,observacion,rowid){
 		$.post("<?php echo base_url();?>index.php/carrito/c_carrito/cargarPopupEditarAjax",
 				{'id_plato':id_plato,'cantidad':cantidad,'observacion':observacion},
@@ -61,6 +72,7 @@
 	}
 
 	function actulizarTipoOrden(valor){
+		
 		$.cookie('tipo_orden', valor,{path: '/'});
 	}
 	
@@ -73,6 +85,7 @@
 	$("#form_carrito input.cantidad").change(
 			function(event){	
 				event.preventDefault();
+				preCargador($('#carrito'));
 				var rowid = $(this).attr("name"),
 				cantidad=$(this).val(),
 				id_tienda = $("#id_tienda").val();;
@@ -81,6 +94,7 @@
 				$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
 						{'cantidad':cantidad,'rowid':rowid,'id_tienda':id_tienda},
 						function(data){
+							postCargador($('#carrito'));
 							$("#carrito").html(data.html);	
 						},
 						'json'
@@ -92,12 +106,14 @@
 	$("#form_carrito a.a-eliminar").click(
 			function(event){	
 				event.preventDefault();
+				preCargador($('#carrito'));
 				var rowid = $(this).attr("name"),
 				id_tienda = $("#id_tienda").val();
 				
 				$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
 						{'cantidad':0,'rowid':rowid,'id_tienda':id_tienda},
 						function(data){
+							postCargador($('#carrito'));
 							$("#carrito").html(data.html);	
 						},
 						'json'
@@ -109,12 +125,12 @@
 	$('#form_carrito input[name="radio_tipo_orden"]:radio').click(function(event){	
 //		event.preventDefault();
 		actulizarTipoOrden($(this).val());
-
+		preCargador($('#carrito'));
 		var id_tienda = $("#id_tienda").val();
 		$.post("<?php echo base_url();?>index.php/carrito/c_carrito",
 				  { 'id_tienda':id_tienda},
  			function(data){
-
+			  postCargador($('#carrito'));
 			  $("#carrito").html(data.html);	
 		
  					
@@ -144,7 +160,7 @@
 		<h3>Pedido</h3>
 	
 	<?php else:?>  
-<!--		<?php //echo print_r($this->cart->contents());?>-->
+		<?php echo print_r($this->cart->contents());?>
 		<?php echo form_open('carrito/c_carrito','id="form_carrito"'); ?>
 		<div class="titulo-carrito" align="center">
 			<h3>Pedido</h3>

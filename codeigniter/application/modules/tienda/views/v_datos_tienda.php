@@ -1,6 +1,17 @@
 
 <script><!--
 	$(function() {
+
+		function preCargador(objeto){
+			objeto.block({
+				message: 'Cargando ...'		
+			});
+			
+		}
+
+		function postCargador(objeto) {
+			objeto.unblock();
+		}
 		
 		function mostrarError(objeto,texto){
 			objeto.text( texto ).addClass( "ui-state-highlight" );
@@ -66,7 +77,8 @@
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
 					{'id_plato':id_plato},
 					function(data){
-						if(data.plato){			
+						if(data.plato){	
+							postCargador($("#tabs_tienda"));		
 							$("#popup-tienda").html(data.html)
 							.dialog({
 								title:data.nombrePlato,
@@ -98,6 +110,7 @@
 		}
 
 		function cargarPopupZona(html,id_plato){
+			postCargador($("#tabs_tienda"));
 			$("#popup-tienda").html(html)
 			.dialog({
 				title:'Seleccionar Zona',
@@ -126,7 +139,7 @@
 		}
 		
 		function cargarPopupTipoOrden(html,id_plato,zona,html_zona){
-			
+			postCargador($("#tabs_tienda"));
 			$("#popup-tienda").html(html)
 			.dialog({
 				title:'Seleccionar Tipo de Orden',
@@ -189,7 +202,8 @@
 			}	
 		});
 		
-		$("a.a-plato").click(function(event){	
+		$("a.a-plato").click(function(event){
+			preCargador($("#tabs_tienda"));
 			event.preventDefault();
 			var id_tienda = $("#id_tienda").val(),
 				id_plato = $(this).attr('id') ;
@@ -212,7 +226,7 @@
 					},
 					'json'
 				);
-				
+					
 		});
 
 
