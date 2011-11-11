@@ -254,10 +254,10 @@ $(function(){
 	<div>
 		<div><p class="error" id="msj_cant"></p></div>
 		<?php echo form_label('Cantidad', 'cantidad');?>
-		<?php echo form_input(array('name' => 'cantidad','id' => 'cantidad','size' => '3'),1);?>
+		<?php echo form_input(array('name' => 'cantidad','id' => 'cantidad','size' => '3'),((isset($cantidad))?$cantidad:1));?>
 	</div>
 	<div>
 		<?php echo form_label('Observaci&oacute;n', 'observacion');?>
-		<?php echo form_textarea(array('name' => 'observacion','id' => 'observacion','rows'	=> '2','cols'=> '40'));?>
+		<?php echo form_textarea(array('name' => 'observacion','id' => 'observacion','rows'	=> '2','cols'=> '40','value'=>((isset($observacion))?$observacion:'')));?>
 	</div>
 <?php echo form_close();?>
