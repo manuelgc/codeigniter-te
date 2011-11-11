@@ -160,7 +160,7 @@
 		<h3>Pedido</h3>
 	
 	<?php else:?>  
-		<?php echo print_r($this->cart->contents());?>
+<!--		<?php echo print_r($this->cart->contents());?>-->
 		<?php echo form_open('carrito/c_carrito','id="form_carrito"'); ?>
 		<div class="titulo-carrito" align="center">
 			<h3>Pedido</h3>

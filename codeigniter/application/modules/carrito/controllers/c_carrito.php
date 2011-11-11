@@ -45,12 +45,14 @@
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 			if ($plato->exists()) {
 				$encontrado=false;
-				$cont_envontrado=0;
+//				$cont_envontrado=0;
 				$tienda = $plato->tiendascomida->where('estatus',1)->get();
 
 				$total_extra=0;
 				$opciones = array();
 				$extras = array();
+				$ops_text = array();
+				
 				
 				if($this->input->post('seleccion')){
 
@@ -62,6 +64,12 @@
 								$opciones[]= array(
 									'opcion_id'=> $cadena_id[0],
 									'det_opc_id' => $detalle['value']);
+								
+									if(array_key_exists($cadena_id[0], $ops_text)){
+										$ops_text[$cadena_id[0]].= ','.$detalle['value'];
+									}else{
+										$ops_text[$cadena_id[0]]= $detalle['value'];
+									}
 
 							}else{
 								$extra_detalle = new Extrasdetalle();
@@ -72,7 +80,13 @@
 										'det_ext_id' => $detalle['value'],
 										'extra_precio' => $extra_detalle->precio);
 									$total_extra += $extra_detalle->precio;
-
+									
+									if(array_key_exists($cadena_id[0], $ops_text)){
+										$ops_text[$cadena_id[0]].= ','.$detalle['value'];
+									}else{
+										$ops_text[$cadena_id[0]]= $detalle['value'];
+									}
+								
 								}
 							}
 
@@ -82,11 +96,14 @@
 					}
 				}
 
-				
+//				log_message('debug', print_r($this->cart->contents(),true));
 				foreach ($this->cart->contents() as $items){
+					log_message('debug', 'palto->id: '.$plato->id.' $items[id]: '.$items['id']);
 					if($items['id']==$plato->id){
-						$cont_envontrado++; 
+//						log_message('debug', 'entro if id');
+//						$cont_envontrado++; 
 						if($items['opciones']===$opciones && $items['extras']===$extras){
+							log_message('debug', 'entro if econtrado');
 							$encontrado=true;
 							$rowid=$items['rowid'];
 							break;
@@ -95,6 +112,8 @@
 				}
 
 				if($encontrado){
+//					log_message('debug', 'entro if');
+					
 					$valor= $items['qty'] + $this->input->post('cantidad');
 					$dataCart = array(
 				               'rowid'   => $rowid,
@@ -104,7 +123,7 @@
 					$this->cart->update($dataCart);
 						
 				}else{
-						
+//					log_message('debug','entro else');
 					$iva = $plato->getImpuesto();
 						
 					if($iva!=false){
@@ -119,7 +138,7 @@
 			               'qty'     => $this->input->post('cantidad'),
 			               'price'   => $plato->precio + $total_extra,
 			               'name'    => $plato->nombre,
-						'options'    => array('contador' => $cont_envontrado++),
+						'options'    => $ops_text,//array('contador' => ++$cont_envontrado),
 					  'observacion'  =>	$this->input->post('observacion'),
 						 'opciones'	 => $opciones,
 						  'extras'	 =>	$extras,
