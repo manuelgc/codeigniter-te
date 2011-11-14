@@ -217,7 +217,8 @@ class C_datos_tienda extends MX_Controller{
 		if($plato->exists()){
 			$dataAjax['plato']=true;
 			$data['id_plato']=$plato->id;
-			$cartPlato= array();
+			$data['tipo']= 'agregar';
+//			$cartPlato= array();
 			if($this->cart->contents()!=false){
 				foreach (array_reverse($this->cart->contents(),true) as $value) {
 					if($value['id']==$plato->id){
@@ -251,16 +252,13 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($items as $item) {
 								
 								$checked=false;
-//								if($carrito!=false){
-//									foreach (array_reverse($carrito,true) as $value) {
-//										if($value['id']==$plato->id){
-											if(isset($cartPlato) && in_array(array( 'opcion_id'=> $opcion->id,'det_opc_id' => $item->id), $cartPlato['opciones'])){
-												$checked=true;
-											}
-//											break;
-//										}
-//									}
-//								}
+
+								if(isset($cartPlato)){
+									if(in_array(array( 'opcion_id'=> $opcion->id,'det_opc_id' => $item->id), $cartPlato['opciones'])){
+										$checked=true;
+									}
+
+								}
 								
 								$attrRadio = array(
 							    'name'        => $opcion->id.'-opcion',
@@ -279,16 +277,11 @@ class C_datos_tienda extends MX_Controller{
 							
 							foreach ($items as $item) {
 								$checked=false;
-//								if($carrito!=false){
-//									foreach (array_reverse($carrito,true) as $value) {
-//										if($value['id']==$plato->id){
-											if(isset($cartPlato) && in_array(array( 'opcion_id'=> $opcion->id,'det_opc_id' => $item->id), $cartPlato['opciones'])){
-												$checked=true;
-											}
-//										}
-//									}
-//								}
-								
+
+								if(isset($cartPlato)&& in_array(array( 'opcion_id'=> $opcion->id,'det_opc_id' => $item->id), $cartPlato['opciones'])){
+									$checked=true;
+								}
+
 								$attrCheck = array(
 							    'name'        => $opcion->id.'-opcion',
 							    'id'          => $item->id,
@@ -322,15 +315,10 @@ class C_datos_tienda extends MX_Controller{
 							foreach ($itemsExt as $itemExt) {
 								
 								$checked=false;
-//								if($this->cart->contents()!=false){
-//									foreach ($this->cart->contents() as $value) {
-//										if($value['id']==$plato->id){
-											if(isset($cartPlato) && in_array(array( 'extra_id'=> $extra->id,'det_ext_id' => $itemExt->id,'extra_precio' => $itemExt->precio), $cartPlato['extras'])){
-												$checked=true;
-											}
-//										}
-//									}
-//								}
+
+									if(isset($cartPlato) && in_array(array( 'extra_id'=> $extra->id,'det_ext_id' => $itemExt->id,'extra_precio' => $itemExt->precio), $cartPlato['extras'])){
+										$checked=true;
+									}
 									
 								$attrRadio = array(
 							    'name'        => $extra->id.'-extra',
@@ -348,18 +336,13 @@ class C_datos_tienda extends MX_Controller{
 						}else{
 							$arrItem= array();
 							foreach ($itemsExt as $itemExt) {
-								
+
 								$checked=false;
-//								if($this->cart->contents()!=false){
-//									foreach ($this->cart->contents() as $value) {
-//										if($value['id']==$plato->id){
-											if(isset($cartPlato) && in_array(array( 'extra_id'=> $extra->id,'det_ext_id' => $itemExt->id,'extra_precio' => $itemExt->precio), $cartPlato['extras'])){
-												$checked=true;
-											}
-//										}
-//									}
-//								}
-								
+
+								if(isset($cartPlato)&& in_array(array( 'extra_id'=> $extra->id,'det_ext_id' => $itemExt->id,'extra_precio' => $itemExt->precio), $cartPlato['extras'])){
+									$checked=true;
+								}
+
 								$attrCheck = array(
 							    'name'        => $extra->id.'-extra',
 							    'id'          => $itemExt->id,
@@ -377,14 +360,17 @@ class C_datos_tienda extends MX_Controller{
 				}
 				$data['extras']=$arrExtras;
 			}
+			
+			if(isset($cartPlato)){
+				$data['observacion']=$cartPlato['observacion'];
+//				$data['cantidad']=$cartPlato['qty'];
+			}
+			
 			$dataAjax['html']=$this->load->view('tienda/v_popup_plato',$data,true);
 			$dataAjax['nombrePlato']=$plato->nombre;
 			$dataAjax['precio']=$plato->precio;
 			
-			if(isset($cartPlato)){
-				$dataAjax['observacion']=$cartPlato['observacion'];
-				$dataAjax['qty']=$cartPlato['qty'];
-			}	
+				
 		}else{
 			$dataAjax['plato']=false;
 		}

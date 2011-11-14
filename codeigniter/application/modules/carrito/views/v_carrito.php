@@ -12,14 +12,43 @@
 		objeto.unblock();
 	}
 	
-	function cargarPopupEditar(id_plato,cantidad,observacion,rowid){
+	function mostrarError(objeto,texto){
+		objeto.text( texto ).addClass( "ui-state-highlight" );
+		setTimeout(function() {
+			objeto.removeClass( "ui-state-highlight", 1500 );
+		}, 500 );
+			
+			
+	}
+	
+	function dialogError(div,titulo,mensaje) {
+		div.html('<p>'+mensaje+'</p>')
+		.dialog({
+			title:titulo,
+			autoOpen: false,
+			modal:true,
+			resizable: false,
+			width:400,
+			show:"blind",
+			hide:"explode",
+			buttons: {
+			'Cerrar': function() {
+				$(this).dialog('close');
+			}
+			}
+
+							
+		}).dialog('open');
+	}
+	
+	function cargarPopupEditar(id_plato,rowid){
 		$.post("<?php echo base_url();?>index.php/carrito/c_carrito/cargarPopupEditarAjax",
-				{'id_plato':id_plato,'cantidad':cantidad,'observacion':observacion},
+				{'id_plato':id_plato,'rowid':rowid},
 				function(data){
 					if(data.plato){			
 						$("#popup-tienda").html(data.html)
 						.dialog({
-							title:"Editar "+data.nombrePlato,
+							title:data.nombrePlato,
 							autoOpen: false,
 							modal:true,
 							resizable: false,
@@ -28,8 +57,9 @@
 							hide:"explode",
 							buttons: {
 							'Aceptar' : function(){
-								editarPlato(id_plato,rowid);
-								$(this).dialog('close');
+//								editarPlato(id_plato,rowid);
+								$("#form_popup_plato").submit();
+//								$(this).dialog('close');
 							},
 							'Cancelar': function() {
 								$(this).dialog('close');
@@ -38,39 +68,17 @@
 			
 											
 						});
-						$("input#cantidad").spinbox({
-							  min: 1,    
-							  max: 10,  
-							  step: 1 
-							});
+
 						$("#popup-tienda").dialog('open');
 					}
-	//				else{
-	//					mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
-	//				}
+				else{
+					mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+				}
 				},
 				'json'
 			);
 	};
 	
-	function editarPlato(id_plato,rowid) {
-		var cantidad = $("#cantidad").val(),
-		observacion= $("#observacion").val();
-		
-		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/editarPlato",
-				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'rowid':rowid },
-				function(data){
-	//		  	if (data.carrito) {
-			  		$("#carrito").html(data.html);	
-	//			} else {
-	//				mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
-	//			}		
-						
-			 },
-			'json'); 
-		
-	}
-
 	function actulizarTipoOrden(valor){
 		
 		$.cookie('tipo_orden', valor,{path: '/'});
@@ -141,11 +149,8 @@
 	$("#form_carrito a.a-editar").click(function(event){	
 		event.preventDefault();
 		var id_plato = $(this).attr('name'),
-		observacion= $("#"+$(this).attr('id')+"observacion").val(),
-		cantidad= $("#"+$(this).attr('id')+"cantidad").val(),
 		rowid= $("#"+$(this).attr('id')+"rowid").val();
-	
-		cargarPopupEditar(id_plato,cantidad,observacion,rowid);
+		cargarPopupEditar(id_plato,rowid);
 		
 	});
 	
@@ -183,7 +188,6 @@
 				  <div>
 				  		<div>
 							<?php echo form_hidden($i.'rowid', $items['rowid']); ?>
-							<?php echo form_hidden($i.'observacion', $items['observacion']); ?>
 							<span> <?php echo form_input(array('id' => $i.'cantidad','name' => $items['rowid'], 'value' => $items['qty'], 'maxlength' => '2', 'size' => '3','class' => 'cantidad')); ?></span>
 							<span><?php echo $items['name']; ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
@@ -242,4 +246,4 @@
 		
 		<!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->  
 	<?php endif;?>
-</div><!--Cierra div carrito -->
+</div> <!--Cierra div carrito -->
