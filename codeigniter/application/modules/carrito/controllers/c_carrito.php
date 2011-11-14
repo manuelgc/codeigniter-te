@@ -45,7 +45,6 @@
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
 			if ($plato->exists()) {
 				$encontrado=false;
-//				$cont_envontrado=0;
 				$tienda = $plato->tiendascomida->where('estatus',1)->get();
 
 				$total_extra=0;
@@ -96,34 +95,30 @@
 					}
 				}
 
-//				log_message('debug', print_r($this->cart->contents(),true));
+				
 				foreach ($this->cart->contents() as $items){
-					log_message('debug', 'palto->id: '.$plato->id.' $items[id]: '.$items['id']);
-					if($items['id']==$plato->id){
-//						log_message('debug', 'entro if id');
-//						$cont_envontrado++; 
-						if($items['opciones']===$opciones && $items['extras']===$extras){
-							log_message('debug', 'entro if econtrado');
-							$encontrado=true;
-							$rowid=$items['rowid'];
-							break;
-						}	
+				
+					if($items['id']==$plato->id && $items['opciones']===$opciones && $items['extras']===$extras){
+						$encontrado=true;
+						$rowid=$items['rowid'];
+						break;
+
 					}
 				}
 
 				if($encontrado){
-//					log_message('debug', 'entro if');
 					
 					$valor= $items['qty'] + $this->input->post('cantidad');
 					$dataCart = array(
 				               'rowid'   => $rowid,
-				               'qty'     => (($valor>$this->limite)?$this->limite:$valor)
+				               'qty'     => (($valor>$this->limite)?$this->limite:$valor),
+						  'observacion'  =>	$this->input->post('observacion')	
 					);
 						
 					$this->cart->update($dataCart);
 						
 				}else{
-//					log_message('debug','entro else');
+
 					$iva = $plato->getImpuesto();
 						
 					if($iva!=false){
@@ -138,7 +133,7 @@
 			               'qty'     => $this->input->post('cantidad'),
 			               'price'   => $plato->precio + $total_extra,
 			               'name'    => $plato->nombre,
-						'options'    => $ops_text,//array('contador' => ++$cont_envontrado),
+						'options'    => $ops_text,
 					  'observacion'  =>	$this->input->post('observacion'),
 						 'opciones'	 => $opciones,
 						  'extras'	 =>	$extras,
@@ -178,6 +173,7 @@
 			 'observacion'  =>	$this->input->post('observacion')
 			);
 			$this->cart->update($dataCart);
+			$data['carrito']=true;
 			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
 			echo json_encode($data);
 		}
@@ -189,45 +185,171 @@
 		}
 		
 		function cargarPopupEditarAjax(){
-			$plato = new Plato();
-			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
-
-			if($plato->exists()){
-				$data['plato']=true;
-				$data['html']='<form>';
-				$img = $plato->getImagen();
-				if($img!=false){
-					$data['html'].='<div align="center" class="imagene_plato">	<img height="auto" width="350px" src="'.base_url().$img->rutaImagen.'"></div>';
-				}else {
-					$data['html'].='<div class="imagene_plato">	<img src=""></div>';
-				}
-				$data['html'].='<div><p class="error" id="mensaje_plato"></p></div>';
-				$data['html'].='<div><p>Precio: '.$plato->precio.' Bs.</p></div>';
-				$data['html'].='<div><p>'.$plato->descripcion.'</p></div>';
-				$data['html'].='<div>'.form_label('Cantidad', 'cantidad');
-				$attr = array(
-              'name'        => 'cantidad',
-              'id'          => 'cantidad',
-              'size'        => '3',
-
-				);
-				$data['html'].=form_input($attr,$this->input->post('cantidad')).'</div>';
-				$data['html'].='<div>'.form_label('Observacion', 'observacion');
-				$attr2 = array(
-              'name'        => 'observacion',
-              'id'          => 'observacion',
-              'rows'   		=> '2',
-              'cols'        => '40',
-
-				);
-				$data['html'].=form_textarea($attr2,$this->input->post('observacion')).'</div>';
-				$data['html'].='</form>';
-				$data['nombrePlato']=$plato->nombre;
-				$data['precio']=$plato->precio;
-			}else{
-				$data['plato']=false;
+		
+		$plato = new Plato();
+		$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+		if($plato->exists()){
+			$dataAjax['plato']=true;
+			$data['id_plato']=$plato->id;
+			$data['tipo']= 'editar';
+			$data['rowid']=$this->input->post('rowid');
+			if($this->cart->contents()!=false){
+				
+					if($this->input->post('rowid')!=false){
+						$temp= $this->cart->contents();
+						$cartPlato = $temp[$this->input->post('rowid')];
+						unset($temp);
+					}
 			}
-			echo json_encode($data);
+			
+			$img=$plato->getImagen();
+			if($img!=false){
+				$data['imagen']=base_url().$img->rutaImagen;
+			}else {
+				$data['imagen']="";
+			}
+			
+			$data['precio']=$plato->precio;
+			$data['descripcion']=$plato->descripcion;
+				
+			$opciones= $plato->getOpciones();
+			$arrOpciones= array();
+			if($opciones!=false){
+				foreach ($opciones as $opcion) {
+					$items=$opcion->getOpcionesDetalle();
+					if($items!=false){
+						$arrOpciones[$opcion->id]['nombre']=$opcion->nombre;
+						$arrOpciones[$opcion->id]['requerido']=($opcion->requerido==1)?'(Requerido)':'';
+						$arrOpciones[$opcion->id]['minimo']=$opcion->minimo;
+						$arrOpciones[$opcion->id]['maximo']=$opcion->maximo;
+						if($opcion->maximo==1){
+							$arrItem= array();
+							foreach ($items as $item) {
+								
+								$checked=false;
+
+								if(isset($cartPlato)){
+									if(in_array(array( 'opcion_id'=> $opcion->id,'det_opc_id' => $item->id), $cartPlato['opciones'])){
+										$checked=true;
+									}
+
+								}
+								
+								$attrRadio = array(
+							    'name'        => $opcion->id.'-opcion',
+							    'id'          => $item->id,
+							    'value'       => $item->id,
+								'checked'     => $checked,
+								);
+								$arrItem[$item->id]['id']=$item->id;
+								$arrItem[$item->id]['input']= form_radio($attrRadio);
+								$arrItem[$item->id]['label']=form_label($item->nombre, $item->id);
+
+							}
+							$arrOpciones[$opcion->id]['opcion_item']=$arrItem;
+						}else{
+							$arrItem= array();
+							
+							foreach ($items as $item) {
+								$checked=false;
+
+								if(isset($cartPlato)&& in_array(array( 'opcion_id'=> $opcion->id,'det_opc_id' => $item->id), $cartPlato['opciones'])){
+									$checked=true;
+								}
+
+								$attrCheck = array(
+							    'name'        => $opcion->id.'-opcion',
+							    'id'          => $item->id,
+							    'value'       => $item->id,
+								'checked'     => $checked,
+								);
+								$arrItem[$item->id]['id']=$item->id;
+								$arrItem[$item->id]['input']= form_checkbox($attrCheck);
+								$arrItem[$item->id]['label']= form_label($item->nombre, $item->id);
+
+							}
+							$arrOpciones[$opcion->id]['opccion_item']=$arrItem;
+						}
+					}
+				}
+				$data['opciones']=$arrOpciones;
+			}
+
+			$extras= $plato->getExtras();
+			$arrExtras= array();
+			if($extras!=false){
+				foreach ($extras as $extra) {
+					$itemsExt=$extra->getExtrasDetalle();
+					if($itemsExt!=false){
+						$arrExtras[$extra->id]['nombre']=$extra->nombre;
+						$arrExtras[$extra->id]['requerido']=($extra->requerido==1)?'(Requerido)':'';
+						$arrExtras[$extra->id]['minimo']=$extra->minimo;
+						$arrExtras[$extra->id]['maximo']=$extra->maximo;
+						if($extra->maximo==1){
+							$arrItem= array();
+							foreach ($itemsExt as $itemExt) {
+								
+								$checked=false;
+
+								if(isset($cartPlato) && in_array(array( 'extra_id'=> $extra->id,'det_ext_id' => $itemExt->id,'extra_precio' => $itemExt->precio), $cartPlato['extras'])){
+									$checked=true;
+								}
+									
+								$attrRadio = array(
+							    'name'        => $extra->id.'-extra',
+							    'id'          => $itemExt->id,
+							    'value'       => $itemExt->id,
+								'checked'	  => $checked,
+								);
+								$arrItem[$itemExt->id]['id']=$itemExt->id;
+								$arrItem[$itemExt->id]['input']= form_radio($attrRadio);
+								$arrItem[$itemExt->id]['label']=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
+                    			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);
+								$arrExtras[$extra->id]['extra_item']=$arrItem;
+							}
+							$arrExtras[$extra->id]['extra_item']=$arrItem;
+						}else{
+							$arrItem= array();
+							foreach ($itemsExt as $itemExt) {
+
+								$checked=false;
+
+								if(isset($cartPlato)&& in_array(array( 'extra_id'=> $extra->id,'det_ext_id' => $itemExt->id,'extra_precio' => $itemExt->precio), $cartPlato['extras'])){
+									$checked=true;
+								}
+
+								$attrCheck = array(
+							    'name'        => $extra->id.'-extra',
+							    'id'          => $itemExt->id,
+							    'value'       => $itemExt->id,
+								'checked'	  => $checked,
+								);
+								$arrItem[$itemExt->id]['id']=$itemExt->id;
+								$arrItem[$itemExt->id]['input']= form_checkbox($attrCheck);
+								$arrItem[$itemExt->id]['label']=form_label('<p class="nombre_extra">'.$itemExt->nombre.' </p>
+                    			<p class="precio">Bs.'.$itemExt->precio.' </p>', $itemExt->id);															
+							}
+							$arrExtras[$extra->id]['extra_item']=$arrItem;
+						}
+					}
+				}
+				$data['extras']=$arrExtras;
+			}
+			
+			if(isset($cartPlato)){
+				$data['observacion']=$cartPlato['observacion'];
+				$data['cantidad']=$cartPlato['qty'];
+			}
+			
+			$dataAjax['html']=$this->load->view('tienda/v_popup_plato',$data,true);
+			$dataAjax['nombrePlato']=$plato->nombre;
+			$dataAjax['precio']=$plato->precio;
+			
+				
+		}else{
+			$dataAjax['plato']=false;
+		}
+		echo json_encode($dataAjax);
 		}
 		
 
@@ -252,5 +374,8 @@
 			}
 			
 		}
+		
+		
+		
 	}
 	?>

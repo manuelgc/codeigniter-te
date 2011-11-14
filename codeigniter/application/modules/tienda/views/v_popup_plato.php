@@ -99,7 +99,7 @@ $(function(){
 			minimo=$("#"+cadena[0]+'-min_'+cadena[1]).val(),
 			msj_obj=$("#"+cadena[0]+'-msj_'+cadena[1]);
 			
-			
+			console.log('num_checked: '+num_checked);
 			if(num_checked < minimo){
 				mostrarError(msj_obj, "Debe seleccionar al menos "+minimo+" opciones");
 				respuesta=false;
@@ -148,6 +148,37 @@ $(function(){
  		 },
 			'json'); 
 	}
+
+	function editarPlato(id_tienda,id_plato,rowid) {
+		var cantidad = $("#cantidad").val(),
+		observacion= $("#observacion").val();
+
+		seleccion= new Array();
+		preCargador($("#carrito"));
+		$("#form_popup_plato ul").each(function (i) {
+
+			var cadena= $(this).attr("id").split("-");
+
+			seleccion.push($('input[name="'+cadena[0]+'-'+cadena[1]+'"]:checked').serializeArray());
+
+	   	});
+	   	
+		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/editarPlato",
+				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'rowid':rowid ,'seleccion':seleccion},
+				function(data){
+			  	if (data.carrito) {
+				  	postCargador($("#carrito"));
+			  		$("#carrito").html(data.html);	
+				} else {
+					postCargador($("#carrito"));
+					mostrarError($("#popup-tienda"),"Error", "El plato no se puede agregar al pedido");
+				}		
+						
+			 },
+			'json'); 
+		
+	}
+
 	
 //	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
 
@@ -165,12 +196,27 @@ $(function(){
 	);
 
 	$("#form_popup_plato").submit(function(event){
-		var id_plato=$("#form_popup_plato > input#id_plato").val();			
-		if( validarTodo() && validarCantidad($("#cantidad"), $("#msj_cant"))){	
-			agregarPlato(id_plato);
-			$("#popup-tienda").dialog('close');
+		var id_plato=$("#form_popup_plato > input#id_plato").val(),
+			tipo=$("#form_popup_plato > input#tipo_popup").val(),
+			rowid=$("#form_popup_plato > input#rowid").val(),
+			id_tienda= $("#id_tienda");
+		console.log("entro submit");
+		console.log("tipo: "+tipo);			
+		if( validarTodo() && validarCantidad($("#cantidad"), $("#msj_cant"))){
+			console.log("entro fi validar");	
+			if(tipo=='agregar'){
+				console.log("entro if agregar");
+				agregarPlato(id_plato);
+				$("#popup-tienda").dialog('close');
+			}else if(tipo=='editar'){
+				console.log("entro if editar");
+				editarPlato(id_tienda,id_plato,rowid);
+				console.log("editar plato");
+				$("#popup-tienda").dialog('close');
+			}	
 			return false;
 		}else{
+			console.log("entro else validar");
 			return false;
 		}
 		});
@@ -181,7 +227,11 @@ $(function(){
 </script>	
 <?php echo form_open('','id="form_popup_plato"');?>
 
-	<?php echo form_hidden('id_plato', $id_plato);?>	
+	<?php echo form_hidden('id_plato', $id_plato);?>
+	<?php echo form_hidden('tipo_popup', $tipo);?>
+	<?php if(isset($rowid)):?>
+		<?php echo form_hidden('rowid', $rowid);?>
+	<?php endif;?>	
 	<div align="center" class="imagene_plato">	
 		<img height="auto" width="350px" src="<?php echo $imagen;?>">
 	</div>
