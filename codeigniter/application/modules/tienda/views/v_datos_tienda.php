@@ -1,6 +1,6 @@
 
 <script><!--
-	$(function() {
+	
 
 		function preCargador(objeto){
 			objeto.block({
@@ -73,7 +73,7 @@
 			$.cookie('tipo_orden', valor,{path: '/'});
 		}	
 				
-		function cargarPopupplato(id_plato){
+		function cargarPopupPlato(id_plato){
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupPlatoAjax",
 					{'id_plato':id_plato},
 					function(data){
@@ -123,7 +123,7 @@
 				'Aceptar' : function(){
 					if(validarSeleccion()){
 						actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
-						cargarPopupplato(id_plato);
+						cargarPopupPlato(id_plato);
 //						$(this).dialog('close');
 						
 					}
@@ -155,7 +155,7 @@
 						if($.cookie("tipo_orden")!=null && $.cookie("tipo_orden")==1 && !zona){
 							cargarPopupZona(html_zona,id_plato);
 						}else{
-							cargarPopupplato(id_plato);
+							cargarPopupPlato(id_plato);
 						}
 					}	
 				},
@@ -169,16 +169,11 @@
 			.dialog('open');
 			
 		}		
+		
+		$(function() {
 			
 		$( "#tabs_tienda" ).tabs({cookie:{expires:1}});
-
-		$("input.cantidad").spinbox({
-			  min: 1,    
-			  max: 10,  
-			  step: 1 
-			});
-		
-						
+								
 		$("#cmbx_ciudad").live('change',function(event){	
 			event.preventDefault();
 			var id_ciudad = $(this).val(),
@@ -216,11 +211,11 @@
 						}else if(!data.envio) {
 							cargarPopupTipoOrden(data.html_orden, id_plato, data.zona, data.html_zona);
 						}else if(!data.envio_domicilio){
-							cargarPopupplato(id_plato);
+							cargarPopupPlato(id_plato);
 						}else if(!data.zona){
 							cargarPopupZona(data.html_zona,id_plato);
 						}else{
-							cargarPopupplato(id_plato);
+							cargarPopupPlato(id_plato);
 						}	
 							
 					},
@@ -230,44 +225,6 @@
 		});
 
 
-		/* 
-		$("#cambiar_ubicacion").click(function(event){
-			event.preventDefault();
-			var id_tienda = $("#id_tienda").val();
-			
-			
-			
-			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarPopupActualizarAjax",
-					{'id_tienda':id_tienda},
-					function(data){
-						$("#popup-tienda").html(data.html_zona)
-						.dialog({
-							title:'Actualizar Zona',
-							autoOpen: false,
-							modal:true,
-							resizable: false,
-							show:"blind",
-							hide:"explode",
-							buttons: {
-							'Aceptar' : function(){
-								if(validarSeleccion()){
-									actualizarCiudadZona($("#cmbx_ciudad").val(),$("#cmbx_zona").val(),$("#cmbx_ciudad option:selected").text(),$("#cmbx_zona option:selected").text());
-									$(this).dialog('close');
-								}
-								},
-								'Cancelar': function() {
-									$(this).dialog('close');
-								}
-								}								
-							})
-							.dialog('open');
-						
-							
-					},
-					'json'
-				);
-		}); 
-		*/
 			
 	});
 </script>
@@ -275,14 +232,7 @@
 
 
 <div class="tienda">
-<!--<div class="message"> 
-	<p>
-		<span>Usted ha seleccionado Ciudad: </span>
-		<span id="nombre_ciudad"><b><?php echo $nombreCiudad;?></b></span><span>, Zona: </span>
-		<span id="nombre_zona"><b><?php echo $nombreZona;?></b></span>
-		<a id="cambiar_ubicacion" href="">Cambiar</a>
-	</p>
-</div>-->
+
 
 <div id="cabecera_tienda">
 			<input id="id_tienda" name="id_tienda" type="hidden" value="<?php echo $id;?>" />

@@ -6,6 +6,7 @@
 			$this->load->library('cart'); 
 			$this->load->helper('language');
 			$this->load->helper('form');
+			
 		}
 		
 		function index($id_tienda = '') {
@@ -43,10 +44,10 @@
 		function agregarPlato(){
 			$plato= new Plato();
 			$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+			$carrito = $this->cart->contents();
 			if ($plato->exists()) {
+				
 				$encontrado=false;
-				$tienda = $plato->tiendascomida->where('estatus',1)->get();
-
 				$total_extra=0;
 				$opciones = array();
 				$extras = array();
@@ -96,11 +97,12 @@
 				}
 
 				
-				foreach ($this->cart->contents() as $items){
+				foreach ($carrito as $items){
 				
 					if($items['id']==$plato->id && $items['opciones']===$opciones && $items['extras']===$extras){
 						$encontrado=true;
 						$rowid=$items['rowid'];
+						$cantCart= $items['qty'];
 						break;
 
 					}
@@ -108,7 +110,7 @@
 
 				if($encontrado){
 					
-					$valor= $items['qty'] + $this->input->post('cantidad');
+					$valor= $cantCart + $this->input->post('cantidad');
 					$dataCart = array(
 				               'rowid'   => $rowid,
 				               'qty'     => (($valor>$this->limite)?$this->limite:$valor),
@@ -146,7 +148,7 @@
 					
 				}
 				$dataAjax['carrito'] = true;
-				$dataAjax['html'] = $this->actualizarCarrito($tienda->id);
+				$dataAjax['html'] = $this->actualizarCarrito($this->input->post('id_tienda'));
 			}else{
 				$dataAjax['carrito'] = false;
 			}
@@ -154,26 +156,143 @@
 			echo json_encode($dataAjax);
 		}
 
+
+		function editarPlato() {
+
+			$data['carrito']=false;
+			$total_extra=0;
+			$opciones = array();
+			$extras = array();
+			$ops_text = array();
+
+
+			if($this->input->post('seleccion')){
+
+				foreach ($this->input->post('seleccion') as $seleccion) {
+
+					foreach ($seleccion as $detalle){
+						$cadena_id= explode("-", $detalle["name"]);
+						if($cadena_id[1]=="opcion"){
+							$opciones[]= array(
+									'opcion_id'=> $cadena_id[0],
+									'det_opc_id' => $detalle['value']);
+
+							if(array_key_exists($cadena_id[0], $ops_text)){
+								$ops_text[$cadena_id[0]].= ','.$detalle['value'];
+							}else{
+								$ops_text[$cadena_id[0]]= $detalle['value'];
+							}
+
+						}else{
+							$extra_detalle = new Extrasdetalle();
+							$extra_detalle->where('estatus',1)->where('extras_id',$cadena_id[0])->get_by_id($detalle['value']);
+							if($extra_detalle->exists()){
+								$extras[]= array(
+										'extra_id' => $cadena_id[0],
+										'det_ext_id' => $detalle['value'],
+										'extra_precio' => $extra_detalle->precio);
+								$total_extra += $extra_detalle->precio;
+									
+								if(array_key_exists($cadena_id[0], $ops_text)){
+									$ops_text[$cadena_id[0]].= ','.$detalle['value'];
+								}else{
+									$ops_text[$cadena_id[0]]= $detalle['value'];
+								}
+
+							}
+						}
+
+
+					}
+
+				}
+			}
+				
+			$carrito = $this->cart->contents();
+				
+			if( $carrito[$this->input->post('rowid')]['opciones']===$opciones && $carrito[$this->input->post('rowid')]['extras']===$extras){
+				$dataCart = array(
+			 	       'rowid' => $this->input->post('rowid'),
+			 	       'qty'   => $this->input->post('cantidad'),
+			 	'observacion'  => $this->input->post('observacion')
+				);
+					
+				$this->cart->update($dataCart);
+				$data['carrito']=true;
+			}else{
+
+				$plato= new Plato();
+				$plato->where('estatus',1)->get_by_id($this->input->post('id_plato'));
+				
+				if ($plato->exists()) {
+
+					$encontrado=false;
+					
+					foreach ($carrito as $items){
+
+						if($items['id']==$plato->id && $items['opciones']===$opciones && $items['extras']===$extras){
+							$encontrado=true;
+							$rowid=$items['rowid'];
+							$cantCart= $items['qty'];
+							break;
+
+						}
+
+					}
+						
+					if($encontrado){
+							
+						$valor= $cantCart + $this->input->post('cantidad');
+						$dataCart = array(
+				               'rowid'   => $rowid,
+				               'qty'     => (($valor>$this->limite)?$this->limite:$valor),
+						  'observacion'  =>	$this->input->post('observacion')	
+						);
+
+						$this->cart->update($dataCart);
+						$data['carrito']=true;
+					}else{
+
+						$iva = $plato->getImpuesto();
+
+						if($iva!=false){
+							$total_iva = ($plato->precio + $total_extra)  * $iva->porcentaje / 100;
+						}else{
+							$total_iva = 0;
+						}
+							
+							
+						$dataCart = array(
+				               'id'      => $this->input->post('id_plato'),
+				               'qty'     => $this->input->post('cantidad'),
+				               'price'   => $plato->precio + $total_extra,
+				               'name'    => $plato->nombre,
+							'options'    => $ops_text,
+						  'observacion'  =>	$this->input->post('observacion'),
+							 'opciones'	 => $opciones,
+							  'extras'	 =>	$extras,
+						'precio_base'	 => $plato->precio,
+						'precio_extra'	 => $total_extra,
+						'precio_iva'	 =>	$total_iva,
+						);
+							
+						$this->cart->insert($dataCart);
+						$data['carrito']=true;
+					}
+				}
+			}
+			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
+			echo json_encode($data);
+		}
+
+
 		function actualizarPlato() {
 			$dataCart = array(
 			        'rowid'   => $this->input->post('rowid'),
 			        'qty'     =>    $this->input->post('cantidad'),
 			);
 			$this->cart->update($dataCart);
-			
-			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
-			echo json_encode($data);
-		}
-
-
-		function editarPlato() {
-			$dataCart = array(
-			        'rowid'   => $this->input->post('rowid'),
-			        'qty'     =>    $this->input->post('cantidad'),
-			 'observacion'  =>	$this->input->post('observacion')
-			);
-			$this->cart->update($dataCart);
-			$data['carrito']=true;
+				
 			$data['html']=$this->actualizarCarrito($this->input->post('id_tienda'));
 			echo json_encode($data);
 		}
@@ -181,7 +300,7 @@
 		function eliminarCarrito(){
 			$this->cart->destroy();
 			$data['html']= $this->load->view('carrito/v_carrito','',true);
-			echo json_encode($date);
+			echo json_encode($data);
 		}
 		
 		function cargarPopupEditarAjax(){
