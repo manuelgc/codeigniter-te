@@ -1,6 +1,7 @@
 <script type="text/javascript">
 	<!--
 	
+		
 	function preCargador(objeto){
 		objeto.block({
 			message: 'Cargando ...'		
@@ -84,77 +85,102 @@
 		$.cookie('tipo_orden', valor,{path: '/'});
 	}
 	
-	$("#form_carrito input.cantidad").spinbox({
-		  min: 1,    
-		  max: 10,  
-		  step: 1 
-		});
-	
-	$("#form_carrito input.cantidad").change(
-			function(event){	
-				event.preventDefault();
-				preCargador($('#carrito'));
-				var rowid = $(this).attr("name"),
-				cantidad=$(this).val(),
-				id_tienda = $("#id_tienda").val();;
-				
-				if(cantidad != ''){
-				$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
-						{'cantidad':cantidad,'rowid':rowid,'id_tienda':id_tienda},
-						function(data){
-							postCargador($('#carrito'));
-							$("#carrito").html(data.html);	
-						},
-						'json'
-					);
-	
-				}	
+	$(function() {
+			
+		$("#form_carrito input.cantidad").spinbox({
+			  min: 1,    
+			  max: 10,  
+			  step: 1 
 			});
-	
-	$("#form_carrito a.a-eliminar").click(
-			function(event){	
-				event.preventDefault();
-				preCargador($('#carrito'));
-				var rowid = $(this).attr("name"),
-				id_tienda = $("#id_tienda").val();
-				
-				$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
-						{'cantidad':0,'rowid':rowid,'id_tienda':id_tienda},
-						function(data){
-							postCargador($('#carrito'));
-							$("#carrito").html(data.html);	
-						},
-						'json'
-					);
 		
-			}
-	);
+		$("#form_carrito input.cantidad").click(
+				function(event){	
+					event.preventDefault();
+					
+					var rowid = $(this).attr("name"),
+					cantidad=$(this).val(),
+					id_tienda = $("#id_tienda").val();
+					if(cantidad != '' && cantidad!=this.defaultValue){
+					preCargador($('#carrito'));
+					$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
+							{'cantidad':cantidad,'rowid':rowid,'id_tienda':id_tienda},
+							function(data){
+								postCargador($('#carrito'));
+								$("#carrito").html(data.html);	
+							},
+							'json'
+						);
+					
+					}	
+					
+					});
 
-	$('#form_carrito input[name="radio_tipo_orden"]:radio').click(function(event){	
-//		event.preventDefault();
-		actulizarTipoOrden($(this).val());
-		preCargador($('#carrito'));
-		var id_tienda = $("#id_tienda").val();
-		$.post("<?php echo base_url();?>index.php/carrito/c_carrito",
-				  { 'id_tienda':id_tienda},
- 			function(data){
-			  postCargador($('#carrito'));
-			  $("#carrito").html(data.html);	
+		$("#form_carrito input.cantidad").focus(
+				function(event){
+					event.preventDefault();
+					$(this).blur();
+		});
 		
- 					
-		 },
-			'json'); 		
-	});
-	
-	$("#form_carrito a.a-editar").click(function(event){	
-		event.preventDefault();
-		var id_plato = $(this).attr('name'),
-		rowid= $("#"+$(this).attr('id')+"rowid").val();
-		cargarPopupEditar(id_plato,rowid);
+		$("#form_carrito a.a-eliminar").click(
+				function(event){	
+					event.preventDefault();
+					var rowid = $(this).attr("name"),
+					id_tienda = $("#id_tienda").val();
+
+					preCargador($('#carrito'));
+					$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
+							{'cantidad':0,'rowid':rowid,'id_tienda':id_tienda},
+							function(data){
+								postCargador($('#carrito'));
+								$("#carrito").html(data.html);	
+							},
+							'json'
+						);
+			
+				}
+		);
 		
-	});
-	
-	
+		$('#form_carrito input[name="radio_tipo_orden"]:radio').click(function(event){	
+	//		event.preventDefault();
+			actulizarTipoOrden($(this).val());
+			preCargador($('#carrito'));
+			var id_tienda = $("#id_tienda").val();
+			$.post("<?php echo base_url();?>index.php/carrito/c_carrito",
+					  { 'id_tienda':id_tienda},
+	 			function(data){
+				  postCargador($('#carrito'));
+				  $("#carrito").html(data.html);	
+			
+	 					
+			 },
+				'json'); 		
+		});
+		
+		$("#form_carrito a.a-editar").click(function(event){	
+			event.preventDefault();
+			var id_plato = $(this).attr('name'),
+			rowid= $("#"+$(this).attr('id')+"rowid").val();
+			cargarPopupEditar(id_plato,rowid);
+			
+		});
+
+		$("#form_carrito button#btn_cancel_carrito").click(
+				function(event){	
+					event.preventDefault();
+					preCargador($('#carrito'));
+					$.post("<?php echo base_url();?>index.php/carrito/c_carrito/eliminarCarrito",'',
+							function(data){
+								postCargador($('#carrito'));
+								$("#carrito").html(data.html);	
+							},
+							'json'
+						);
+			
+				}
+		);
+		
+		
+		});
 	//-->
 </script>
 
@@ -243,7 +269,10 @@
 				<?php echo $radio_tipo;?>
 			</div>
 		<?php endif;?>
-		
-		<!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->  
+		<div>
+			<!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->
+			<?php echo form_button('btn_cancel_carrito', 'Cancelar Pedido', 'id="btn_cancel_carrito" class="button_text art-button"'); ?>
+		</div>
+		<?php form_close()?>  
 	<?php endif;?>
 </div> <!--Cierra div carrito -->

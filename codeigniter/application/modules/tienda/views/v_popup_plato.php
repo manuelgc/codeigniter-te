@@ -1,6 +1,6 @@
 <script type="text/javascript">
 <!--
-$(function(){
+
 
 
 	function mostrarError(objeto,texto){
@@ -99,7 +99,6 @@ $(function(){
 			minimo=$("#"+cadena[0]+'-min_'+cadena[1]).val(),
 			msj_obj=$("#"+cadena[0]+'-msj_'+cadena[1]);
 			
-			console.log('num_checked: '+num_checked);
 			if(num_checked < minimo){
 				mostrarError(msj_obj, "Debe seleccionar al menos "+minimo+" opciones");
 				respuesta=false;
@@ -121,7 +120,7 @@ $(function(){
 
 	}
 
-	function agregarPlato(id_plato) {
+	function agregarPlato(id_tienda, id_plato) {
 		var cantidad = $("#cantidad").val(),
 		observacion= $("#observacion").val(),
 		seleccion= new Array();
@@ -135,7 +134,7 @@ $(function(){
 	   	});
 		
 		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/agregarPlato",
-				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'seleccion':seleccion},
+				  {'id_tienda': id_tienda, 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'seleccion':seleccion},
   			function(data){
 			  	if (data.carrito) {
 					postCargador($("#carrito"));
@@ -164,7 +163,8 @@ $(function(){
 	   	});
 	   	
 		 $.post("<?php echo base_url();?>index.php/carrito/c_carrito/editarPlato",
-				  { 'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,'rowid':rowid ,'seleccion':seleccion},
+				  { 'id_tienda':id_tienda,'id_plato': id_plato,'cantidad': cantidad, 'observacion': observacion,
+			  		'rowid':rowid ,'seleccion':seleccion},
 				function(data){
 			  	if (data.carrito) {
 				  	postCargador($("#carrito"));
@@ -179,10 +179,10 @@ $(function(){
 		
 	}
 
-	
+	$(function(){
 //	$("form#form_popup_plato input").filter(":checkbox,:radio").checkbox();
 
-	$("input#cantidad").spinbox({
+	$("#form_popup_plato input#cantidad").spinbox({
 			  min: 1,    
 			  max: 10,  
 			  step: 1 
@@ -199,24 +199,19 @@ $(function(){
 		var id_plato=$("#form_popup_plato > input#id_plato").val(),
 			tipo=$("#form_popup_plato > input#tipo_popup").val(),
 			rowid=$("#form_popup_plato > input#rowid").val(),
-			id_tienda= $("#id_tienda");
-		console.log("entro submit");
-		console.log("tipo: "+tipo);			
+			id_tienda= $("#id_tienda").val();
+				
 		if( validarTodo() && validarCantidad($("#cantidad"), $("#msj_cant"))){
-			console.log("entro fi validar");	
+				
 			if(tipo=='agregar'){
-				console.log("entro if agregar");
-				agregarPlato(id_plato);
+				agregarPlato(id_tienda, id_plato);
 				$("#popup-tienda").dialog('close');
 			}else if(tipo=='editar'){
-				console.log("entro if editar");
 				editarPlato(id_tienda,id_plato,rowid);
-				console.log("editar plato");
 				$("#popup-tienda").dialog('close');
 			}	
 			return false;
 		}else{
-			console.log("entro else validar");
 			return false;
 		}
 		});
