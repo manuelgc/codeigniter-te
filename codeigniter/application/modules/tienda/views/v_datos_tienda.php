@@ -272,7 +272,8 @@
 				<li>
 					<a class="a-plato" name="<?php echo $id;?>" id="<?php echo $id;?>" href="">
 						<span class="text"><?php echo $p['nombre'];?> </span>
-						<span class="text"><?php echo $p['precio'];?> Bs. </span>
+						<span class="text"><?php echo $p['precio'];?> Bs </span>
+						<span class="text">(<?php echo $p['tipo_plato'];?>)</span>
 					</a>
 				</li>
 			<?php endforeach;?>	

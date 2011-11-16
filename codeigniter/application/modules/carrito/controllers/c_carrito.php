@@ -10,6 +10,7 @@
 		}
 		
 		function index($id_tienda = '') {
+	
 			if($this->input->is_ajax_request()){
 				
 				$data['html']= $this->actualizarCarrito($this->input->post('id_tienda'));
@@ -25,7 +26,9 @@
 		function actualizarCarrito($id_tienda){
 			$tienda = new Tiendascomida();
 			$tienda->where('estatus',1)->get_by_id($id_tienda);
+			
 			if($tienda->exists()){
+		
 				$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
 				$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0;
 
@@ -36,7 +39,7 @@
 				}
 					
 				$data['radio_tipo']= $this->cargarRadioOrden($tienda);
-					
+				
 				return $this->load->view('carrito/v_carrito',$data,true);
 			}
 		}
@@ -135,6 +138,7 @@
 			               'qty'     => $this->input->post('cantidad'),
 			               'price'   => $plato->precio + $total_extra,
 			               'name'    => $plato->nombre,
+						   'tipo'	 => $plato->tipoPlato,
 						'options'    => $ops_text,
 					  'observacion'  =>	$this->input->post('observacion'),
 						 'opciones'	 => $opciones,
@@ -267,6 +271,7 @@
 				               'qty'     => $this->input->post('cantidad'),
 				               'price'   => $plato->precio + $total_extra,
 				               'name'    => $plato->nombre,
+							   'tipo'	 => $plato->tipoPlato,
 							'options'    => $ops_text,
 						  'observacion'  =>	$this->input->post('observacion'),
 							 'opciones'	 => $opciones,

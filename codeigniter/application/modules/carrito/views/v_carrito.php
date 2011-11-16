@@ -85,6 +85,15 @@
 		$.cookie('tipo_orden', valor,{path: '/'});
 	}
 	
+	function validarCarrito() {
+		var valor=<?php echo $cont_pricipal;?>;
+		if(valor==0){
+			$("#mensaje_carrito").text("advertencia").fadeIn(1000);
+		}
+		console.log("algo");
+		console.log("valor:"+valor);
+	}
+	
 	$(function() {
 			
 		$("#form_carrito input.cantidad").spinbox({
@@ -96,7 +105,6 @@
 		$("#form_carrito input.cantidad").click(
 				function(event){	
 					event.preventDefault();
-					
 					var rowid = $(this).attr("name"),
 					cantidad=$(this).val(),
 					id_tienda = $("#id_tienda").val();
@@ -115,6 +123,7 @@
 					
 					});
 
+		
 		$("#form_carrito input.cantidad").focus(
 				function(event){
 					event.preventDefault();
@@ -164,7 +173,7 @@
 			
 		});
 
-		$("#form_carrito button#btn_cancel_carrito").click(
+		$("#form_carrito button#btn_cancel_pedido").click(
 				function(event){	
 					event.preventDefault();
 					preCargador($('#carrito'));
@@ -178,6 +187,11 @@
 			
 				}
 		);
+
+//		$("div #carrito").change( 
+//			function(event){
+				validarCarrito();
+//			});
 		
 		
 		});
@@ -219,7 +233,7 @@
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['subtotal']); ?></span>
 							<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>
-							<?php $total_iva +=($items['precio_iva']*$items['qty']);?>	
+							<?php $total_iva +=($items['precio_iva']*$items['qty']);?>
 						</div>
 						
 						<div class="eliminar-plato">
@@ -270,9 +284,10 @@
 			</div>
 		<?php endif;?>
 		<div>
-			<!--<p><?php echo form_submit('', 'Update your Cart'); ?></p> -->
-			<?php echo form_button('btn_cancel_carrito', 'Cancelar Pedido', 'id="btn_cancel_carrito" class="button_text art-button"'); ?>
+			<?php echo form_submit('btn_comfirmar_pedido', 'Confirmar Pedido', 'id="btn_confir_pedido" class="button_text art-button"')?>
+			<?php echo form_button('btn_cancel_pedido', 'Cancelar Pedido', 'id="btn_cancel_pedido" class="button_text art-button"'); ?>
 		</div>
+		<div><p class="error" id="mensaje_carrito"></p></div>
 		<?php form_close()?>  
 	<?php endif;?>
 </div> <!--Cierra div carrito -->

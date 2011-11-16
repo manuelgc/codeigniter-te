@@ -137,8 +137,9 @@ class Tiendascomida extends DataMapper{
 	function getTiposVentaById($id_tienda){
 		$tienda = new Tiendascomida();
 		$tienda->where('estatus',1)->get_by_id($id_tienda);
+	
 		if($tienda->exists()){	
-			$tipoVenta =$tienda->tiposventa->where('estatus',1)->get();
+			$tipoVenta =$tienda->tiposventa->where('estatus',1)->where_join_field($this,'estatus',1)->get();
 				if($tipoVenta->exists()){
 					return $tipoVenta;							
 				}else{
@@ -149,7 +150,8 @@ class Tiendascomida extends DataMapper{
 		}	
 	}
 	function getTiposVenta(){
-		$tipoVenta =$this->tiposventa->where('estatus',1)->get();
+		$tipoVenta =$this->tiposventa->where('estatus',1)->where_join_field($this,'estatus',1)->get();
+
 			if($tipoVenta->exists()){
 				return $tipoVenta;							
 			}else{
@@ -215,7 +217,7 @@ class Tiendascomida extends DataMapper{
 		$tienda = new Tiendascomida();
 		$tienda->where('estatus',1)->get_by_id($id_tienda);
 		if($tienda->exists()){	
-			$tipoComida =$tienda->tipotiendascomida->where('estatus',1)->get();
+			$tipoComida =$tienda->tipotiendascomida->where('estatus',1)->where_join_field($tienda,'estatus',1)->get();
 				if($tipoComida->exists()){
 					return $tipoComida;							
 				}else{
@@ -227,7 +229,7 @@ class Tiendascomida extends DataMapper{
 	}
 	
 	function getTiposComida(){
-		$tipoComida =$this->tipotiendascomida->where('estatus',1)->get();
+		$tipoComida =$this->tipotiendascomida->where('estatus',1)->where_join_field($this,'estatus',1)->get();
 			if($tipoComida->exists()){
 				return $tipoComida;						
 			}else{
@@ -277,6 +279,7 @@ class Tiendascomida extends DataMapper{
 				$respuesta[$p->id]['descripcion']=$p->descripcion;
 				$respuesta[$p->id]['tamano']=$p->tamano;
 				$respuesta[$p->id]['descuento']=$p->descuento;
+				$respuesta[$p->id]['tipoPlato']=$p->tipoPlato;
 				$respuesta[$p->id]['estatus']=$p->estatus;
 				$respuesta[$p->id]['categoriaplatos_id']=$p->categoriaplatos_id;
 				$respuesta[$p->id]['tiendacomida_id']=$p->tiendacomida_id;
