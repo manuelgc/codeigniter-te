@@ -88,6 +88,7 @@ class C_datos_tienda extends MX_Controller{
 					$arrPlato[$iterador['id']]['descripcion']=$iterador['descripcion'];
 					$arrPlato[$iterador['id']]['tamano']=$iterador['tamano'];
 					$arrPlato[$iterador['id']]['descuento']=$iterador['descuento'];
+					$arrPlato[$iterador['id']]['tipo_plato']=($iterador['tipoPlato']==1?'Principal':'Secundario');
 					$arrPlato[$iterador['id']]['estatus']=$iterador['estatus'];
 					$arrPlato[$iterador['id']]['categoriaplatos_id']=$iterador['categoriaplatos_id'];
 					$arrPlato[$iterador['id']]['tiendacomida_id']=$iterador['tiendacomida_id'];

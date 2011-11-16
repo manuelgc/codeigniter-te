@@ -10,11 +10,15 @@ var $table = 'tipotiendascomida';
 			            'join_table' => 'tiendascomida_tipotiendascomida')
 	);
 	
+	function __construct($id = NULL) {
+		parent::__construct($id);
+	}
+	
 	function getTiendasById($id_tipoComida){
 		$tipoComida = new Tipotiendascomida();
 		$tipoComida->where('estatus',1)->get_by_id($id_tipoComida);
 		if($tipoComida->exists()){
-			$tienda =$tipoComida->tiendascomida->where('estatus',1)->get();
+			$tienda =$tipoComida->tiendascomida->where('estatus',1)->where_join_field($tipoComida,'estatus',1)->get();
 			if($tienda->exists()){
 				return $tienda;
 			}else{
@@ -26,7 +30,7 @@ var $table = 'tipotiendascomida';
 	}
 
 	function getTiendas(){
-		$tienda =$this->tiendascomida->where('estatus',1)->get();
+		$tienda =$this->tiendascomida->where('estatus',1)->where_join_field($this,'estatus',1)->get();
 		if($tienda->exists()){
 			return $tienda;
 		}else{
@@ -35,7 +39,5 @@ var $table = 'tipotiendascomida';
 
 	}
 	
-	function __construct($id = NULL) {
-		parent::__construct($id);
-	}
+	
 }

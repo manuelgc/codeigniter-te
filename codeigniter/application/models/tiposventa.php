@@ -40,7 +40,7 @@ class Tiposventa extends DataMapper{
 		$tipoVenta = new Tiposventa();
 		$tipoVenta->where('estatus',1)->get_by_id($id_tipoVenta);
 		if($tipoVenta->exists()){
-			$tienda =$tipoVenta->tiendascomida->where('estatus',1)->get();
+			$tienda =$tipoVenta->tiendascomida->where('estatus',1)->where_join_field($tipoVenta,'estatus',1)->get();
 			if($tienda->exists()){
 				return $tienda;
 			}else{
@@ -52,7 +52,7 @@ class Tiposventa extends DataMapper{
 	}
 
 	function getTiendas(){
-		$tienda =$this->tiendascomida->where('estatus',1)->get();
+		$tienda =$this->tiendascomida->where('estatus',1)->where_join_field($this,'estatus',1)->get();
 		if($tienda->exists()){
 			return $tienda;
 		}else{
