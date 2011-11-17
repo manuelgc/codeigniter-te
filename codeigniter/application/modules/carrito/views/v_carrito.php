@@ -86,12 +86,29 @@
 	}
 	
 	function validarCarrito() {
-		var valor=<?php echo $cont_pricipal;?>;
-		if(valor==0){
-			$("#mensaje_carrito").text("advertencia").fadeIn(1000);
+		var cantMinima= $('#cant_minima').val(),
+		costoMinimo = $('#costo_minimo').val(), 
+		subTotal= <?php echo $sub_total;?>,
+		contItems =	<?php echo $cont_items;?>,
+		contPrincipal=<?php echo $cont_principal;?>;
+				
+		repuesta=true;
+		if(subTotal < costoMinimo){
+			$('#btn_confirn_pedido').attr('disabled',true);
+			$('#mensaje_carrito').append('<span>El gasto minimo del pedido debe ser de '+costoMinimo+'</span><br>').fadeIn(1000);
+			repuesta=false;
 		}
-		console.log("algo");
-		console.log("valor:"+valor);
+		if (contItems< cantMinima){
+			$('#btn_confirn_pedido').attr('disabled',true);
+			$('#mensaje_carrito').append('<span>La cantidad minima del pedido debe ser de '+cantMinima+'</span><br>').fadeIn(1000);
+			repuesta=false;
+		}
+		if (contPrincipal< 1){
+			$('#btn_confirn_pedido').attr('disabled',true);
+			$('#mensaje_carrito').append('<sapn>El pedido debe contener al menos 1 plato marcado como (Pricipal)</span>').fadeIn(1000);
+			repuesta=false;
+		}							
+		return repuesta;
 	}
 	
 	$(function() {
@@ -188,12 +205,20 @@
 				}
 		);
 
-//		$("div #carrito").change( 
-//			function(event){
-				validarCarrito();
-//			});
-		
-		
+		$("#form_carrito").submit(function(event){
+			event.preventDefault();
+
+			if (validarCarrito()) {
+//				return true;
+				console.log("Hacer Pedido");
+				return false;
+				
+			} else {
+				return false;
+			}	
+
+		});
+				
 		});
 	//-->
 </script>
@@ -206,7 +231,9 @@
 	
 	<?php else:?>  
 <!--		<?php echo print_r($this->cart->contents());?>-->
-		<?php echo form_open('carrito/c_carrito','id="form_carrito"'); ?>
+		<?php echo form_open('pedido/c_pedido','id="form_carrito"'); ?>
+		<?php echo form_hidden('cant_minima', $cant_minima); ?>
+		<?php echo form_hidden('costo_minimo', $costo_minimo); ?>
 		<div class="titulo-carrito" align="center">
 			<h3>Pedido</h3>
 		</div>
@@ -233,7 +260,6 @@
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['subtotal']); ?></span>
 							<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>
-							<?php $total_iva +=($items['precio_iva']*$items['qty']);?>
 						</div>
 						
 						<div class="eliminar-plato">
@@ -249,31 +275,26 @@
 			<li class="total-carrito">	  
 			  <div align="right">
 			  	<span><strong>Sub-Total</strong></span>
-			  	<span> Bs.<?php echo $this->cart->format_number($this->cart->total()); ?></span>
+			  	<span> Bs.<?php echo number_format($sub_total,2,',','.'); ?></span>
 			  </div>
 			</li>
 			<li class="total-carrito">	
 			  <div align="right">
 			  	<span><strong>IVA</strong></span>
-			  	<span> Bs.<?php echo number_format($total_iva,2,',','.'); ?></span>
+			  	<span> Bs.<?php echo number_format($iva,2,',','.'); ?></span>
 			 </div>
 			</li>
-			<?php if(isset($costo_envio)):?>
-				<li class="total-carrito">	
-				  <div align="right">
-				  	<span><strong>Costo de envio</strong></span>
-				  	<span> Bs.<?php echo  number_format($costo_envio,2,',','.') ?></span>
-				  </div>
-				</li>
-			<?php endif;?>
+			<li class="total-carrito">	
+			  <div align="right">
+			  	<span><strong>Costo de envio</strong></span>
+			  	<span> Bs.<?php echo number_format($costo_envio,2,',','.');?> </span>
+			  </div>
+			</li>
+			
 			<li class="total-carrito">	
 			  <div align="right">
 			  	<span><strong>Total</strong></span>
-			  	<?php if(isset($costo_envio)):?>
-			  		<span> Bs.<?php echo  number_format($this->cart->total()+$total_iva + $costo_envio,2,',','.'); ?></span>
-			  	<?php else:?>
-			  		<span> Bs.<?php echo  number_format($this->cart->total()+$total_iva,2,',','.'); ?></span>
-			  	<?php endif;?>
+			  	<span> Bs.<?php echo  number_format($total,2,',','.'); ?></span>
 			  </div>
 			  		
 			</li>  
@@ -284,10 +305,10 @@
 			</div>
 		<?php endif;?>
 		<div>
-			<?php echo form_submit('btn_comfirmar_pedido', 'Confirmar Pedido', 'id="btn_confir_pedido" class="button_text art-button"')?>
+			<?php echo form_submit('btn_comfirmar_pedido', 'Confirmar Pedido', 'id="btn_confir_pedido" class="button_text art-button" '.$boton_disb.'"')?>
 			<?php echo form_button('btn_cancel_pedido', 'Cancelar Pedido', 'id="btn_cancel_pedido" class="button_text art-button"'); ?>
 		</div>
-		<div><p class="error" id="mensaje_carrito"></p></div>
+		<div><p class="error" id="mensaje_carrito"><?php echo $mensaje_error;?></p></div>
 		<?php form_close()?>  
 	<?php endif;?>
 </div> <!--Cierra div carrito -->
