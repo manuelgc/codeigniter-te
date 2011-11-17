@@ -24,24 +24,69 @@
 		}
 
 		function actualizarCarrito($id_tienda){
-			$tienda = new Tiendascomida();
-			$tienda->where('estatus',1)->get_by_id($id_tienda);
-			
-			if($tienda->exists()){
-		
-				$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
-				$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0;
-
-				if ($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
-					$data['costo_envio'] = $tienda->costoenvio;
-				}else{
-					$data['costo_envio'] = 0;
-				}
-					
-				$data['radio_tipo']= $this->cargarRadioOrden($tienda);
+			$carrito = $this->cart->contents();
 				
-				return $this->load->view('carrito/v_carrito',$data,true);
+			if($carrito!=false){
+				
+				$cont_principal = 0;
+				$cont_items= 0;
+				$total_iva = 0;
+				$tienda = new Tiendascomida();
+				$tienda->where('estatus',1)->get_by_id($id_tienda);
+				
+				if($tienda->exists()){
+
+					$data['cant_minima'] = ($tienda->minimoordencant!=null)?$tienda->minimoordencant:0;
+					$data['costo_minimo'] = ($tienda->minimoordenprecio!=null)?$tienda->minimoordenprecio:0;
+
+					if ($this->input->cookie('tipo_orden')!=false && $this->input->cookie('tipo_orden')==1){
+						$data['costo_envio'] = $tienda->costoenvio;
+					}else{
+						$data['costo_envio'] = 0;
+					}
+
+					$data['radio_tipo']= $this->cargarRadioOrden($tienda);
+
+
+					foreach ($carrito as $item) {
+						$total_iva += ($item['precio_iva']*$item['qty']);
+						$cont_items += $item['qty'];
+						if ($item['tipo']==1){
+							$cont_principal++;
+						}
+					}
+
+					$data['sub_total'] = $this->cart->total();
+					$data['iva'] = $total_iva;
+					$data['total']=$this->cart->total()+$total_iva + $tienda->costoenvio;
+					$data['cont_principal']=$cont_principal;
+					$data['cont_items']= $cont_items;
+					
+					$data['boton_disb']='';
+					$data['mensaje_error']='';
+					
+					if($this->cart->total() < $tienda->minimoordenprecio){
+						$data['boton_disb']='disabled="disabled"';
+						$data['mensaje_error'].='<span>El gasto minimo del pedido debe ser de '.$tienda->minimoordenprecio.'</span><br>';
+					}
+					if ($cont_items< $tienda->minimoordencant){
+						$data['boton_disb']='disabled="disabled"';
+						$data['mensaje_error'].='<span>La cantidad minima del pedido debe ser de '.$tienda->minimoordencant.'</span><br>';
+					}
+					if ($cont_principal< 1){
+						$data['boton_disb']='disabled="disabled"';
+						$data['mensaje_error'].='<span>El pedido debe contener al menos 1 plato marcado como (Pricipal)</span>';
+					}
+					
+					return $this->load->view('carrito/v_carrito',$data,true);
+
+				}
+			}else{
+				return $this->load->view('carrito/v_carrito','',true);
 			}
+
+
+
 		}
 
 		function agregarPlato(){
