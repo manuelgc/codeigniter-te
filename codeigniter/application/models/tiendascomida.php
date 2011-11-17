@@ -447,25 +447,7 @@ class Tiendascomida extends DataMapper{
 		}else {
 			return false;
 		}
-	}
-	
-	function guardarActualizar($tienda,$ciudad_id,$zona_id){
-		$c = new Ciudad();
-		$z = new Zona();
-		
-		$c->where('estatus',1);
-		$c->get_by_id($ciudad_id);
-		
-		$z->where('estatus',1);
-		$z->get_by_id($zona_id);
-		
-		$tienda->get_by_id($tienda->id);
-		if ($tienda->exist()) {
-			$tienda->save(array($c,$z));
-		}elseif($tienda->id == '') {
-			$tienda->save(array($c,$z));
-		}
-	}
+	}	
 	
 	function getCantTiendasComida($filtro = array()) {
 		$tc = new Tiendascomida();

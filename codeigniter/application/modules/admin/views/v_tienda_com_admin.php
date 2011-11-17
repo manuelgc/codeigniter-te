@@ -253,7 +253,7 @@ $(document).ready(function(){
 	<h1>
 		<a>Tienda de Comida</a>
 	</h1>	
-	<?php echo form_open('admin/c_tienda_com_admin/','id="form_tiendas_comida"',array('oculto'=>'1','id_tienda'=>''));?>
+	<?php echo form_open_multipart('admin/c_tienda_com_admin/','id="form_tiendas_comida"',array('oculto'=>'1','id_tienda'=>''));?>
 		<div class="form_description">
 			<h2>Tienda de Comida</h2><div><input id="boton-catalogo" class="button_text art-button"
 				type="button" name="boton-catalogo" value="Buscar" /></div>
@@ -266,7 +266,17 @@ $(document).ready(function(){
 					Tienda </label>
 				<div>
 					<input id="nombre_tienda" name="nombre_tienda" class="element text medium"
-						type="text" maxlength="255" value="<?php echo set_value('nombre_tienda');?>" />
+						type="text" maxlength="255" value="<?php 
+						if (form_error('nombre_tienda','<p class="error">','</p>') != '') {
+							echo set_value('nombre_tienda');
+						}else{
+							if(isset($tienda_nueva) && $tienda_nueva == 0){								
+								echo set_value('nombre_tienda');
+							}else {
+								echo '';
+							}
+						}
+						?>" />
 						<?php echo form_error('nombre_tienda','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_1">
@@ -277,7 +287,17 @@ $(document).ready(function(){
 					de la tienda </label>
 				<div>
 					<input id="descrip_tienda" name="descrip_tienda" class="element text medium"
-						type="text" maxlength="255" value="<?php echo set_value('descrip_tienda');?>" />
+						type="text" maxlength="255" value="<?php 
+						if (form_error('descrip_tienda','<p class="error">','</p>') != '') {
+							echo set_value('descrip_tienda');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('descrip_tienda');
+							}else {
+								echo '';
+							}
+						}						
+						?>" />
 						<?php echo form_error('descrip_tienda','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_2">
@@ -286,16 +306,46 @@ $(document).ready(function(){
 			<li id="li_3"><label class="description" for="tlf_1_1">Telefono 1 </label>
 				<span> 
 					<input id="tlf_1_1" name="tlf_1_1" 
-						class="element text" size="3" maxlength="3" value="<?php echo set_value('tlf_1_1');?>" type="text"> -
+						class="element text" size="3" maxlength="3" value="<?php 
+						if (form_error('tlf_1_1','<p class="error">','</p>') != '') {
+							echo set_value('tlf_1_1');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('tlf_1_1');
+							}else {
+								echo '';
+							}							
+						}						
+						?>" type="text"> -
 						<label for="tlf_1_1">(###)</label> 						
 				</span>			
 				<span> 
 					<input id="tlf_1_2" name="tlf_1_2" class="element text" size="3"
-						maxlength="3" value="<?php echo set_value('tlf_1_2');?>" type="text"> - <label for="tlf_1_2">###</label>											
+						maxlength="3" value="<?php 
+						if (form_error('tlf_1_2','<p class="error">','</p>') != '') {
+							echo set_value('tlf_1_2');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('tlf_1_2');
+							}else {
+								echo '';
+							}							
+						}								
+						?>" type="text"> - <label for="tlf_1_2">###</label>											
 				</span> 
 				<span> 
 					<input id="tlf_1_3" name="tlf_1_3"
-					class="element text" size="4" maxlength="4" value="<?php echo set_value('tlf_1_3');?>" type="text"> <label for="tlf_1_3">####</label> 
+					class="element text" size="4" maxlength="4" value="<?php 
+					if (form_error('tlf_1_3','<p class="error">','</p>') != '') {
+							echo set_value('tlf_1_3');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('tlf_1_3');
+							}else {
+								echo '';
+							}							
+						}		
+					?>" type="text"> <label for="tlf_1_3">####</label> 
 				</span>
 				<?php echo form_error('tlf_1_1','<p class="error">','</p>');?>
 				<p class="guidelines" id="guide_3">
@@ -304,18 +354,50 @@ $(document).ready(function(){
 			<li id="li_4"><label class="description" for="tlf_2_1">Telefono 2 </label>
 				<span> 
 					<input id="tlf_2_1" name="tlf_2_1"
-						class="element text" size="3" maxlength="3" value="<?php echo set_value('tlf_2_1');?>" type="text"> -
+						class="element text" size="3" maxlength="3" value="<?php 
+						if (form_error('tlf_2_1','<p class="error">','</p>') != '') {
+							echo set_value('tlf_2_1');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('tlf_2_1');
+							}else {
+								echo '';
+							}							
+						}
+						?>" type="text"> -
 						<label for="tlf_2_1">(###)</label>						
 				</span> 
 				<span> 
 					<input id="tlf_2_2" name="tlf_2_2" class="element text" size="3"
-					maxlength="3" value="<?php echo set_value('tlf_2_2');?>" type="text"> - <label for="tlf_2_2">###</label>					
+					maxlength="3" value="<?php 
+					if (form_error('tlf_2_2','<p class="error">','</p>') != '') {
+							echo set_value('tlf_2_2');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('tlf_2_2');
+							}else {
+								echo '';
+							}							
+						}
+					?>" type="text"> - <label for="tlf_2_2">###</label>					
 				</span> 
 				<span> 
 					<input id="tlf_2_3" name="tlf_2_3"
-					class="element text" size="4" maxlength="4" value="<?php echo set_value('tlf_2_3');?>" type="text"> <label
+					class="element text" size="4" maxlength="4" value="<?php 
+					if (form_error('tlf_2_3','<p class="error">','</p>') != '') {
+							echo set_value('tlf_2_3');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('tlf_2_3');
+							}else {
+								echo '';
+							}							
+						}
+					?>" type="text"> <label
 					for="tlf_2_3">####</label> </span>
-					<?php echo form_error('tlf_2_1','<p class="error">','</p>');?>
+					<?php 
+					echo form_error('tlf_2_1','<p class="error">','</p>');
+					?>
 				<p class="guidelines" id="guide_4">
 					<small>Ingresa un numero de telefono valido, puedes ingresar numero
 						local o celular</small>
@@ -324,7 +406,18 @@ $(document).ready(function(){
 			</label>
 				<div>
 					<input id="razon_social" name="razon_social" class="element text medium"
-						type="text" maxlength="255" value="<?php echo set_value('razon_social');?>" />
+						type="text" maxlength="255" value="<?php 
+						if (form_error('razon_social','<p class="error">','</p>') != '') {
+							echo set_value('razon_social');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('razon_social');
+							}else {
+								echo '';
+							}							
+						}
+						;?>" 
+						/>
 						<?php echo form_error('razon_social','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_5">
@@ -333,18 +426,40 @@ $(document).ready(function(){
 			<li id="li_6"><label class="description" for="ci_rif">Cedula/RIF </label>
 				<div>
 					<input id="ci_rif" name="ci_rif" class="element text medium"
-						type="text" maxlength="10" value="<?php echo set_value('ci_rif');?>" />
+						type="text" maxlength="10" value="<?php 
+						if (form_error('ci_rif','<p class="error">','</p>') != '') {
+							echo set_value('ci_rif');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('ci_rif');
+							}else {
+								echo '';
+							}							
+						}
+						?>" 
+						/>
 						<?php echo form_error('ci_rif','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_6">
 					<small>Ingresa el RIF de la empresa o el numero de cedula del
-						representante legal</small>
+						representante legal sin guiones ni puntos.</small>
 				</p></li>
 			<li id="li_7"><label class="description" for="min_ord_cant">Minimo orden
 					(cantidad) </label>
 				<div>
 					<input id="min_ord_cant" name="min_ord_cant" class="element text medium"
-						type="text" maxlength="255" value="<?php echo set_value('min_ord_cant');?>" />
+						type="text" maxlength="255" value="<?php 
+						if (form_error('min_ord_cant','<p class="error">','</p>') != '') {
+							echo set_value('min_ord_cant');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('min_ord_cant');
+							}else {
+								echo '';
+							}							
+						}
+						?>" 
+						/>
 						<?php echo form_error('min_ord_cant','<p class="error">','</p>');?>
 				</div>
 				<p class="guidelines" id="guide_7">
@@ -354,7 +469,17 @@ $(document).ready(function(){
 			<li id="li_8"><label class="description" for="min_ord_precio">Minimo orden (precio)</label> 
 				<span class="symbol">Bs</span> 
 				<span> <input id="min_ord_precio" name="min_ord_precio" class="element text currency"
-					size="10" value="<?php echo set_value('min_ord_cant');?>" type="text" /> . <label for="element_8_1">Bolivares</label>
+					size="10" value="<?php 
+					if (form_error('min_ord_precio','<p class="error">','</p>') != '') {
+							echo set_value('min_ord_precio');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('min_ord_precio');
+							}else {
+								echo '';
+							}							
+						}
+					?>" type="text" /> . <label for="element_8_1">Bolivares</label>
 					<?php echo form_error('min_ord_precio','<p class="error">','</p>');?>
 			</span>
 				<p class="guidelines" id="guide_8">
@@ -371,18 +496,48 @@ $(document).ready(function(){
 				</p></li>
 			<li id="li_13"><label class="description" for="ciudad">Ciudad </label>
 				<div>
-					<?php echo form_dropdown('ciudad',$ciudades,array(),'class="element select medium" id="ciudad"');?>
+					<?php
+					if (form_error('ciudad','<p class="error">','</p>') != '') {
+						echo form_dropdown('ciudad',$ciudades,set_select('ciudad'),'class="element select medium" id="ciudad"');
+					}else {
+						if (isset($tienda_nueva) && $tienda_nueva == 0) {
+							echo form_dropdown('ciudad',$ciudades,set_select('ciudad'),'class="element select medium" id="ciudad"');
+						}else {
+							echo form_dropdown('ciudad',$ciudades,null,'class="element select medium" id="ciudad"');
+						}
+					}					
+					?>
 					<?php echo form_error('ciudad','<p class="error">','</p>');?>
 				</div></li>
 			<li id="li_14"><label class="description" for="element_14">Zona </label>
 				<div>
-					<?php echo form_dropdown('zona',array(),null,'class="element select medium" id="zona"');?>
+					<?php
+					if (form_error('zona','<p class="error">','</p>') != '') {
+						echo form_dropdown('zona',array(),null,'class="element select medium" id="zona"');
+					}else {
+						if (isset($tienda_nueva) && $tienda_nueva == 0) {
+							echo form_dropdown('zona',$zonas,set_select('zona'),'class="element select medium" id="zona"');
+						}else {
+							echo form_dropdown('zona',array(),NULL,'class="element select medium" id="zona"');
+						}
+					}	 					
+					?>
 					<?php echo form_error('zona','<p class="error">','</p>');?>
 				</div></li>
 			<li id="li_9">
 				<label class="description" for="min_tiempo_ent">Minimo tiempo entrega </label> 
 					<span> <input id="min_tiempo_ent" name="min_tiempo_ent" class="element text " size="2" type="text"
-					maxlength="2" value="<?php echo set_value('min_tiempo_ent_1');?>" /><label>HH</label> 
+					maxlength="2" value="<?php 
+					if (form_error('min_tiempo_ent','<p class="error">','</p>') != '') {
+							echo set_value('min_tiempo_ent');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('min_tiempo_ent');
+							}else {
+								echo '';
+							}							
+						}					
+					?>" /><label>HH</label> 
 					</span> 					
 			<p class="guidelines" id="guide_9">
 					<small>Ingrese el tiempo minimo para la entrega de un producto</small>
@@ -391,12 +546,28 @@ $(document).ready(function(){
 			<li id="li_10">
 				<label class="description" for="min_tiempo_esp">Minimo tiempo espera </label> 
 					<span> <input id="min_tiempo_esp" name="min_tiempo_esp" class="element text " size="2" type="text"
-						maxlength="2" value="<?php echo set_value('min_tiempo_esp_1');?>" /><label>HH</label> </span> 					
+						maxlength="2" value="<?php 
+						if (form_error('min_tiempo_esp','<p class="error">','</p>') != '') {
+							echo set_value('min_tiempo_esp');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('min_tiempo_esp');
+							}else {
+								echo '';
+							}							
+						}
+						?>" /><label>HH</label> </span> 					
 			<p class="guidelines" id="guide_10">
 					<small>Tiempo minimo de espera para entregar un pedido tipo "Yo lo
 						Busco"</small>
 				</p></li>
-
+			<li id="li_11">
+				<label class="description" for="img_tienda">Imagen:</label> 
+					<span> <input id="img_tienda" name="img_tienda" class="element text " size="20" type="file" />
+					</span> 					
+			<p class="guidelines" id="guide_11">
+					<small>Ingresa una imagen en formato JPG/PNG</small>
+				</p></li>
 			<li class="buttons"> 
 			<input id="guardar" class="button_text art-button"
 				type="submit" name="guardar" value="Guardar" />
