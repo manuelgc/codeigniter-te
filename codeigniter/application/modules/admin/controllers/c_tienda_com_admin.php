@@ -23,9 +23,29 @@ class C_tienda_com_admin extends MX_Controller {
 			'rules'=>'trim|max_length[3]|required|callback_validar_tlf_1'
 		),
 		array(
+			'field'=>'tlf_1_2',
+			'label'=>'Telefono 1',
+			'rules'=>'trim|max_length[3]|required'
+		),
+		array(
+			'field'=>'tlf_1_3',
+			'label'=>'Telefono 1',
+			'rules'=>'trim|max_length[4]|required'
+		),
+		array(
 			'field'=>'tlf_2_1',
 			'label'=>'Telefono 2',
 			'rules'=>'trim|required|max_length[3]|callback_validar_tlf_2'
+		),
+		array(
+			'field'=>'tlf_2_2',
+			'label'=>'Telefono 2',
+			'rules'=>'trim|required|max_length[3]'
+		),
+		array(
+			'field'=>'tlf_2_3',
+			'label'=>'Telefono 2',
+			'rules'=>'trim|required|max_length[4]'
 		),
 		array(
 			'field'=>'razon_social',
@@ -88,11 +108,12 @@ class C_tienda_com_admin extends MX_Controller {
 		$campo2 = $this->input->post('tlf_1_2');
 		$campo3 = $this->input->post('tlf_1_3');
 		if (empty($campo1) || empty($campo2) || empty($campo3)) {
-			$this->form_validation->set_message('validar_fijo','Debe ingresar un numero de telefono valido');
+			$this->form_validation->set_message('validar_tlf_1','Debe ingresar un numero de telefono valido');
+			
 			return FALSE;
 		}else {
 			if (!$this->form_validation->numeric($campo2) && !$this->form_validation->numeric($campo3)) {
-				$this->form_validation->set_message('validar_fijo','Solo se permiten numeros para este campo');
+				$this->form_validation->set_message('validar_tlf_1','Solo se permiten numeros para este campo');
 				return FALSE;
 			}else {
 				return TRUE;
@@ -104,11 +125,11 @@ class C_tienda_com_admin extends MX_Controller {
 		$campo2 = $this->input->post('tlf_2_2');
 		$campo3 = $this->input->post('tlf_2_3');
 		if (empty($campo1) || empty($campo2) || empty($campo3)) {
-			$this->form_validation->set_message('validar_fijo','Debe ingresar un numero de telefono valido');
+			$this->form_validation->set_message('validar_tlf_2','Debe ingresar un numero de telefono valido');
 			return FALSE;
 		}else {
 			if (!$this->form_validation->numeric($campo2) && !$this->form_validation->numeric($campo3)) {
-				$this->form_validation->set_message('validar_fijo','Solo se permiten numeros para este campo');
+				$this->form_validation->set_message('validar_tlf_2','Solo se permiten numeros para este campo');
 				return FALSE;
 			}else {
 				return TRUE;
@@ -130,26 +151,47 @@ class C_tienda_com_admin extends MX_Controller {
 		$this->form_validation->set_rules($this->config);
 		
 		if ($this->form_validation->run($this) == FALSE) {
-			$data['ciudades'] = $this->cargarCiudad();
+			$data['ciudades'] = $this->cargarCiudad();			
 			$data['catalogo_default'] = $this->catalogoTienda();
+			$data['tienda_nueva'] = 0;
 			$this->template->build('v_tienda_com_admin',$data);
 		}else {
 			$tc = new Tiendascomida();
-			$tc->id = $this->input->post('id_tienda');
+			
+			$tc->id = ($this->input->post('id_tienda')) ? $this->input->post('id_tienda') : '';
 			$tc->nombre = $this->input->post('nombre_tienda');
-			$tc->descripcion = $this->input->post('telefono1');
+			$tc->descripcion = $this->input->post('descrip_tienda');
 			$tc->telefono1 = $this->input->post('tlf_1_1').$this->input->post('tlf_1_2').$this->input->post('tlf_1_3');
 			$tc->telefono2 = $this->input->post('tlf_2_1').$this->input->post('tlf_2_2').$this->input->post('tlf_2_3');
 			$tc->razonsocial = $this->input->post('razon_social');
 			$tc->ci_rif = $this->input->post('ci_rif');
 			$tc->minimoordencant = $this->input->post('min_ord_cant');
 			$tc->minimoordenprecio = $this->input->post('min_ord_precio');
-			$tc->estacionamiento = ($this->input->post('estacionamiento')) ? 1 : 0;
+			$tc->estacionamiento = ($this->input->post('estacionamiento')) ? 0 : 1;
 			$tc->minimotiempoentrega = $this->input->post('min_tiempo_ent');
 			$tc->minimotiempoespera = $this->input->post('min_tiempo_esp');
-			$tc->estatus = 1;
-			$tc->guardarActualizar($tc, $this->input->post('ciudad'), $this->input->post('zona'));
+			$tc->estatus = 1;			
+						
+			$c = new Ciudad();
+			$z = new Zona();
+			$e = new Estado();
+			
+			$e->where('estatus',1);
+			$e->get_by_id(7);
+			
+			$c->where('estatus',1);
+			$c->get_by_id($this->input->post('ciudad'));
+			
+			$z->where('estatus',1);
+			$z->get_by_id($this->input->post('zona'));
+			
+			$tc->save(array($e,$c,$z));
+			
 			$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+			$data['ciudades'] = $this->cargarCiudad();
+			//$data['zonas'] = $this->cargarZonaPorCiudad($this->input->post('ciudad'));
+			$data['catalogo_default'] = $this->catalogoTienda();
+			$data['tienda_nueva'] = 1;
 			$this->template->build('v_tienda_com_admin',$data);
 		}
 	}
