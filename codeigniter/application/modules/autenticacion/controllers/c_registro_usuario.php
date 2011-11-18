@@ -232,7 +232,7 @@ class C_registro_usuario extends MX_Controller {
 						if ($this->form_validation->run($this) == FALSE) {
 							$data['ciudad'] = $this->cargarCiudad();
 							$data['captcha'] = $this->crearCaptcha();
-							$this->template->build('v_registro_cliente',$data);
+							$this->template->build('autenticacion/v_registro_cliente',$data);
 						}else {
 							$usuario = new Usuario();
 							$estado = new Estado();
@@ -268,7 +268,7 @@ class C_registro_usuario extends MX_Controller {
 								$data['ciudad'] = $this->cargarCiudad();
 								$data['captcha'] = $this->crearCaptcha();
 								$data['error_bd'] = $usuario->error->string;								
-								$this->template->build('v_registro_cliente',$data);
+								$this->template->build('autenticacion/v_registro_cliente',$data);
 							}else {
 								$direccion_envio->calle_carrera = $this->input->post('calle_carrera');
 								$direccion_envio->casa_urb = $this->input->post('urb_edif');
@@ -283,7 +283,7 @@ class C_registro_usuario extends MX_Controller {
 									$data['ciudad'] = $this->cargarCiudad();
 									$data['captcha'] = $this->crearCaptcha();
 									$data['error_bd'] = $usuario->error->string;								
-									$this->template->build('v_registro_cliente',$data);
+									$this->template->build('autenticacion/v_registro_cliente',$data);
 								}else {
 									$usuario->trans_commit();
 									$direccion_envio->trans_commit();
@@ -295,7 +295,7 @@ class C_registro_usuario extends MX_Controller {
 					}else {
 						$data['ciudad'] = $this->cargarCiudad();
 						$data['captcha'] = $this->crearCaptcha();
-						$this->template->build('v_registro_cliente',$data);
+						$this->template->build('autenticacion/v_registro_cliente',$data);
 					}
 				}
 				
