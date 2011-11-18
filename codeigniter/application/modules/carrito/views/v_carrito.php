@@ -206,13 +206,10 @@
 		);
 
 		$("#form_carrito").submit(function(event){
-			event.preventDefault();
+//			event.preventDefault();
 
 			if (validarCarrito()) {
-//				return true;
-				console.log("Hacer Pedido");
-				return false;
-				
+				return true;
 			} else {
 				return false;
 			}	
@@ -231,7 +228,7 @@
 	
 	<?php else:?>  
 <!--		<?php echo print_r($this->cart->contents());?>-->
-		<?php echo form_open('pedido/c_pedido','id="form_carrito"'); ?>
+		<?php echo form_open('pedido/c_pedido_login','id="form_carrito"'); ?>
 		<?php echo form_hidden('cant_minima', $cant_minima); ?>
 		<?php echo form_hidden('costo_minimo', $costo_minimo); ?>
 		<div class="titulo-carrito" align="center">

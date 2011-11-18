@@ -251,7 +251,6 @@
 			</div>
 			<div><p class="error" id=<?php echo $key."-msj_opcion";?>></p></div>
 			<div class="contenido-opciones">
-<!--				<fieldset class="ui-widget ui-widget-content ui-corner-all">-->
 				<ul id="<?php echo $key.'-opcion';?>" name="<?php echo $opcion['nombre'];?>" class="ui-widget ui-widget-content ui-corner-all">
 					<?php foreach ($opcion['opcion_item'] as $item):?>
 						<li>
@@ -260,7 +259,6 @@
 						</li>
 					<?php endforeach;?>
 				</ul>
-<!--				</fieldset>-->
 			</div>
 		<?php endforeach;?>
 	<?php endif;?>	
@@ -280,7 +278,6 @@
 		<div><p class="error" id=<?php echo $key."-msj_extra";?>></p></div>
 		<div class="contenido-extras">
 			<ul id="<?php echo $key.'-extra';?>" name="<?php echo $extra['nombre'];?>" class="ui-widget ui-widget-content ui-corner-all">
-<!--			<fieldset class="ui-widget ui-widget-content ui-corner-all">-->
 				<?php foreach ($extra['extra_item'] as $item):?>
 					<li>
 						<div class="detalle-extra">
@@ -290,7 +287,6 @@
 						
 					</li>
 				<?php endforeach;?>
-<!--			</fieldset>-->
 			</ul>		
 		</div>
 		<?php endforeach;?>
