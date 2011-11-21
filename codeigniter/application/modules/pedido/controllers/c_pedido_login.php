@@ -12,7 +12,7 @@ class c_pedido_login extends MX_Controller{
 		$this->form_validation->CI =& $this;	
 	}
 
-	function index() {
+	function index($datos=array()) {
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
 //		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
@@ -31,14 +31,13 @@ class c_pedido_login extends MX_Controller{
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
 
-		echo 'current: '.current_url();
-		echo '<br>uri_string: '.uri_string();
-		
 		if($this->verificarExisteSesion()===false){
-			$data['login_usuario']= $this->load->view('autenticacion/v_login','',true);
-			$this->template->build('v_pedido_login',$data);
+			
+			$data['login_usuario']= $this->load->view('autenticacion/v_login',$login_usuario,true);
+			$this->template->build('pedido/v_pedido_login',$data);
 		}else{
-			$this->load->view('v_pedido',$data);
+//			$this->load->view('pedido/v_pedido',$data);
+			$this->template->build('pedido/v_pedido_login',$data);
 		}
 		
 	}

@@ -11,6 +11,7 @@
 					'json'
 				);	
 		});
+		$('#form-login').append('<input id="pedido" type="hidden" value="1" name="pedido">');
 
 	});
 //-->
@@ -20,11 +21,19 @@
 		<?php if(isset($login_usuario)):?>
 			<fieldset id="login">		
 				<?php echo $login_usuario;?>
-				<?php echo form_button('btn_registrar','Nuevo Usuario','id="btn_registrar" class="button_text art-button"'); ?>
 			</fieldset>
-			<fieldset id="registro">
-			</fieldset>
-		<?php endif;?>			
-			
-		
+		<?php endif;?>	
+	
+		<fieldset id="registro">
+			<?php if (isset($registro_usuario)):?>
+				<?php echo $registro_usuario;?>
+			<?php else:?>
+				<div>
+					<h2>Registro de clientes todoexpress</h2>
+					<p>Crea tu cuenta para poder disfrutar de nuestros servicios.</p>
+				</div>
+				<?php echo form_button('btn_registrar','Registrar','id="btn_registrar" class="button_text art-button"'); ?>
+			<?php endif;?>	
+		</fieldset>
+				
 </div>
