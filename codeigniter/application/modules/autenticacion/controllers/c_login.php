@@ -22,7 +22,7 @@ class C_login extends MX_Controller {
 		$this->form_validation->CI =& $this;	
 	}
 	
-	function index() {
+	function index() { 
 		if ($this->input->post('oculto')) {							
 			$this->ejecutarLogin();
 		}else {												
@@ -34,15 +34,20 @@ class C_login extends MX_Controller {
 		return $this->load->view('v_login');
 	}		
 	
-	function respuestaLogin($resultado) {		
-		//$this->session->set_userdata('respuesta_block','1');			
-		Modules::run('respuesta_modulos/c_procesar_respuesta/redirectRespuesta',$resultado,'block');
+	function respuestaLogin($resultado) {
+		if($this->input->post('pedido')){		
+			$data['login_usuario']=$resultado;
+			Modules::run('pedido/c_pedido_login/index',$resultado);
+		}else{
+			//$this->session->set_userdata('respuesta_block','1');			
+			Modules::run('respuesta_modulos/c_procesar_respuesta/redirectRespuesta',$resultado,'block');
+			
+		}
 	}
 	
 	function ejecutarLogin() {
 		$this->form_validation->set_rules($this->config);		
 		$this->input->set_cookie('respuesta_block','1',0);
-		
 		if ($this->form_validation->run($this) == FALSE) {									
 			$resultado = $this->load->view('v_login',null,true);
 			$this->respuestaLogin($resultado);				
