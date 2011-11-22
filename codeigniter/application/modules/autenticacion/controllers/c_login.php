@@ -35,13 +35,12 @@ class C_login extends MX_Controller {
 	}		
 	
 	function respuestaLogin($resultado) {
-		if($this->input->post('pedido')){		
-			$data['login_usuario']=$resultado;
-			Modules::run('pedido/c_pedido_login/index',$resultado);
-		}else{
+		if($this->input->post('pedido')===FALSE){		
 			//$this->session->set_userdata('respuesta_block','1');			
 			Modules::run('respuesta_modulos/c_procesar_respuesta/redirectRespuesta',$resultado,'block');
-			
+		}else{
+			$data['login_usuario']=$resultado;
+			Modules::run('pedido/c_pedido_login/index',$data);
 		}
 	}
 	
