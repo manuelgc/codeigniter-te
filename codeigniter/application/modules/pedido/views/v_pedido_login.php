@@ -6,13 +6,15 @@
 			$.post("<?php echo base_url();?>index.php/pedido/c_pedido_login/cargarRegistro",
 					null,
 					function(data){
-						$("#registro").html(data.html_registro);	
+						$("#registro").html(data.html_registro);
+						$("#registro > div#form_container > form").append('<input id="pedido" type="hidden" value="1" name="pedido">');	
 					},
 					'json'
 				);	
 		});
-		$('#form-login').append('<input id="pedido" type="hidden" value="1" name="pedido">');
 
+		$('form  > div.hidden').append('<input id="pedido" type="hidden" value="1" name="pedido">');
+		
 	});
 //-->
 </script>

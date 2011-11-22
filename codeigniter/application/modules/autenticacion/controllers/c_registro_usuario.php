@@ -232,7 +232,12 @@ class C_registro_usuario extends MX_Controller {
 						if ($this->form_validation->run($this) == FALSE) {
 							$data['ciudad'] = $this->cargarCiudad();
 							$data['captcha'] = $this->crearCaptcha();
-							$this->template->build('autenticacion/v_registro_cliente',$data);
+							if($this->input->post('pedido')===FALSE){
+								$this->template->build('autenticacion/v_registro_cliente',$data);
+							}else{
+//								$respuesta['registro_usuario']=$this->load->view('autenticacion/v_registro_cliente',$data,true);
+								Modules::run('pedido/c_pedido_login/index',$data);
+							}
 						}else {
 							$usuario = new Usuario();
 							$estado = new Estado();
@@ -267,8 +272,15 @@ class C_registro_usuario extends MX_Controller {
 								$usuario->trans_rollback();
 								$data['ciudad'] = $this->cargarCiudad();
 								$data['captcha'] = $this->crearCaptcha();
-								$data['error_bd'] = $usuario->error->string;								
-								$this->template->build('autenticacion/v_registro_cliente',$data);
+								$data['error_bd'] = $usuario->error->string;
+								
+								if($this->input->post('pedido')===FALSE){
+									$this->template->build('autenticacion/v_registro_cliente',$data);
+								}else{
+//									$respuesta['registro_usuario']=$this->load->view('autenticacion/v_registro_cliente',$data,true);
+									Modules::run('pedido/c_pedido_login/index',$data);
+								}
+								
 							}else {
 								$direccion_envio->calle_carrera = $this->input->post('calle_carrera');
 								$direccion_envio->casa_urb = $this->input->post('urb_edif');
@@ -283,12 +295,26 @@ class C_registro_usuario extends MX_Controller {
 									$data['ciudad'] = $this->cargarCiudad();
 									$data['captcha'] = $this->crearCaptcha();
 									$data['error_bd'] = $usuario->error->string;								
+									
+								if($this->input->post('pedido')===FALSE){
 									$this->template->build('autenticacion/v_registro_cliente',$data);
+								}else{
+//									$respuesta['registro_usuario']=$this->load->view('autenticacion/v_registro_cliente',$data,true);
+									Modules::run('pedido/c_pedido_login/index',$data);
+								}
+								
 								}else {
 									$usuario->trans_commit();
 									$direccion_envio->trans_commit();
 									Modules::run('autenticacion/c_login/crearSesion',$usuario);
-									$this->template->build('v_registro_exitoso');
+									
+									
+									if($this->input->post('pedido')===FALSE){
+										$this->template->build('v_registro_exitoso');
+									}else{
+//										$respuesta['registro_usuario']=$this->load->view(v_registro_exitoso);
+										Modules::run('pedido/c_pedido_login/index');
+									}
 								}
 							}																					
 						}
