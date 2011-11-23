@@ -157,12 +157,12 @@ class C_registro_usuario extends MX_Controller {
 						//el breadcrumb no se esta usando aun porque hay que cambiar algunas cosas de sergio
 						//se mantiene como estaba antes
 						/*case 'breadcrumb':
-						 if ($this->view_respuesta == NULL) {
-						 $data['output_header'] = Modules::run('banner_principal/c_banner_principal/index');
-						 }else {
-						 $data['output_header'] = $this->view_respuesta;
-						 }
-						 break;*/
+						if ($this->view_respuesta == NULL) {
+						$data['output_header'] = Modules::run('banner_principal/c_banner_principal/index');
+						}else {
+						$data['output_header'] = $this->view_respuesta;
+						}
+						break;*/
 						case FALSE:{
 							$data['output_block'] = Modules::run('autenticacion/c_login/cargarView');
 						}
@@ -172,7 +172,7 @@ class C_registro_usuario extends MX_Controller {
 					$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 					$this->template->set_layout('two_columns/theme');
 
-					$this->qtip2->addCssJs();
+//					$this->qtip2->addCssJs();
 					$this->qtip2->putCustomTip();
 
 					$this->procesarRegistro();
@@ -235,7 +235,6 @@ class C_registro_usuario extends MX_Controller {
 							if($this->input->post('pedido')===FALSE){
 								$this->template->build('autenticacion/v_registro_cliente',$data);
 							}else{
-//								$respuesta['registro_usuario']=$this->load->view('autenticacion/v_registro_cliente',$data,true);
 								Modules::run('pedido/c_pedido_login/index',$data);
 							}
 						}else {
@@ -277,7 +276,6 @@ class C_registro_usuario extends MX_Controller {
 								if($this->input->post('pedido')===FALSE){
 									$this->template->build('autenticacion/v_registro_cliente',$data);
 								}else{
-//									$respuesta['registro_usuario']=$this->load->view('autenticacion/v_registro_cliente',$data,true);
 									Modules::run('pedido/c_pedido_login/index',$data);
 								}
 								
@@ -299,7 +297,6 @@ class C_registro_usuario extends MX_Controller {
 								if($this->input->post('pedido')===FALSE){
 									$this->template->build('autenticacion/v_registro_cliente',$data);
 								}else{
-//									$respuesta['registro_usuario']=$this->load->view('autenticacion/v_registro_cliente',$data,true);
 									Modules::run('pedido/c_pedido_login/index',$data);
 								}
 								
@@ -312,7 +309,6 @@ class C_registro_usuario extends MX_Controller {
 									if($this->input->post('pedido')===FALSE){
 										$this->template->build('v_registro_exitoso');
 									}else{
-//										$respuesta['registro_usuario']=$this->load->view(v_registro_exitoso);
 										Modules::run('pedido/c_pedido_login/index');
 									}
 								}

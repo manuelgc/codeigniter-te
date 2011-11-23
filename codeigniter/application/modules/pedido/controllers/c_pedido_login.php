@@ -5,8 +5,10 @@ class c_pedido_login extends MX_Controller{
 		parent::__construct();
 		$this->load->helper('language');	
 		$this->load->library('form_validation');	
-		$this->load->library('encrypt');	
-		$this->load->module('autenticacion/c_registro_usuario');
+		$this->load->library('encrypt');
+		$this->load->helper('form');
+		$this->load->helper('captcha');
+		$this->load->library('qtip2');
 		$this->load->module('busqueda/c_busqueda');
 		$this->load->module('carrito/c_carrito');
 		$this->form_validation->CI =& $this;	
@@ -30,39 +32,33 @@ class c_pedido_login extends MX_Controller{
 //		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
-
+//		$this->qtip2->addCssJs();
+		$this->qtip2->putCustomTip();
+		
 		if($this->verificarExisteSesion()===false){
-			echo 'Entro usuario no logeado';
 			if(!empty($data_param) ){
-				echo 'Entro c_login';
-				print_r($data_param);
 				if(array_key_exists('login_usuario', $data_param)){
-//					$data['login_usuario']= $this->load->view('autenticacion/v_login',$login_usuario,true);
 					$this->template->build('pedido/v_pedido_login',$data_param);
-//					redirect('pedido/v_pedido_login', 'refresh');
 				}else{
+					$data['login_usuario']= $this->load->view('autenticacion/v_login','',true);
 					$data['registro_usuario']= $this->load->view('autenticacion/v_registro_cliente',$data_param,true);
-					$this->template->build('pedido/v_pedido_login',$data_param);
+					$this->template->build('pedido/v_pedido_login',$data);
 				}
 			}else{
-					echo 'Entro primera ves';
 					$data['login_usuario']= $this->load->view('autenticacion/v_login','',true);
 					$this->template->build('pedido/v_pedido_login',$data);
-//					redirect('pedido/c_pedido_login', 'refresh');
+
 				}
 		}else{
-			
-			echo 'Entro usuario logeado';
-			print_r($data_param);
-//			$this->template->build('pedido/v_pedido',$data);			
-			$this->template->build('pedido/v_pedido_login',$data_param);
-//			redirect('pedido/v_pedido_login', 'refresh');
+			$this->template->build('pedido/v_pedido',$data);
+			redirect('pedido/c_pedido');
+						
 		}
 		
 	}
 	
 	function cargarRegistro() {
-		$data['ciudad'] = $this->c_registro_usuario->cargarCiudad();
+		$data['ciudad'] = $dataReg['ciudad'] = Modules::run('autenticacion/c_registro_usuario/cargarCiudad');
 		$data['captcha'] = $this->crearCaptcha();
 		$dataAjax['html_registro']= $this->load->view('autenticacion/v_registro_cliente',$data,true);
 		
@@ -101,7 +97,11 @@ class c_pedido_login extends MX_Controller{
 				$output = $this->c_busqueda->index();
 				break;
 			case 'header':
-				$output = Modules::run('banner_principal/c_banner_principal/index');
+				$output = $this->load->helper('language');
+					$this->load->helper('form');
+					$this->load->helper('captcha');
+					$this->load->library('qtip2');
+					$this->load->library('form_validation');;
 				break;
 			case 'block':
 				$output = Modules::run('autenticacion/c_login/cargarView');

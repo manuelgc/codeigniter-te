@@ -227,7 +227,6 @@
 		<h3>Pedido</h3>
 	
 	<?php else:?>  
-<!--		<?php echo print_r($this->cart->contents());?>-->
 		<?php echo form_open('pedido/c_pedido_login','id="form_carrito"'); ?>
 		<?php echo form_hidden('cant_minima', $cant_minima); ?>
 		<?php echo form_hidden('costo_minimo', $costo_minimo); ?>
