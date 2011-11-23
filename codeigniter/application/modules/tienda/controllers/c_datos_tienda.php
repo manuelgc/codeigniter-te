@@ -38,6 +38,10 @@ class C_datos_tienda extends MX_Controller{
 		$this->template->set_layout('two_columns/theme');
 
 		if($this->input->post('id_tienda')){
+			$this->input->set_cookie(
+						array('name' => 'tienda',
+						 	 'value' => $this->input->post('id_tienda'),
+							'expire' => 0));
 			$data=$this->getDatosTienda($this->input->post('id_tienda'));
 			$data+=$this->getCiudadZona();
 			
