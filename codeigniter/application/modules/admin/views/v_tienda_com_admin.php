@@ -125,6 +125,7 @@ $(document).ready(function(){
 				$('#zona').replaceWith(data.zona);
 				$('#min_tiempo_ent').val(data.min_tiempo_ent);
 				$('#min_tiempo_esp').val(data.min_tiempo_esp);
+				$('#costo_envio').val(data.costoenvio);
 			}
 		});
 		$('#popup').dialog('close');
@@ -562,6 +563,23 @@ $(document).ready(function(){
 						Busco"</small>
 				</p></li>
 			<li id="li_11">
+				<label class="description" for="costo_envio">Costo de envio</label> 
+					<span> <input id="costo_envio" name="costo_envio" class="element text " size="10" type="text"
+						maxlength="3" value="<?php 
+						if (form_error('costo_envio','<p class="error">','</p>') != '') {
+							echo set_value('costo_envio');
+						}else{
+							if (isset($tienda_nueva) && $tienda_nueva == 0) {
+								echo set_value('costo_envio');
+							}else {
+								echo '';
+							}							
+						}
+						?>" /></span> 					
+			<p class="guidelines" id="guide_10">
+					<small>Costo de envio</small>
+				</p></li>
+			<li id="li_12">
 				<label class="description" for="img_tienda">Imagen:</label> 
 					<span> <input id="img_tienda" name="img_tienda" class="element text " size="20" type="file" />
 					</span> 					
