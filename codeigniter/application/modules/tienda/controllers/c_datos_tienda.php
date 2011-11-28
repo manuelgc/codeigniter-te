@@ -27,7 +27,9 @@ class C_datos_tienda extends MX_Controller{
 		
 		if($this->input->post('id_tienda')){
 			$data['output_block'] = $this->c_carrito->index($this->input->post('id_tienda'));
-		}
+		}elseif ($this->input->cookie('tienda')!=false){
+			$data['output_block'] = $this->c_carrito->index($this->input->cookie('tienda'));
+		}	
 		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
@@ -46,14 +48,19 @@ class C_datos_tienda extends MX_Controller{
 			$data+=$this->getCiudadZona();
 			
 			$this->template->build('v_datos_tienda',$data);
+		}elseif ($this->input->cookie('tienda')!=false){
+			$data=$this->getDatosTienda($this->input->cookie('tienda'));
+			$data+=$this->getCiudadZona();
+			
+			$this->template->build('v_datos_tienda',$data);
 		}
 		
 	}
 
-	function getDatosTienda($id) {
+	function getDatosTienda($id_tienda) {
 		$tienda = new Tiendascomida();
 		$tienda->where('estatus',1);
-		$tienda->get_by_id($id);
+		$tienda->get_by_id($id_tienda);
 		$arrTienda= array();
 		if($tienda->exists()){
 			$arrTienda['id'] = $tienda->id;

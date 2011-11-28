@@ -117,7 +117,7 @@ class Usuario extends DataMapper {
 		$u->where('estatus',1);
 		$u->get();		
 		$u->direccionesenvio->where('estatus',1)->get();		
-		foreach ($u->direccionesenvio->get() as $valor) {
+		foreach ($u->direccionesenvio as $valor) {
 			$resultadoDireccion[$contador]['calle_carrera'] = $valor->calle_carrera;
 			$resultadoDireccion[$contador]['casa_urb'] = $valor->casa_urb;
 			$resultadoDireccion[$contador]['numeroCasaApto'] = $valor->numeroCasaApto;
@@ -139,7 +139,7 @@ class Usuario extends DataMapper {
 		$u->where('estatus',1);
 		$u->get();		
 		$u->direccionesenvio->where('estatus',1)->get();		
-		foreach ($u->direccionesenvio->get() as $valor) {
+		foreach ($u->direccionesenvio as $valor) {
 			$resultadoDireccion[$contador]['calle_carrera'] = $valor->calle_carrera;
 			$resultadoDireccion[$contador]['casa_urb'] = $valor->casa_urb;
 			$resultadoDireccion[$contador]['numeroCasaApto'] = $valor->numeroCasaApto;
@@ -151,6 +151,31 @@ class Usuario extends DataMapper {
 			$contador++;									
 		}									
 		return $resultadoDireccion;
-	}		
+	}
+	
+	function getDireccionesEnvioByZona($id_usuario,$id_ciudad,$id_zona) {
+		$u = new Usuario();
+		$resultadoDireccion = array();
+		$contador = 0;
+		$u->where('id',$id_usuario);
+		$u->where('estatus',1);
+		$u->get();
+		$direciones= $u->direccionesenvio
+		->where('estatus',1)
+		->where('ciudades_id',$id_ciudad)
+		->where('zona_id',$id_zona)->get();
+		foreach ($direciones as $valor) {
+			$resultadoDireccion[$contador]['calle_carrera'] = $valor->calle_carrera;
+			$resultadoDireccion[$contador]['casa_urb'] = $valor->casa_urb;
+			$resultadoDireccion[$contador]['numeroCasaApto'] = $valor->numeroCasaApto;
+			$resultadoDireccion[$contador]['lugarreferencia'] = $valor->lugarreferencia;
+			$resultadoDireccion[$contador]['estado'] = $valor->estado->where('estatus',1)->get()->nombreEstado;
+			$resultadoDireccion[$contador]['ciudad'] = $valor->ciudad->where('estatus',1)->get()->nombreCiudad;
+			$resultadoDireccion[$contador]['zona'] = $valor->zona->where('estatus',1)->get()->nombreZona;
+			$resultadoDireccion[$contador]['id'] = $valor->id;
+			$contador++;
+		}
+		return $resultadoDireccion;
+	}
 }
 ?>
