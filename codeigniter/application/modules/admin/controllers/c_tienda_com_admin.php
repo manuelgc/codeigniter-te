@@ -1,6 +1,7 @@
 <?php
 class C_tienda_com_admin extends MX_Controller {
-	private $id_usuario;
+	private $id_usuario;	
+	private $img_defecto = array();
 	private $config = array(
 		array(
 			'field'=>'nombre_tienda',
@@ -79,12 +80,24 @@ class C_tienda_com_admin extends MX_Controller {
 		)
 	);
 	function __construct() {
-		parent::__construct();
+		parent::__construct();		
+		$this->img_defecto['ruta'] = 'imagenes/tiendas_comida/';
+		$this->img_defecto['nombre'] = 'tienda_defecto.jpg';
+		$this->img_defecto['tipo_archivo'] = 'image/jpg';
 		
 		$this->load->library('qtip2');
 		$this->load->library('table');
 		$this->load->library('pagination');
 		$this->load->library('form_validation');
+		$this->load->library('upload');
+		$this->load->library('image_lib');
+		
+		$config['upload_path'] = './imagenes/tiendas_comida/';
+		$config['allowed_types'] = 'jpg|png';
+		$config['max_size'] = '1024';
+		
+		$this->upload->initialize($config);
+		
 		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip();
 		$data['output_menu'] = Modules::run('admin/c_menu_admin/index');
@@ -155,8 +168,9 @@ class C_tienda_com_admin extends MX_Controller {
 			$data['catalogo_default'] = $this->catalogoTienda();
 			$data['tienda_nueva'] = 0;
 			$this->template->build('v_tienda_com_admin',$data);
-		}else {
+		}else {			
 			$tc = new Tiendascomida();
+			$img = new Imagen();			
 			
 			$tc->id = ($this->input->post('id_tienda')) ? $this->input->post('id_tienda') : '';
 			$tc->nombre = $this->input->post('nombre_tienda');
@@ -170,6 +184,7 @@ class C_tienda_com_admin extends MX_Controller {
 			$tc->estacionamiento = ($this->input->post('estacionamiento')) ? 0 : 1;
 			$tc->minimotiempoentrega = $this->input->post('min_tiempo_ent');
 			$tc->minimotiempoespera = $this->input->post('min_tiempo_esp');
+			$tc->costoenvio = $this->input->post('costo_envio');
 			$tc->estatus = 1;			
 						
 			$c = new Ciudad();
@@ -185,13 +200,29 @@ class C_tienda_com_admin extends MX_Controller {
 			$z->where('estatus',1);
 			$z->get_by_id($this->input->post('zona'));
 			
-			$tc->save(array($e,$c,$z));
+			if ($this->upload->do_upload('img_tienda') == FALSE) {				
+				$img->rutaImagen = $this->img_defecto['ruta'];
+				$img->nombreImagen = $this->img_defecto['nombre'];
+				$img->tipoArchivo = $this->img_defecto['tipo_archivo'];
+				$tc->save(array($e,$c,$z));
+				$img->tiendascomida_id = $tc->id;							
+				$img->save();
+				$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+				$data['mensaje'] .= $this->upload->display_errors();
+			}else {
+				$arr_img = $this->upload->data();
+				$img->rutaImagen = $this->img_defecto['ruta'];
+				$img->nombreImagen = $arr_img['file_name'];
+				$img->tipoArchivo = $arr_img['file_type'];
+				$tc->save(array($e,$c,$z));
+				$img->tiendascomida_id = $tc->id;
+				$img->save();				
+				$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';					
+			}																		
 			
-			$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
-			$data['ciudades'] = $this->cargarCiudad();
-			//$data['zonas'] = $this->cargarZonaPorCiudad($this->input->post('ciudad'));
+			$data['ciudades'] = $this->cargarCiudad();			
 			$data['catalogo_default'] = $this->catalogoTienda();
-			$data['tienda_nueva'] = 1;
+			$data['tienda_nueva'] = 1;					
 			$this->template->build('v_tienda_com_admin',$data);
 		}
 	}
@@ -268,6 +299,7 @@ class C_tienda_com_admin extends MX_Controller {
 			$data['zona'] = form_dropdown('zona',$opciones_zona,$tc->zona->get()->id,'class="element select medium" id="zona"');
 			$data['min_tiempo_ent'] = $tc->minimotiempoentrega;
 			$data['min_tiempo_esp'] = $tc->minimotiempoespera;
+			$data['costoenvio'] = $tc->costoenvio;
 			echo json_encode($data);
 		}				
 	}

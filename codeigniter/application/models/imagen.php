@@ -15,9 +15,9 @@ class Imagen extends DataMapper {
             'other_field' => 'imagen'),
 	'tiendascomida' => array(
             'class' => 'tiendascomida',
-            'other_field' => 'imagen',
-			'join_other_as' => 'tiendascomida',
-			'join_self_as' => 'imagenes')
+            'other_field' => 'imagen',			
+			'join_other_as' => 'tiendascomida'
+			)
 	);
 	
 	function __construct($id = NULL) {
