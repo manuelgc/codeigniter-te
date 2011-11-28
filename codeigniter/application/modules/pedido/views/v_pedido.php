@@ -1,6 +1,22 @@
 <script type="text/javascript">
 <!--
+	function preCargador(objeto){
+		objeto.block({
+			message: 'Cargando ...'		
+		});
+		
+	}
+	
+	function postCargador(objeto) {
+		objeto.unblock();
+	}
 
+	function cargarFormularioDireccion(html,selector){
+		window.setTimeout(function(){
+			$(selector).html(html.formulario);
+		},1000);
+	}
+	
 	function actulizarCiudad(valor){
 		$.cookie('ciudad', valor,{path: '/'});
 	}
@@ -32,7 +48,8 @@
 				);
 			}else{
 				$("#cmbx_zona").empty().append('<option value="" >Seleccione</option>;').attr("disabled",true);
-			}	
+			}
+			$("#cmbx_zona").change();	
 		});
 
 		$("#cmbx_zona").change(function(event){
@@ -40,37 +57,93 @@
 			var id_zona = $(this).val(),
 			id_ciudad = $('#cmbx.ciudad').val(),
 			msj=$('#direcciones > div.message').attr('class');
+
+			preCargador($('div#det_direcciones'));
 			actulizarZona(id_zona);
-			console.log(msj);
 			if(id_ciudad != '' && id_zona != ''){
 			$.post("<?php echo base_url();?>index.php/pedido/c_pedido/actualizarDirecciones",
 					{'id_zona':id_zona},
 					function(data){
 						if(data.direccion){
 							$('#det_direcciones').html(data.html_dir);
-							$('#direcciones > div.message').empty();
+							$('#direcciones > div.message').empty().hide();
 						}else{
 							$('#det_direcciones').empty();
 							
 							if(typeof msj == 'undefined'){
 								$('#direcciones').append('<div class="message">'+data.error+'</div>');
 							}else{
-								$('#direcciones > div.message').text(data.error);
+								$('#direcciones > div.message').text(data.error).show();
 							}	
 						}
+						postCargador($('div#det_direcciones'));
 					},
 					'json'
 				);
+				
 			}else{
 				$('#det_direcciones').empty();
 				if(typeof msj == 'undefined'){
 					$('#direcciones').append('<div class="message">Debe selecionar la ciudad y zona donde se encuentra</div>');
 				}else{
-					$('#direcciones > div.message').text('Debe selecionar la ciudad y zona donde se encuentra');
+					$('#direcciones > div.message').text('Debe selecionar la ciudad y zona donde se encuentra').show();
 				}
+				postCargador($('div#det_direcciones'));
 			}
 
 		});
+
+		$('img#agregar-dir').live('click',function(e){
+			$.ajax({
+				url: '<?php echo base_url()?>index.php/usuario/c_editar_usuario/mostrarFormDireccion',
+				type:'POST',
+				dataType : 'json',
+				beforeSend: function(data){
+					preCargador($('#nueva-dir'));
+				},
+				success:function(data){
+					cargarFormularioDireccion(data, '#nueva-dir');
+					$('img#agregar-dir').hide();
+				}
+			});
+		});		
+		
+		$('#guardar-dir').live('click',function(e){	
+			e.preventDefault();		
+			var formulario_action = $("#form_agregar_dir").attr("action");
+			var datos_form = $('#form_agregar_dir').serialize();
+			
+			$.ajax({
+				url: formulario_action,
+				type:'POST',
+				dataType:'json',				
+				data:datos_form,
+				beforeSend: function(){
+					preCargador('#nueva-dir');
+				},
+				success:function(data){
+					if(data.resultado == false){		
+						window.setTimeout(function(){
+							$('#nueva-dir').html('Lo sentimos, no hemos podido agregar la direccion especificada, por favor verifica los datos e intenta de nuevo');
+						},1000);		
+					}else{		
+						window.setTimeout(function(){
+							$('ul.direcciones-content').append(data.resultado);
+							$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
+							$('img#agregar-dir').show();
+							$('#nueva-dir').unblock();
+						},1000);								
+					}					
+				}
+			});						
+		});
+		
+		$('#cancelar').live('click',function(e){
+			e.preventDefault();			
+			$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
+			$('img#agregar-dir').show();
+		});
+		
 	});
 //-->
 </script>
@@ -90,7 +163,7 @@
 		<?php echo img(array(
 							'src' =>base_url().'application/img/icon/Add-icon.png',
 							'id'=>'agregar-dir',
-							'alt'=>'Agregar Direccion'));?>
+							'alt'=>'Agregar Direccion'));?>					
 		<div id="det_direcciones" class="direcciones">
 			<?php if(isset($dir_usuario)):?>
 			

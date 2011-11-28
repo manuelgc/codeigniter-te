@@ -15,6 +15,7 @@
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.blockUI.js'));
 		
 //		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		
@@ -72,25 +73,25 @@
 	}
 	
 	function actualizarDirecciones(){
-		$data = $this->cargarDireciones();	
-		 if(array_key_exists('dir_usuario', $data) && !empty($data['dir_usuario'])){
+		$data = $this->cargarDireciones();
+		if(array_key_exists('dir_usuario', $data) && !empty($data['dir_usuario'])){
 			$dataAjax['direccion']=true;
-		 	$dataAjax['html_dir']= '';
-				foreach ($data['dir_usuario'] as $direcciones){
-					$dataAjax['html_dir'].= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
-                    $dataAjax['html_dir'].= '<table><tbody><tr><td style="border: 0px">';
-					$dataAjax['html_dir'].= form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion"') .'</td>';
-					$dataAjax['html_dir'].=	'<td style="border: 0px">
+			$dataAjax['html_dir']= '';
+			foreach ($data['dir_usuario'] as $direcciones){
+				$dataAjax['html_dir'].= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
+				$dataAjax['html_dir'].= '<table><tbody><tr><td style="border: 0px">';
+				$dataAjax['html_dir'].= form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion"') .'</td>';
+				$dataAjax['html_dir'].=	'<td style="border: 0px">
 												Ciudad: '.$direcciones['ciudad'].',
 												Zona: '.$direcciones['zona'].', Calle/Carrera: '.$direcciones['calle_carrera'].', 
 												Casa/Urb: '.$direcciones['casa_urb'].' , Numero
 												Casa/Apto: '. $direcciones['numeroCasaApto'].', Lugar de
 												Referencia: '.$direcciones['lugarreferencia'];
-					$dataAjax['html_dir'].=	'</td></tr></tbody></table></fielset>';	
-				}
+				$dataAjax['html_dir'].=	'</td></tr></tbody></table></fieldset>';
+			}
 		}else{
 			$dataAjax['direccion']=false;
-			$dataAjax['error']=$data['error_dir'];		
+			$dataAjax['error']=$data['error_dir'];
 		}
 		echo json_encode($dataAjax);
 	}
