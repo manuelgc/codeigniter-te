@@ -76,6 +76,11 @@
 								$('#direcciones > div.message').text(data.error).show();
 							}	
 						}
+						if(data.agr_visible){
+							$('img#agregar-dir').show();
+						}else{
+							$('img#agregar-dir').hide();
+						}	
 						postCargador($('div#det_direcciones'));
 					},
 					'json'
@@ -83,6 +88,7 @@
 				
 			}else{
 				$('#det_direcciones').empty();
+				$('img#agregar-dir').hide();
 				if(typeof msj == 'undefined'){
 					$('#direcciones').append('<div class="message">Debe selecionar la ciudad y zona donde se encuentra</div>');
 				}else{
@@ -94,8 +100,10 @@
 		});
 
 		$('img#agregar-dir').live('click',function(e){
+			$('#cmbx_ciudad').attr('disabled',true);
+			$('#cmbx_zona').attr('disabled',true);
 			$.ajax({
-				url: '<?php echo base_url()?>index.php/usuario/c_editar_usuario/mostrarFormDireccion',
+				url: '<?php echo base_url()?>index.php/pedido/c_pedido/mostrarFormDireccion',
 				type:'POST',
 				dataType : 'json',
 				beforeSend: function(data){
@@ -112,26 +120,32 @@
 			e.preventDefault();		
 			var formulario_action = $("#form_agregar_dir").attr("action");
 			var datos_form = $('#form_agregar_dir').serialize();
-			
+			var id_ciudad = $('#cmbx_ciudad').val();
+			var id_zona = $('#cmbx_zona').val();
+			console.log(datos_form);
 			$.ajax({
 				url: formulario_action,
 				type:'POST',
 				dataType:'json',				
-				data:datos_form,
+				data: datos_form+'&id_ciudad='+id_ciudad+'&id_zona='+id_zona,
 				beforeSend: function(){
-					preCargador('#nueva-dir');
+					preCargador($('#nueva-dir'));
 				},
 				success:function(data){
 					if(data.resultado == false){		
 						window.setTimeout(function(){
 							$('#nueva-dir').html('Lo sentimos, no hemos podido agregar la direccion especificada, por favor verifica los datos e intenta de nuevo');
+							$('#cmbx_ciudad').attr('disabled',false);
+							$('#cmbx_zona').attr('disabled',false);
 						},1000);		
 					}else{		
 						window.setTimeout(function(){
-							$('ul.direcciones-content').append(data.resultado);
+							$('#det_direcciones').append(data.resultado);
 							$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
 							$('img#agregar-dir').show();
 							$('#nueva-dir').unblock();
+							$('#cmbx_ciudad').attr('disabled',false);
+							$('#cmbx_zona').attr('disabled',false);
 						},1000);								
 					}					
 				}
@@ -142,6 +156,8 @@
 			e.preventDefault();			
 			$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
 			$('img#agregar-dir').show();
+			$('#cmbx_ciudad').attr('disabled',false);
+			$('#cmbx_zona').attr('disabled',false);
 		});
 		
 	});
@@ -159,11 +175,7 @@
 	
 	<div id="direcciones">
 		
-		<p><strong>Direcci&oacute;n</strong></p>
-		<?php echo img(array(
-							'src' =>base_url().'application/img/icon/Add-icon.png',
-							'id'=>'agregar-dir',
-							'alt'=>'Agregar Direccion'));?>					
+		<p><strong>Direcci&oacute;n</strong></p>				
 		<div id="det_direcciones" class="direcciones">
 			<?php if(isset($dir_usuario)):?>
 			
@@ -193,9 +205,16 @@
 <!--				</ul>	-->
 		<?php endif;?>
 		</div>
+		
+		<?php $visible=($agr_visible)?'display:inline':'display:none';?>
+		<?php echo img(array(
+					'src' =>base_url().'application/img/icon/Add-icon.png',
+					'id'=>'agregar-dir',
+					'alt'=>'Agregar Direccion',
+					'style'=>$visible));?>
 		<?php if(isset($error_dir)):?>
 			<div class="message"><?php echo $error_dir;?></div>
-		<?php endif;?>
+		<?php endif;?>			
 		<div id="nueva-dir"></div>
 	</div>
 	

@@ -8,6 +8,8 @@
 		$this->load->library('qtip2');
 		$this->load->module('busqueda/c_busqueda');
 		$this->load->module('carrito/c_carrito');
+		$this->load->library('form_validation');	
+		$this->form_validation->CI =& $this;	
 		$this->id_usuario = $this->verificarExisteSesion();
 	}
 
@@ -17,7 +19,7 @@
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.blockUI.js'));
 		
-//		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
+		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		
 //		if($this->input->post('id_tienda')){
 //			$data['output_block'] = $this->c_carrito->index($this->input->post('id_tienda'));
@@ -26,7 +28,7 @@
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
-//		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
+		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
 //		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
@@ -51,13 +53,16 @@
 	function cargarDireciones() {
 		if ($this->input->cookie('ciudad')===false || $this->input->cookie('zona')===false) {
 			$data["error_dir"]='Debe selecionar la ciudad y zona donde se encuentra';
+			$data['agr_visible']=false;
 		}else if($this->validarZona()){
 			$data['dir_usuario']= $this->getDireccionesUsuario($this->input->cookie('ciudad'),$this->input->cookie('zona'));
+			$data['agr_visible']=true;
 			if(empty($data['dir_usuario'])){
 				$data['error_dir']='No posee direcciones registradas en la Zona Seleccionada, Por favor seleccione otra zona o agregue una direcci&oacute;n';
 			}
 		}else {
 			$data['error_dir']='No se pueden realizar envios en la Ciudad o Zona Seleccionada, Por favor selccione otra';
+			$data['agr_visible']=false;
 		}
 		return $data;
 	}
@@ -77,6 +82,7 @@
 		if(array_key_exists('dir_usuario', $data) && !empty($data['dir_usuario'])){
 			$dataAjax['direccion']=true;
 			$dataAjax['html_dir']= '';
+			$dataAjax['agr_visible']=$data['agr_visible'];
 			foreach ($data['dir_usuario'] as $direcciones){
 				$dataAjax['html_dir'].= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
 				$dataAjax['html_dir'].= '<table><tbody><tr><td style="border: 0px">';
@@ -92,8 +98,65 @@
 		}else{
 			$dataAjax['direccion']=false;
 			$dataAjax['error']=$data['error_dir'];
+			$dataAjax['agr_visible']=$data['agr_visible'];
 		}
 		echo json_encode($dataAjax);
+	}
+	
+	function agregarValidaciones($datos) {
+		$cant_direcciones = count($datos['direcciones']);
+		for ($i = 1; $i <= $cant_direcciones; $i++) {
+			$this->config[] = array('field'=>'ciudad_'.$i,'label'=>'lang:regcliente_ciudad','rules'=>'required');
+			$this->config[] = array('field'=>'zona_'.$i,'label'=>'lang:regcliente_zona','rules'=>'required');
+			$this->config[] = array('field'=>'calle_carrera_'.$i,'label'=>'lang:regcliente_calle_carr','rules'=>'trim|required|max_length[255]|xss_clean');
+			$this->config[]	= array('field'=>'urb_edif_'.$i,'label'=>'lang:regcliente_urb_edif','rules'=>'trim|required|max_length[255]|xss_clean');
+			$this->config[]	= array('field'=>'nroCasa_apt_'.$i,'label'=>'lang:regcliente_numcasa_apto','rules'=>'trim|required|max_length[255]|xss_clean');
+			$this->config[]	= array('field'=>'lugar_referencia_'.$i,'label'=>'lang:regcliente_lugar_referencia','rules'=>'trim|required|max_length[255]|xss_clean');
+		}
+	}
+	
+	function mostrarFormDireccion() {
+		$data['formulario'] = $this->load->view('v_form_direccion','',true);
+		echo json_encode($data);
+	}
+
+	function guardarDireccion() {
+		$id_usuario = $this->id_usuario;//$this->id_usuario
+		if ($this->input->is_ajax_request()) {
+			$data = array();
+			$d = new Direccionesenvio();
+			$ciu = new Ciudad();
+			$zona = new Zona();
+			$u = new Usuario();
+				
+			$d->calle_carrera = $this->input->post('calle_carrera');
+			$d->casa_urb = $this->input->post('urb_edif');
+			$d->numeroCasaApto = $this->input->post('nroCasa_apt');
+			$d->lugarreferencia = $this->input->post('lugar_referencia');
+			$d->estatus = (int)1;
+
+			$d->estado_id = (int)7; //para cuando se implemente en otros estados
+			$ciu->get_by_id($this->input->post('id_ciudad'));
+			$zona->get_by_id($this->input->post('id_zona'));
+			$u->get_by_id($id_usuario);
+				
+			if ($d->save(array($ciu,$zona,$u)) == FALSE) {
+				$data['resultado'] = FALSE;
+			}else {
+				$data['resultado']= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
+				$data['resultado'].= '<table><tbody><tr><td style="border: 0px">';
+				$data['resultado'].= form_radio('radio_direc', $d->id, false,'id="'.$d->id.'-direccion"') .'</td>';
+				$data['resultado'].=	'<td style="border: 0px">
+												Ciudad: '.$d->ciudad->get()->nombreCiudad.',
+												Zona: '.$d->zona->get()->nombreZona.', Calle/Carrera: '.$d->calle_carrera.', 
+												Casa/Urb: '.$d->casa_urb.' , Numero Casa/Apto: '. $d->numeroCasaApto.', 
+												Lugar de Referencia: '.$d->lugarreferencia;
+				$data['resultado'].=	'</td></tr></tbody></table></fieldset>';
+				
+			}
+				
+			echo json_encode($data);
+		}
 	}
 	
 	function validarZona(){
@@ -193,6 +256,25 @@
 			return $this->session->userdata('id');
 		}		
 	}
-		
+
+	function getDataPartial($partial = '') {
+		$output = '';
+		switch ($partial) {
+			case 'breadcrumb':
+				$output = $this->c_busqueda->index();
+				break;
+			case 'header':
+				$output = $this->load->helper('language');
+				$this->load->helper('form');
+				$this->load->helper('captcha');
+				$this->load->library('qtip2');
+				$this->load->library('form_validation');;
+				break;
+			case 'block':
+				$output = Modules::run('autenticacion/c_login/cargarView');
+		}
+
+		return $output;
+	}
 }
-?>		
+?>
