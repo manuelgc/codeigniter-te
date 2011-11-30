@@ -112,6 +112,7 @@
 				success:function(data){
 					cargarFormularioDireccion(data, '#nueva-dir');
 					$('img#agregar-dir').hide();
+					$('#direcciones > div.message').hide();
 				}
 			});
 		});		
@@ -132,13 +133,17 @@
 					preCargador($('#nueva-dir'));
 				},
 				success:function(data){
-					if(data.resultado == false){		
+					if(data.validacion){
+						console.log("entro if validacion");
+					if(data.resultado == false){
+						console.log("entro if resultado");		
 						window.setTimeout(function(){
 							$('#nueva-dir').html('Lo sentimos, no hemos podido agregar la direccion especificada, por favor verifica los datos e intenta de nuevo');
 							$('#cmbx_ciudad').attr('disabled',false);
 							$('#cmbx_zona').attr('disabled',false);
 						},1000);		
 					}else{		
+						console.log("entro else resultado");
 						window.setTimeout(function(){
 							$('#det_direcciones').append(data.resultado);
 							$('#form_agregar_dir').fadeOut('slow',function(){$(this).empty();});
@@ -147,7 +152,11 @@
 							$('#cmbx_ciudad').attr('disabled',false);
 							$('#cmbx_zona').attr('disabled',false);
 						},1000);								
-					}					
+					}
+					}else{
+						console.log("entro else validacion");
+						$('#nueva-dir').html(data.formulario);;
+					}						
 				}
 			});						
 		});
@@ -158,6 +167,9 @@
 			$('img#agregar-dir').show();
 			$('#cmbx_ciudad').attr('disabled',false);
 			$('#cmbx_zona').attr('disabled',false);
+			if($('#direcciones > div.message').text()!=''){
+				$('#direcciones > div.message').show();
+			}
 		});
 		
 	});

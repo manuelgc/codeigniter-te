@@ -176,10 +176,11 @@
 								
 		$("#cmbx_ciudad").live('change',function(event){	
 			event.preventDefault();
-			var id_ciudad = $(this).val();
+			var id_ciudad = $(this).val(),
+			id_tienda=$('#id_tienda').val();
 			if(id_ciudad != ''){
 			$.post("<?php echo base_url();?>index.php/tienda/c_datos_tienda/cargarZonaAjax",
-					{'id_ciudad':id_ciudad},
+					{'id_ciudad':id_ciudad,'id_tienda':id_tienda},
 					function(data){
 						if(data.zona!=false){
 							$("#cmbx_zona").html(data.html_zona).attr("disabled",data.disable);
