@@ -1,5 +1,24 @@
 <?php class c_pedido extends MX_Controller {
-		
+	private $config = array(
+    		'direccion' => array(
+				array('field'=>'calle_carrera',
+				'label'=>'lang:regcliente_calle_carr',
+				'rules'=>'trim|required|max_length[255]|xss_clean'
+				),
+				array('field'=>'urb_edif',
+				'label'=>'lang:regcliente_urb_edif',
+				'rules'=>'trim|required|max_length[255]|xss_clean'
+				),
+				array('field'=>'nroCasa_apt',
+				'label'=>'lang:regcliente_numcasa_apto',
+				'rules'=>'trim|required|max_length[255]|xss_clean'
+				),
+				array('field'=>'lugar_referencia',
+				'label'=>'lang:regcliente_lugar_referencia',
+				'rules'=>'trim|required|max_length[255]|xss_clean'
+				)
+            ),
+    		'pedido' => array());	
 	function __construct(){
 		parent::__construct();
 		$this->load->library('cart'); 
@@ -21,19 +40,21 @@
 		
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		
-//		if($this->input->post('id_tienda')){
-//			$data['output_block'] = $this->c_carrito->index($this->input->post('id_tienda'));
-//		}
+		if($this->input->cookie('tienda')){
+			$data['output_block'] = $this->c_carrito->index($this->input->cookie('tienda'));
+		}
 		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
 		$this->template->set_partial('breadcrumb','web/layouts/two_columns/partials/breadcrumb',$data);
-//		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
+		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
 //		$this->qtip2->addCssJs();
 		$this->qtip2->putCustomTip();
+		
+		$this->form_validation->set_rules($this->config);
 		
 		if($this->input->cookie('tienda')!==false){
 			$data['ciudad']=$this->cargarCiudad($this->input->cookie('tienda'));
@@ -103,18 +124,6 @@
 		echo json_encode($dataAjax);
 	}
 	
-	function agregarValidaciones($datos) {
-		$cant_direcciones = count($datos['direcciones']);
-		for ($i = 1; $i <= $cant_direcciones; $i++) {
-			$this->config[] = array('field'=>'ciudad_'.$i,'label'=>'lang:regcliente_ciudad','rules'=>'required');
-			$this->config[] = array('field'=>'zona_'.$i,'label'=>'lang:regcliente_zona','rules'=>'required');
-			$this->config[] = array('field'=>'calle_carrera_'.$i,'label'=>'lang:regcliente_calle_carr','rules'=>'trim|required|max_length[255]|xss_clean');
-			$this->config[]	= array('field'=>'urb_edif_'.$i,'label'=>'lang:regcliente_urb_edif','rules'=>'trim|required|max_length[255]|xss_clean');
-			$this->config[]	= array('field'=>'nroCasa_apt_'.$i,'label'=>'lang:regcliente_numcasa_apto','rules'=>'trim|required|max_length[255]|xss_clean');
-			$this->config[]	= array('field'=>'lugar_referencia_'.$i,'label'=>'lang:regcliente_lugar_referencia','rules'=>'trim|required|max_length[255]|xss_clean');
-		}
-	}
-	
 	function mostrarFormDireccion() {
 		$data['formulario'] = $this->load->view('v_form_direccion','',true);
 		echo json_encode($data);
@@ -122,7 +131,19 @@
 
 	function guardarDireccion() {
 		$id_usuario = $this->id_usuario;//$this->id_usuario
-		if ($this->input->is_ajax_request()) {
+		
+		$this->form_validation->set_rules($this->config['direccion']);
+		if ($this->form_validation->run() == FALSE){
+			$data['calle_carrera']= $this->input->post('calle_carrera');
+			$data['urb_edif']= $this->input->post('urb_edif');
+			$data['nroCasa_apt'] = $this->input->post('nroCasa_apt');
+			$data['lugar_referencia'] = $this->input->post('lugar_referencia');
+			$dataAjax['formulario'] = $this->load->view('v_form_direccion',$data,true);
+			$dataAjax['validacion'] = false; 
+			echo json_encode($dataAjax);
+			
+		}else if ($this->input->is_ajax_request()) {
+			
 			$data = array();
 			$d = new Direccionesenvio();
 			$ciu = new Ciudad();
@@ -139,7 +160,9 @@
 			$ciu->get_by_id($this->input->post('id_ciudad'));
 			$zona->get_by_id($this->input->post('id_zona'));
 			$u->get_by_id($id_usuario);
-				
+
+			$data['validacion'] = true;
+			
 			if ($d->save(array($ciu,$zona,$u)) == FALSE) {
 				$data['resultado'] = FALSE;
 			}else {
