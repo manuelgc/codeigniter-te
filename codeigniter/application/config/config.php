@@ -14,8 +14,8 @@
 | path to your installation.
 |
 */
-//$config['base_url']	= 'http://todoexpress.dev/public_codeigniter/codeigniter';
-$config['base_url']	= 'http://todoexpress.dev';
+$config['base_url']	= 'http://todoexpress.dev/public_codeigniter/codeigniter';
+//$config['base_url']	= 'http://todoexpress.dev';
 
 /*
 |--------------------------------------------------------------------------
