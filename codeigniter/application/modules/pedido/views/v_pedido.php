@@ -177,20 +177,27 @@
 </script>
 
 <?php form_open('pedido/c_pedido','id="form_pedido"',array('pedido' => '1'))?>		
+	
+	<?php if($envio):?>
 	<div>
-		<h2>Direcci&oacute;n de Entrega</h2>		
+		<h2>Direcci&oacute;n de Entrega</h2>
+		<div name="dir">		
 		<p><?php echo form_label('<b>Ciudad</b>', 'cmbx_ciudad');?></p>
 		<?php echo $ciudad;?>
+		<small class="guidelines" id="guide_1">Seleccione la ciudad donde se encuentra</small>
+		</div>
+		<div name="dir">
 		<p><?php echo form_label('<b>Zona</b>', 'cmbx_zona');?></p>
 		<?php echo $zona;?>
+		<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>
+		</div>
 	</div>
 	
 	<div id="direcciones">
 		
-		<p><strong>Direcci&oacute;n</strong></p>				
+		<p><strong>Direcci&oacute;n</strong></p>						
 		<div id="det_direcciones" class="direcciones">
 			<?php if(isset($dir_usuario)):?>
-			
 <!--				<ul class="direcciones-content">-->
 					<?php foreach ($dir_usuario as $direcciones):?>
 <!--						<li>-->
@@ -211,32 +218,42 @@
 										</tr>
 									</tbody>
 								</table>
+							<small class="guidelines" >Seleccione una direcci&oacute;n de entrega</small>						
 							</fieldset>
+							
 <!--						</li>-->
 					<?php endforeach;?>
 <!--				</ul>	-->
 		<?php endif;?>
+		
 		</div>
 		
 		<?php $visible=($agr_visible)?'display:inline':'display:none';?>
-		<?php echo img(array(
-					'src' =>base_url().'application/img/icon/Add-icon.png',
-					'id'=>'agregar-dir',
-					'alt'=>'Agregar Direccion',
-					'style'=>$visible));?>
+		<div>
+			<?php echo img(array(
+						'src' =>base_url().'application/img/icon/Add-icon.png',
+						'id'=>'agregar-dir',
+						'alt'=>'Agregar Direccion',
+						'style'=>$visible));?>
+			<small class="guidelines" id="guide_3">Agregar direcci&oacute;n</small>
+		</div>			
 		<?php if(isset($error_dir)):?>
 			<div class="message"><?php echo $error_dir;?></div>
 		<?php endif;?>			
 		<div id="nueva-dir"></div>
 	</div>
-	
-	<div>
+	<?php endif;?>
+	<div name="forma_pago">
 		<h2>Forma de Pago</h2>
-		<?php echo $radio_pago;?>
+		<div name="radio_pago">
+			<?php echo $radio_pago;?>
+		</div>
+		<small class="guidelines" id="guide_4">Selecione una forma de pago</small>	
 	</div>
 	<div>
-		<h2>Observaciones: </h2>
+		<h2>Observaciones(Opcional): </h2>
 		<?php echo form_textarea(array('name' =>'observacion','id' => 'observacion','rows'	=> '4','cols'=> '40'));?>
+		<small class="guidelines" id="guide_5">Puede agregar algunas indicaciones adicionales para la entrega del pedido</small>	
 	</div>
 	<div>
 		<?php echo form_submit('btn_finalizar_pedido', 'Finalizar Pedido', 'id="btn_finalizar_pedido" class="button_text art-button" ')?>

@@ -19,6 +19,7 @@
 				)
             ),
     		'pedido' => array());	
+            
 	function __construct(){
 		parent::__construct();
 		$this->load->library('cart'); 
@@ -33,11 +34,14 @@
 	}
 
 	function index() {
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/view.css'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/view.js'));
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.cookie.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.blockUI.js'));
-		
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery.spinbox.css'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.spinbox.js'));	
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		
 		if($this->input->cookie('tienda')){
@@ -51,22 +55,32 @@
 		$this->template->set_partial('block','web/layouts/two_columns/partials/block',$data);
 		$this->template->set_partial('footer','web/layouts/two_columns/partials/footer');
 		$this->template->set_layout('two_columns/theme');
-//		$this->qtip2->addCssJs();
-		$this->qtip2->putCustomTip();
-		
-		$this->form_validation->set_rules($this->config);
-		
-		if($this->input->cookie('tienda')!==false){
-			$data['ciudad']=$this->cargarCiudad($this->input->cookie('tienda'));
-			if($this->input->cookie('ciudad')!==false){
-				$data['zona']= $this->cargarZona($this->input->cookie('tienda'),$this->input->cookie('ciudad'));
-			}else{
-				$data['zona']= $this->cargarZona($this->input->cookie('tienda'), '');
-			}
-			$data['radio_pago']=$this->cargarRadioPago();
-			
-			$data += $this->cargarDireciones();
+
+//		$this->qtip2->addCssJs();		
+//		$this->qtip2->putCustomTip('select','img','textarea','p','radio');
+		$this->qtip2->putCustomTip('div','textarea');
+		$this->qtip2->putCustomTip('div[name="dir"]','select');
+		$this->qtip2->putCustomTip('div','img#agregar-dir');
+		$this->qtip2->putCustomTip('fieldset','table');
+		$this->qtip2->putCustomTip('div[name="forma_pago"]','div[name="radio_pago"]');					
+		if ( !$this->cart->contents() ) {
+			redirect('tienda/c_datos_tienda');
+		}elseif($this->input->cookie('tienda')!==false){
+			if($this->input->cookie('tipo_orden')!==false && $this->input->cookie('tipo_orden')==1){
+				$data['envio']=true;
+				$data['ciudad']=$this->cargarCiudad($this->input->cookie('tienda'));
+				if($this->input->cookie('ciudad')!==false){
+					$data['zona']= $this->cargarZona($this->input->cookie('tienda'),$this->input->cookie('ciudad'));
+				}else{
+					$data['zona']= $this->cargarZona($this->input->cookie('tienda'), '');
+				}
 				
+				$data += $this->cargarDireciones();
+				
+			}else{
+				$data['envio']=false;
+			}	
+			$data['radio_pago']=$this->cargarRadioPago();
 			$this->template->build('pedido/v_pedido',$data);
 		}
 	}
