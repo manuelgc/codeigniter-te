@@ -171,12 +171,16 @@
 				$('#direcciones > div.message').show();
 			}
 		});
+
+		$('#carrito').change(function(event){
+			console.log('change');
+			});
 		
 	});
 //-->
 </script>
 
-<?php form_open('pedido/c_pedido','id="form_pedido"',array('pedido' => '1'))?>		
+<?php echo form_open('pedido/c_pedido','id="form_pedido"',array('pedido' => '1'));?>		
 	
 	<?php if($envio):?>
 	<div>
@@ -260,4 +264,4 @@
 		<?php echo form_button('btn_cancel_pedido', 'Cancelar Pedido', 'id="btn_cancel_pedido" class="button_text art-button"'); ?>
 	</div>
 	
-<?php form_close();?>		
+<?php echo form_close();?>		
