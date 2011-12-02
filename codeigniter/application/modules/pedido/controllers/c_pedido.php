@@ -45,7 +45,7 @@
 		$data['opcion_combos'] = $this->getDataPartial('breadcrumb');
 		
 		if($this->input->cookie('tienda')){
-			$data['output_block'] = $this->c_carrito->index($this->input->cookie('tienda'));
+			$data['output_block'] = $this->c_carrito->index($this->input->cookie('tienda'),true);
 		}
 		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');

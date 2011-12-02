@@ -122,13 +122,16 @@
 		$("#form_carrito input.cantidad").click(
 				function(event){	
 					event.preventDefault();
+					
 					var rowid = $(this).attr("name"),
 					cantidad=$(this).val(),
-					id_tienda = $("#id_tienda").val();
+					id_tienda = $("#id_tienda").val()
+					pedido=$('#pedido').val();;
+					
 					if(cantidad != '' && cantidad!=this.defaultValue){
 					preCargador($('#carrito'));
 					$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
-							{'cantidad':cantidad,'rowid':rowid,'id_tienda':id_tienda},
+							{'cantidad':cantidad,'rowid':rowid,'id_tienda':id_tienda,'pedido':pedido},
 							function(data){
 								postCargador($('#carrito'));
 								$("#carrito").html(data.html);	
@@ -151,11 +154,12 @@
 				function(event){	
 					event.preventDefault();
 					var rowid = $(this).attr("name"),
-					id_tienda = $("#id_tienda").val();
+					id_tienda = $("#id_tienda").val(),
+					pedido=$('#pedido').val();;
 
 					preCargador($('#carrito'));
 					$.post("<?php echo base_url();?>index.php/carrito/c_carrito/actualizarPlato",
-							{'cantidad':0,'rowid':rowid,'id_tienda':id_tienda},
+							{'cantidad':0,'rowid':rowid,'id_tienda':id_tienda,'pedido':pedido},
 							function(data){
 								postCargador($('#carrito'));
 								$("#carrito").html(data.html);	
@@ -170,9 +174,12 @@
 	//		event.preventDefault();
 			actulizarTipoOrden($(this).val());
 			preCargador($('#carrito'));
-			var id_tienda = $("#id_tienda").val();
+			
+			var id_tienda = $("#id_tienda").val(),
+			pedido=$('#pedido').val();
+			
 			$.post("<?php echo base_url();?>index.php/carrito/c_carrito",
-					  { 'id_tienda':id_tienda},
+					  { 'id_tienda':id_tienda,'pedido':pedido},
 	 			function(data){
 				  postCargador($('#carrito'));
 				  $("#carrito").html(data.html);	
@@ -255,7 +262,9 @@
 							<span><?php echo $items['name']; ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['price']); ?></span>
 							<span style="text-align:right">Bs.<?php echo $this->cart->format_number($items['subtotal']); ?></span>
-							<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>
+							<?php if(!isset($pedido)):?>
+								<?php echo anchor('','Editar',array('title' => 'Editar Plato','class' => 'a-editar', 'id' =>$i ,'name' => $items['id']));?>
+							<?php endif;?>
 						</div>
 						
 						<div class="eliminar-plato">
@@ -301,8 +310,12 @@
 			</div>
 		<?php endif;?>
 		<div>
-			<?php echo form_submit('btn_comfirmar_pedido', 'Confirmar Pedido', 'id="btn_confir_pedido" class="button_text art-button" '.$boton_disb.'"')?>
-			<?php echo form_button('btn_cancel_pedido', 'Cancelar Pedido', 'id="btn_cancel_pedido" class="button_text art-button"'); ?>
+			<?php if(!isset($pedido)):?>
+				<?php echo form_submit('btn_comfirmar_pedido', 'Confirmar Pedido', 'id="btn_confir_pedido" class="button_text art-button" '.$boton_disb.'"')?>
+				<?php echo form_button('btn_cancel_pedido', 'Cancelar Pedido', 'id="btn_cancel_pedido" class="button_text art-button"'); ?>
+			<?php else: ?>
+				<?php echo anchor('tienda/c_datos_tienda','Continuar comprando',array('title' => 'Continuar comprando','id' =>'cont_compra' ,'name' =>'cont_compra'));?>
+			<?php endif;?>
 		</div>
 		<div><p class="error" id="mensaje_carrito"><?php echo $mensaje_error;?></p></div>
 		<?php form_close()?>  

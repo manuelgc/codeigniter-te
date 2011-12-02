@@ -9,7 +9,7 @@
 			
 		}
 		
-		function index($id_tienda = '') {
+		function index($id_tienda = '',$pedido=false) {
 	
 			if($this->input->is_ajax_request()){
 				
@@ -17,15 +17,23 @@
 				echo json_encode($data);
 				
 			}elseif($id_tienda!='') {
-				
-				return $this->actualizarCarrito($id_tienda);
-				
+				if($pedido){
+					return $this->actualizarCarrito($id_tienda,true);
+				}else{
+					return $this->actualizarCarrito($id_tienda);
+				}
 			}
 		}
 
-		function actualizarCarrito($id_tienda){
+		function actualizarCarrito($id_tienda,$pedido=false){
 			$carrito = $this->cart->contents();
-				
+			
+			if(empty($id_tienda) && $this->input->cookie('tienda')!=false){
+					$id_tienda=$this->input->cookie('tienda');
+				}
+			if($pedido || $this->input->post('pedido')!=false){
+				$data['pedido']=true;
+			}		
 			if($carrito!=false){
 				
 				$cont_principal = 0;
@@ -33,6 +41,8 @@
 				$total_iva = 0;
 				$tienda = new Tiendascomida();
 				$tienda->where('estatus',1)->get_by_id($id_tienda);
+				
+				
 				
 				if($tienda->exists()){
 
