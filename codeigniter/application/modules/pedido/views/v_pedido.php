@@ -189,17 +189,19 @@
 		<p><?php echo form_label('<b>Ciudad</b>', 'cmbx_ciudad');?></p>
 		<?php echo $ciudad;?>
 		<small class="guidelines" id="guide_1">Seleccione la ciudad donde se encuentra</small>
+		<?php echo form_error('cmbx_ciudad','<p class="error">','</p>');?>
 		</div>
 		<div name="dir">
 		<p><?php echo form_label('<b>Zona</b>', 'cmbx_zona');?></p>
 		<?php echo $zona;?>
 		<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>
+		<?php echo form_error('cmbx_zona','<p class="error">','</p>');?>
 		</div>
 	</div>
 	
 	<div id="direcciones">
 		
-		<p><strong>Direcci&oacute;n</strong></p>						
+		<p><strong>Direcci&oacute;n</strong></p>					
 		<div id="det_direcciones" class="direcciones">
 			<?php if(isset($dir_usuario)):?>
 <!--				<ul class="direcciones-content">-->
@@ -210,7 +212,7 @@
 									<tbody>
 										<tr>					
 											<td style="border: 0px">
-												<?php echo form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion"');?>
+												<?php echo form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion" '.set_radio('radio_direc', $direcciones['id']));?>
 											</td>
 											<td style="border: 0px">
 												Ciudad: <?php echo $direcciones['ciudad'];?>,
@@ -229,9 +231,8 @@
 					<?php endforeach;?>
 <!--				</ul>	-->
 		<?php endif;?>
-		
+		<?php echo form_error('radio_direc','<p class="error">','</p>');?>		
 		</div>
-		
 		<?php $visible=($agr_visible)?'display:inline':'display:none';?>
 		<div>
 			<?php echo img(array(
@@ -252,7 +253,8 @@
 		<div name="radio_pago">
 			<?php echo $radio_pago;?>
 		</div>
-		<small class="guidelines" id="guide_4">Selecione una forma de pago</small>	
+		<small class="guidelines" id="guide_4">Selecione una forma de pago</small>
+		<?php echo form_error('radio_tipo_pago','<p class="error">','</p>');?>		
 	</div>
 	<div>
 		<h2>Observaciones(Opcional): </h2>

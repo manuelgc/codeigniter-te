@@ -18,7 +18,29 @@
 				'rules'=>'trim|required|max_length[255]|xss_clean'
 				)
             ),
-    		'pedido' => array());	
+    		'pedDom' => array(
+            	array('field'=>'ciudad',
+            	'label'=>'Ciudad',
+            	'rules'=>'required'
+            	),
+				array('field'=>'zona',
+				'label'=>'Zona',
+				'rules'=>'required'
+				),
+				array('field'=>'radio_direc',
+            	'label'=>'Direcci&oacute;n',
+            	'rules'=>'required'
+				),
+				array('field'=>'radio_tipo_pago',
+				'label'=>'Forma de Pago',
+				'rules'=>'required')
+            	),
+            'pedRet' => array(
+				array('field'=>'radio_tipo_pago',
+				'label'=>'Forma de Pago',
+				'rules'=>'required')
+            )	
+            );	
             
 	function __construct(){
 		parent::__construct();
@@ -62,11 +84,15 @@
 		$this->qtip2->putCustomTip('div[name="dir"]','select');
 		$this->qtip2->putCustomTip('div','img#agregar-dir');
 		$this->qtip2->putCustomTip('fieldset','table');
-		$this->qtip2->putCustomTip('div[name="forma_pago"]','div[name="radio_pago"]');					
+		$this->qtip2->putCustomTip('div[name="forma_pago"]','div[name="radio_pago"]');
+
+		
+		
 		if ( !$this->cart->contents() ) {
 			redirect('tienda/c_datos_tienda');
 		}elseif($this->input->cookie('tienda')!==false){
 			if($this->input->cookie('tipo_orden')!==false && $this->input->cookie('tipo_orden')==1){
+				$this->form_validation->set_rules($this->config['pedDom']);
 				$data['envio']=true;
 				$data['ciudad']=$this->cargarCiudad($this->input->cookie('tienda'));
 				if($this->input->cookie('ciudad')!==false){
@@ -74,17 +100,33 @@
 				}else{
 					$data['zona']= $this->cargarZona($this->input->cookie('tienda'), '');
 				}
-				
+
 				$data += $this->cargarDireciones();
-				
+
 			}else{
 				$data['envio']=false;
-			}	
+				$this->form_validation->set_rules($this->config['pedRet']);
+			}
 			$data['radio_pago']=$this->cargarRadioPago();
-			$this->template->build('pedido/v_pedido',$data);
+				
+				
+			if($this->input->post('pedido')==false){
+
+				$this->template->build('pedido/v_pedido',$data);
+			}else{
+				
+				if ($this->form_validation->run() == FALSE){
+					$this->template->build('pedido/v_pedido',$data);
+				}else{
+					echo 'exito';
+				}
+			}
 		}
 	}
-
+    
+	function procesarPedido() {
+		;
+	}
 	function cargarDireciones() {
 		if ($this->input->cookie('ciudad')===false || $this->input->cookie('zona')===false) {
 			$data["error_dir"]='Debe selecionar la ciudad y zona donde se encuentra';
@@ -276,8 +318,12 @@
 			$respuesta ='';
 			if($tipoPago->exists()){
 				foreach ($tipoPago as $tipo){
+					$check=false;
+					if ($tipo->id == $this->input->post('radio_tipo_pago')) {
+						$check=true;
+					}
 					$respuesta .='<div>';				
-					$respuesta .= form_radio('radio_tipo_pago', $tipo->id, false,'id="'.$tipo->id.'-tipo_pago"');
+					$respuesta .= form_radio('radio_tipo_pago', $tipo->id, $check,'id="'.$tipo->id.'-tipo_pago"');
 					$respuesta .= form_label($tipo->nombre);
 					$respuesta .= '</div>';
 				}
