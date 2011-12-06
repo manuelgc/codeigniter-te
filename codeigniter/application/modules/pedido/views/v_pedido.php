@@ -189,13 +189,13 @@
 		<p><?php echo form_label('<b>Ciudad</b>', 'cmbx_ciudad');?></p>
 		<?php echo $ciudad;?>
 		<small class="guidelines" id="guide_1">Seleccione la ciudad donde se encuentra</small>
-		<?php echo form_error('cmbx_ciudad','<p class="error">','</p>');?>
+		<?php echo form_error('ciudad','<p class="error">','</p>');?>
 		</div>
 		<div name="dir">
 		<p><?php echo form_label('<b>Zona</b>', 'cmbx_zona');?></p>
 		<?php echo $zona;?>
 		<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>
-		<?php echo form_error('cmbx_zona','<p class="error">','</p>');?>
+		<?php echo form_error('zona','<p class="error">','</p>');?>
 		</div>
 	</div>
 	
