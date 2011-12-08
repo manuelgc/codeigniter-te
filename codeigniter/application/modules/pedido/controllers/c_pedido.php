@@ -127,6 +127,7 @@
 	function procesarPedido() {
 		;
 	}
+	
 	function cargarDireciones() {
 		if ($this->input->cookie('ciudad')===false || $this->input->cookie('zona')===false) {
 			$data["error_dir"]='Debe selecionar la ciudad y zona donde se encuentra';
@@ -142,6 +143,60 @@
 			$data['agr_visible']=false;
 		}
 		return $data;
+	}
+	
+	function cargarDireccionesAjax() {
+		
+		$ciudad=$this->cargarCiudad($this->input->cookie('tienda'));
+			if($this->input->cookie('ciudad')!==false){
+				$zona= $this->cargarZona($this->input->cookie('tienda'),$this->input->cookie('ciudad'));
+			}else{
+				$zona= $this->cargarZona($this->input->cookie('tienda'), '');
+			}
+			$dir = $this->cargarDireciones();
+		
+		$data['html'] = '<div id="direccion"><div><h2>Direcci&oacute;n de Entrega</h2>';
+		$data['html'].= '<div name="dir">';
+		$data['html'].= '<p>'.form_label('<b>Ciudad</b>', 'cmbx_ciudad').'</p>';
+		$data['html'].= $ciudad;
+		$data['html'].= '<small class="guidelines" id="guide_1">Seleccione la ciudad donde se encuentra</small>';
+		$data['html'].= form_error('ciudad','<p class="error">','</p>');
+		$data['html'].= '</div><div name="dir">';
+		$data['html'].= '<p>'. form_label('<b>Zona</b>', 'cmbx_zona').'</p>';
+		$data['html'].= $zona;
+		$data['html'].= '<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>';
+		$data['html'].= form_error('zona','<p class="error">','</p>');
+		$data['html'].= '</div></div><div id="direcciones">';
+		$data['html'].= '<p><strong>Direcci&oacute;n</strong></p><div id="det_direcciones" class="direcciones">';
+		foreach ($dir as $direcciones){
+			$data['html'].= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
+			$data['html'].= '<table class="direcciones-content"><tbody><tr>';					
+			$data['html'].= '<td style="border: 0px">'. form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion" '.set_radio('radio_direc', $direcciones['id'])).'</td>';
+			$data['html'].= '<td style="border: 0px">Ciudad:'. $direcciones['ciudad'].','
+													 .'Zona:'. $direcciones['zona'].','
+													 .'Calle/Carrera:'.$direcciones['calle_carrera'].',' 
+													.'Casa/Urb:'.$direcciones['casa_urb'].','
+													.'Numero Casa/Apto:'.$direcciones['numeroCasaApto'].','
+													.'Lugar de Referencia:' .$direcciones['lugarreferencia'];
+			$data['html'].= '</td></tr></tbody></table>';
+			$data['html'].= '<small class="guidelines" >Seleccione una direcci&oacute;n de entrega</small>';						
+			$data['html'].= '</fieldset>';
+		}
+		$data['html'].= '</div>';
+		$data['html'].= form_error('radio_direc','<p class="error">','</p>');		
+		$data['html'].= '</div>'.
+		$visible=($dir['agr_visible'])?'display:inline':'display:none';
+		$data['html'].= '<div>'.img(array(
+						'src' =>base_url().'application/img/icon/Add-icon.png',
+						'id'=>'agregar-dir',
+						'alt'=>'Agregar Direccion',
+						'style'=>$visible));
+		$data['html'].= '<small class="guidelines" id="guide_3">Agregar direcci&oacute;n</small></div>';			
+		if(isset($dir['error_dir'])){
+			$data['html'].= '<div class="message">'.$dir['error_dir'].'</div>';
+		}			
+		$data['html'].= '<div id="nueva-dir"></div>	</div>';
+		echo json_decode($data);
 	}
 	
 	function getDireccionesUsuario($id_ciudad,$id_zona) {

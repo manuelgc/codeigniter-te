@@ -172,9 +172,26 @@
 			}
 		});
 
-		$('#carrito').change(function(event){
-			console.log('change');
-			});
+		$("#carrito :radio").live('change',function(event){
+			var tipo= $(this).val();
+			if(tipo==2){
+				$('div#direccion').fadeOut();	
+			}else{
+				if(typeof $('div#direccion').attr('id') == 'undefined'){
+					$.post("<?php echo base_url();?>index.php/pedido/c_pedido/cargarDireccionesAjax",
+							null,
+							function(data){
+							 $("#form_pedido").append(data.html);	
+							},
+							'json'
+						);	
+				}else{
+					$('div#direccion').fadeIn();
+				}
+			}	
+		});
+
+
 		
 	});
 //-->
@@ -183,53 +200,55 @@
 <?php echo form_open('pedido/c_pedido','id="form_pedido"',array('pedido' => '1'));?>		
 	
 	<?php if($envio):?>
-	<div>
-		<h2>Direcci&oacute;n de Entrega</h2>
-		<div name="dir">		
-		<p><?php echo form_label('<b>Ciudad</b>', 'cmbx_ciudad');?></p>
-		<?php echo $ciudad;?>
-		<small class="guidelines" id="guide_1">Seleccione la ciudad donde se encuentra</small>
-		<?php echo form_error('ciudad','<p class="error">','</p>');?>
+	<div id="direccion">
+		<div>
+			<h2>Direcci&oacute;n de Entrega</h2>
+			<div name="dir">		
+			<p><?php echo form_label('<b>Ciudad</b>', 'cmbx_ciudad');?></p>
+			<?php echo $ciudad;?>
+			<small class="guidelines" id="guide_1">Seleccione la ciudad donde se encuentra</small>
+			<?php echo form_error('ciudad','<p class="error">','</p>');?>
+			</div>
+			<div name="dir">
+			<p><?php echo form_label('<b>Zona</b>', 'cmbx_zona');?></p>
+			<?php echo $zona;?>
+			<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>
+			<?php echo form_error('zona','<p class="error">','</p>');?>
+			</div>
 		</div>
-		<div name="dir">
-		<p><?php echo form_label('<b>Zona</b>', 'cmbx_zona');?></p>
-		<?php echo $zona;?>
-		<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>
-		<?php echo form_error('zona','<p class="error">','</p>');?>
-		</div>
-	</div>
-	
-	<div id="direcciones">
 		
-		<p><strong>Direcci&oacute;n</strong></p>					
-		<div id="det_direcciones" class="direcciones">
-			<?php if(isset($dir_usuario)):?>
-<!--				<ul class="direcciones-content">-->
-					<?php foreach ($dir_usuario as $direcciones):?>
-<!--						<li>-->
-							<fieldset class="ui-widget ui-widget-content ui-corner-all">
-								<table class="direcciones-content">
-									<tbody>
-										<tr>					
-											<td style="border: 0px">
-												<?php echo form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion" '.set_radio('radio_direc', $direcciones['id']));?>
-											</td>
-											<td style="border: 0px">
-												Ciudad: <?php echo $direcciones['ciudad'];?>,
-												Zona: <?php echo $direcciones['zona'];?> , Calle/Carrera: <?php echo $direcciones['calle_carrera'];?>, 
-												Casa/Urb: <?php echo $direcciones['casa_urb'];?> , Numero
-												Casa/Apto: <?php echo $direcciones['numeroCasaApto'];?> , Lugar de
-												Referencia: <?php echo $direcciones['lugarreferencia'];?>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							<small class="guidelines" >Seleccione una direcci&oacute;n de entrega</small>						
-							</fieldset>
-							
-<!--						</li>-->
-					<?php endforeach;?>
-<!--				</ul>	-->
+		<div id="direcciones">
+			
+			<p><strong>Direcci&oacute;n</strong></p>					
+			<div id="det_direcciones" class="direcciones">
+				<?php if(isset($dir_usuario)):?>
+	<!--				<ul class="direcciones-content">-->
+						<?php foreach ($dir_usuario as $direcciones):?>
+	<!--						<li>-->
+								<fieldset class="ui-widget ui-widget-content ui-corner-all">
+									<table class="direcciones-content">
+										<tbody>
+											<tr>					
+												<td style="border: 0px">
+													<?php echo form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion" '.set_radio('radio_direc', $direcciones['id']));?>
+												</td>
+												<td style="border: 0px">
+													Ciudad: <?php echo $direcciones['ciudad'];?>,
+													Zona: <?php echo $direcciones['zona'];?> , Calle/Carrera: <?php echo $direcciones['calle_carrera'];?>, 
+													Casa/Urb: <?php echo $direcciones['casa_urb'];?> , Numero
+													Casa/Apto: <?php echo $direcciones['numeroCasaApto'];?> , Lugar de
+													Referencia: <?php echo $direcciones['lugarreferencia'];?>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								<small class="guidelines" >Seleccione una direcci&oacute;n de entrega</small>						
+								</fieldset>
+								
+	<!--						</li>-->
+						<?php endforeach;?>
+	<!--				</ul>	-->
+		</div>
 		<?php endif;?>
 		<?php echo form_error('radio_direc','<p class="error">','</p>');?>		
 		</div>
