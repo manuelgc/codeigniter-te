@@ -165,6 +165,7 @@
 								$("#carrito").html(data.html);
 								if(typeof $('#pedido').val() != 'undefined'){
 									if(typeof $('#form_carrito').val() == 'undefined'){
+										preCargador($("#form_pedido"));
 										$(location).attr('href',"<?php echo base_url();?>index.php/tienda/c_datos_tienda");
 									}	
 								}		
