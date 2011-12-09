@@ -33,13 +33,19 @@
 				),
 				array('field'=>'radio_tipo_pago',
 				'label'=>'Forma de Pago',
-				'rules'=>'required')
+				'rules'=>'required'),
+				array('field'=>'pedido',
+				'label'=>'Pedido',
+				'rules'=>'callback_validarCarrito')
             	),
             'pedRet' => array(
 				array('field'=>'radio_tipo_pago',
 				'label'=>'Forma de Pago',
-				'rules'=>'required')
-            )	
+				'rules'=>'required'),
+				array('field'=>'pedido',
+				'label'=>'Pedido',
+				'rules'=>'callback_validarCarrito')
+            	)	
             );	
             
 	function __construct(){
@@ -118,14 +124,72 @@
 				if ($this->form_validation->run() == FALSE){
 					$this->template->build('pedido/v_pedido',$data);
 				}else{
-					echo 'exito';
+					$this->procesarPedido();
 				}
 			}
 		}
 	}
     
 	function procesarPedido() {
-		;
+		$pedido = new Pedido();
+		$pedPlato = new Pedidos_plato();
+		$opcDet = new Opcionesdetalle();
+		$extDet = new Extrasdetalle();
+		$plato = new Plato();
+		$usuario = new Usuario();
+		$tienda = new Tiendascomida();
+		$tipoVenta = new Tiposventa();
+		$tipoPago = new Tipospago();
+		$direccion = new Direccionesenvio();
+		$estadoPed = new Estadospedido();
+		
+		$carrito = $this->cart->contents();
+		
+		
+		echo 'procesar pedido';
+	}
+	
+	function validarCarrito() {
+			$carrito = $this->cart->contents();		
+			$id_tienda=$this->input->cookie('tienda');		
+			
+			if($carrito!=false){
+				$respuesta = true;
+				$cont_principal = 0;
+				$cont_items= 0;
+				$tienda = new Tiendascomida();
+				$tienda->where('estatus',1)->get_by_id($id_tienda);
+							
+				if($tienda->exists()){
+					foreach ($carrito as $item) {
+						$cont_items += $item['qty'];
+						if ($item['tipo']==1){
+							$cont_principal++;
+						}
+					}
+
+					$sub_total = $this->cart->total();
+					$msj='';	
+					if($sub_total < $tienda->minimoordenprecio){
+						$respuesta = false;
+						$msj = 'El gasto minimo del pedido debe ser de '.$tienda->minimoordenprecio.'<br>';
+					}
+					if ($cont_items< $tienda->minimoordencant){
+						$respuesta = false;
+						$msj .= 'La cantidad minima del pedido debe ser de '.$tienda->minimoordencant.'<br>';
+					}
+					if ($cont_principal< 1){
+						$respuesta = false;
+						$msj .= 'El pedido debe contener al menos 1 plato marcado como (Pricipal)<br>';
+					}
+					$this->form_validation->set_message('validarCarrito', $msj);
+					
+					return $respuesta;
+				}
+			}else{
+				//return false;
+				redirect('tienda/c_datos_tienda');
+			}	
 	}
 	
 	function cargarDireciones() {
@@ -153,8 +217,8 @@
 			}else{
 				$zona= $this->cargarZona($this->input->cookie('tienda'), '');
 			}
-			$dir = $this->cargarDireciones();
-		
+		$dir = $this->cargarDireciones();
+		$visible=($dir['agr_visible'])?'display:inline':'display:none';
 		$data['html'] = '<div id="direccion"><div><h2>Direcci&oacute;n de Entrega</h2>';
 		$data['html'].= '<div name="dir">';
 		$data['html'].= '<p>'.form_label('<b>Ciudad</b>', 'cmbx_ciudad').'</p>';
@@ -167,36 +231,39 @@
 		$data['html'].= '<small class="guidelines" id="guide_2">Seleccione la zona donde se encuentra</small>';
 		$data['html'].= form_error('zona','<p class="error">','</p>');
 		$data['html'].= '</div></div><div id="direcciones">';
-		$data['html'].= '<p><strong>Direcci&oacute;n</strong></p><div id="det_direcciones" class="direcciones">';
-		foreach ($dir as $direcciones){
-			$data['html'].= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
-			$data['html'].= '<table class="direcciones-content"><tbody><tr>';					
-			$data['html'].= '<td style="border: 0px">'. form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion" '.set_radio('radio_direc', $direcciones['id'])).'</td>';
-			$data['html'].= '<td style="border: 0px">Ciudad:'. $direcciones['ciudad'].','
-													 .'Zona:'. $direcciones['zona'].','
-													 .'Calle/Carrera:'.$direcciones['calle_carrera'].',' 
-													.'Casa/Urb:'.$direcciones['casa_urb'].','
-													.'Numero Casa/Apto:'.$direcciones['numeroCasaApto'].','
-													.'Lugar de Referencia:' .$direcciones['lugarreferencia'];
-			$data['html'].= '</td></tr></tbody></table>';
-			$data['html'].= '<small class="guidelines" >Seleccione una direcci&oacute;n de entrega</small>';						
-			$data['html'].= '</fieldset>';
+		
+		if(isset($dir['dir_usuario'])){
+			$data['html'].= '<p><strong>Direcci&oacute;n</strong></p><div id="det_direcciones" class="direcciones">';
+			foreach ($dir['dir_usuario'] as $direcciones){
+				$data['html'].= '<fieldset class="ui-widget ui-widget-content ui-corner-all">';
+				$data['html'].= '<table class="direcciones-content"><tbody><tr>';
+				$data['html'].= '<td style="border: 0px">'. form_radio('radio_direc', $direcciones['id'], false,'id="'.$direcciones['id'].'-direccion" '.set_radio('radio_direc', $direcciones['id'])).'</td>';
+				$data['html'].= '<td style="border: 0px">Ciudad:'. $direcciones['ciudad'].','
+														 .'Zona:'. $direcciones['zona'].','
+														 .'Calle/Carrera:'.$direcciones['calle_carrera'].',' 
+														.'Casa/Urb:'.$direcciones['casa_urb'].','
+														.'Numero Casa/Apto:'.$direcciones['numeroCasaApto'].','
+														.'Lugar de Referencia:' .$direcciones['lugarreferencia'];
+				$data['html'].= '</td></tr></tbody></table>';
+				$data['html'].= '<small class="guidelines" >Seleccione una direcci&oacute;n de entrega</small>';
+				$data['html'].= '</fieldset>';
+			}
+			$data['html'].= '</div>';
 		}
-		$data['html'].= '</div>';
 		$data['html'].= form_error('radio_direc','<p class="error">','</p>');		
 		$data['html'].= '</div>'.
-		$visible=($dir['agr_visible'])?'display:inline':'display:none';
+		
 		$data['html'].= '<div>'.img(array(
 						'src' =>base_url().'application/img/icon/Add-icon.png',
 						'id'=>'agregar-dir',
 						'alt'=>'Agregar Direccion',
-						'style'=>$visible));
+						'style'=>$visible ));
 		$data['html'].= '<small class="guidelines" id="guide_3">Agregar direcci&oacute;n</small></div>';			
 		if(isset($dir['error_dir'])){
 			$data['html'].= '<div class="message">'.$dir['error_dir'].'</div>';
 		}			
 		$data['html'].= '<div id="nueva-dir"></div>	</div>';
-		echo json_decode($data);
+		echo json_encode($data);
 	}
 	
 	function getDireccionesUsuario($id_ciudad,$id_zona) {

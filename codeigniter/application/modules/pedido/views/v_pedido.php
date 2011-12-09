@@ -178,13 +178,15 @@
 				$('div#direccion').fadeOut();	
 			}else{
 				if(typeof $('div#direccion').attr('id') == 'undefined'){
-					$.post("<?php echo base_url();?>index.php/pedido/c_pedido/cargarDireccionesAjax",
-							null,
-							function(data){
-							 $("#form_pedido").append(data.html);	
-							},
-							'json'
-						);	
+					preCargador($("#form_pedido"));
+					$(location).attr('href',"<?php echo base_url();?>index.php/pedido/c_pedido");
+//					$.post("<?php echo base_url();?>index.php/pedido/c_pedido/index",
+//							null,
+//							function(data){
+//							 $("#form_pedido").before(data.html);	
+//							},
+//							'json'
+//						);	
 				}else{
 					$('div#direccion').fadeIn();
 				}
@@ -219,8 +221,9 @@
 		
 		<div id="direcciones">
 			
-			<p><strong>Direcci&oacute;n</strong></p>					
+							
 			<div id="det_direcciones" class="direcciones">
+			<p><strong>Direcci&oacute;n</strong></p>	
 				<?php if(isset($dir_usuario)):?>
 	<!--				<ul class="direcciones-content">-->
 						<?php foreach ($dir_usuario as $direcciones):?>
@@ -280,6 +283,7 @@
 		<?php echo form_textarea(array('name' =>'observacion','id' => 'observacion','rows'	=> '4','cols'=> '40'));?>
 		<small class="guidelines" id="guide_5">Puede agregar algunas indicaciones adicionales para la entrega del pedido</small>	
 	</div>
+	<?php echo form_error('pedido','<p class="error">','</p>');?>
 	<div>
 		<?php echo form_submit('btn_finalizar_pedido', 'Finalizar Pedido', 'id="btn_finalizar_pedido" class="button_text art-button" ')?>
 		<?php echo form_button('btn_cancel_pedido', 'Cancelar Pedido', 'id="btn_cancel_pedido" class="button_text art-button"'); ?>
