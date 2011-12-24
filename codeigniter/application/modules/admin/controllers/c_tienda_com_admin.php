@@ -84,13 +84,14 @@ class C_tienda_com_admin extends MX_Controller {
 		$this->img_defecto['ruta'] = 'imagenes/tiendas_comida/';
 		$this->img_defecto['nombre'] = 'tienda_defecto.jpg';
 		$this->img_defecto['tipo_archivo'] = 'image/jpg';
+		$this->img_defecto['solo_nombre'] = 'tienda_defecto';
+		$this->img_defecto['ext'] = '.jpg';
 		
 		$this->load->library('qtip2');
 		$this->load->library('table');
 		$this->load->library('pagination');
 		$this->load->library('form_validation');
-		$this->load->library('upload');
-		$this->load->library('image_lib');
+		$this->load->library('upload');		
 		
 		$config['upload_path'] = './imagenes/tiendas_comida/';
 		$config['allowed_types'] = 'jpg|png';
@@ -102,13 +103,11 @@ class C_tienda_com_admin extends MX_Controller {
 		$this->qtip2->putCustomTip();
 		$data['output_menu'] = Modules::run('admin/c_menu_admin/index');
 		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/view.css'));
-		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));
-		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/page.css'));
-		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/table.css'));
+		$this->template->append_metadata(link_tag(base_url().'application/views/web/layouts/two_columns/css/jquery-ui-1.8.16.custom.css'));	
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/view.js'));
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.blockUI.js'));		
 		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery-ui-1.8.16.custom.min.js'));
-		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.dataTables.min.js'));
+		$this->template->append_metadata(script_tag(base_url().'application/views/web/layouts/two_columns/js/jquery.collapsible.js'));		
 		$this->template->set_partial('metadata','web/layouts/two_columns/partials/metadata');
 		$this->template->set_partial('inc_css','web/layouts/two_columns/partials/inc_css');
 		$this->template->set_partial('inc_js','web/layouts/two_columns/partials/inc_js');
@@ -200,31 +199,95 @@ class C_tienda_com_admin extends MX_Controller {
 			$z->where('estatus',1);
 			$z->get_by_id($this->input->post('zona'));
 			
-			if ($this->upload->do_upload('img_tienda') == FALSE) {				
-				$img->rutaImagen = $this->img_defecto['ruta'];
-				$img->nombreImagen = $this->img_defecto['nombre'];
-				$img->tipoArchivo = $this->img_defecto['tipo_archivo'];
-				$tc->save(array($e,$c,$z));
-				$img->tiendascomida_id = $tc->id;							
-				$img->save();
-				$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
-				$data['mensaje'] .= $this->upload->display_errors();
+			if ($this->input->post('id_tienda')) {
+				if ($this->upload->do_upload('img_tienda') == FALSE) {									
+					$tc->save(array($e,$c,$z));					
+					$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+					$data['mensaje'] .= $this->upload->display_errors();
+				}else {
+					$arr_img = $this->upload->data();
+					$img->where('tiendascomida_id',$this->input->post('id_tienda'))->get();
+					if ($img->exists()) {						
+						
+						if ($img->soloNombre != 'tienda_defecto') {
+							if(file_exists('.'.DIRECTORY_SEPARATOR.$img->rutaImagen.$img->nombreImagen)){							
+								unlink('.'.DIRECTORY_SEPARATOR.$img->rutaImagen.$img->nombreImagen);									
+							}
+							if(file_exists('.'.DIRECTORY_SEPARATOR.$img->rutaImagen.'thumb'.DIRECTORY_SEPARATOR.$img->soloNombre.'_thumb'.$img->extension)){							
+								unlink('.'.DIRECTORY_SEPARATOR.$img->rutaImagen.'thumb'.DIRECTORY_SEPARATOR.$img->soloNombre.'_thumb'.$img->extension);								
+							}
+						}						
+																
+						$img->rutaImagen = $this->img_defecto['ruta'];
+						$img->nombreImagen = $arr_img['file_name'];
+						$img->tipoArchivo = $arr_img['file_type'];
+						$img->soloNombre = $arr_img['raw_name'];
+						$img->extension = $arr_img['file_ext'];
+						$tc->save(array($e,$c,$z));											
+						$img->save();		
+						$data['mensaje'] = $this->crearThumbnail($this->img_defecto['ruta'], $arr_img['raw_name'], $arr_img['file_ext']);		
+						$data['mensaje'] .= 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+					}else {
+						$img->rutaImagen = $this->img_defecto['ruta'];
+						$img->nombreImagen = $arr_img['file_name'];
+						$img->tipoArchivo = $arr_img['file_type'];
+						$img->soloNombre = $arr_img['raw_name'];
+						$img->extension = $arr_img['file_ext'];						
+						$tc->save(array($e,$c,$z));				
+						$img->tiendascomida_id = $tc->id;							
+						$img->save();		
+						$data['mensaje'] = $this->crearThumbnail($this->img_defecto['ruta'], $arr_img['raw_name'], $arr_img['file_ext']);		
+						$data['mensaje'] .= 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+					}																																	
+				}
 			}else {
-				$arr_img = $this->upload->data();
-				$img->rutaImagen = $this->img_defecto['ruta'];
-				$img->nombreImagen = $arr_img['file_name'];
-				$img->tipoArchivo = $arr_img['file_type'];
-				$tc->save(array($e,$c,$z));
-				$img->tiendascomida_id = $tc->id;
-				$img->save();				
-				$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';					
-			}																		
+				if ($this->upload->do_upload('img_tienda') == FALSE) {				
+					$img->rutaImagen = $this->img_defecto['ruta'];
+					$img->nombreImagen = $this->img_defecto['nombre'];
+					$img->tipoArchivo = $this->img_defecto['tipo_archivo'];
+					$img->soloNombre = $this->img_defecto['solo_nombre'];
+					$img->extension = $this->img_defecto['ext'];					
+					$tc->save(array($e,$c,$z));
+					$img->tiendascomida_id = $tc->id;							
+					$img->save();
+					$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';
+					$data['mensaje'] .= $this->upload->display_errors();
+				}else {
+					$arr_img = $this->upload->data();
+					$img->rutaImagen = $this->img_defecto['ruta'];
+					$img->nombreImagen = $arr_img['file_name'];
+					$img->tipoArchivo = $arr_img['file_type'];
+					$img->soloNombre = $arr_img['raw_name'];
+					$img->extension = $arr_img['file_ext'];
+					$tc->save(array($e,$c,$z));
+					$img->tiendascomida_id = $tc->id;
+					$img->save();				
+					$this->crearThumbnail($this->img_defecto['ruta'], $arr_img['raw_name'], $arr_img['file_ext']);
+					$data['mensaje'] = 'Se ha guardado la tienda exitosamente, recuerde ingresar los demas datos de la tienda.';					
+				}	
+			}																							
 			
 			$data['ciudades'] = $this->cargarCiudad();			
 			$data['catalogo_default'] = $this->catalogoTienda();
 			$data['tienda_nueva'] = 1;					
 			$this->template->build('v_tienda_com_admin',$data);
 		}
+	}
+	
+	function crearThumbnail($rutaImg,$soloNombre,$ext) {
+		$config['source_image'] = '.'.DIRECTORY_SEPARATOR.$rutaImg.$soloNombre.$ext;		
+		$config['new_image'] = '.'.DIRECTORY_SEPARATOR.$rutaImg.'thumb'.DIRECTORY_SEPARATOR.$soloNombre.$ext;
+		$config['create_thumb'] = TRUE;
+		$config['maintain_ratio'] = TRUE;
+		$config['width'] = 80;
+		$config['height'] = 70;
+		
+		$this->load->library('image_lib', $config);
+		if ( ! $this->image_lib->resize()){
+		    return $this->image_lib->display_errors('<p>','</p>');
+		}else {
+			return img(base_url().$rutaImg.'thumb'.DIRECTORY_SEPARATOR.$soloNombre.'_thumb'.$ext);
+		} 
 	}
 	
 	function cargarCiudad(){
@@ -261,7 +324,7 @@ class C_tienda_com_admin extends MX_Controller {
 		}
 	}
 	
-	function cargarZonaPorCiudad($ciudad){
+		function cargarZonaPorCiudad($ciudad){
 		$zona = new Zona();
 		$zona->where('estatus','1');
 		$zona->where('ciudades_id',$ciudad);
@@ -300,6 +363,11 @@ class C_tienda_com_admin extends MX_Controller {
 			$data['min_tiempo_ent'] = $tc->minimotiempoentrega;
 			$data['min_tiempo_esp'] = $tc->minimotiempoespera;
 			$data['costoenvio'] = $tc->costoenvio;
+			if ($tc->imagen->get()->soloNombre == 'tienda_defecto') {				
+				$data['thumb_img'] = img(base_url().$this->img_defecto['ruta'].'thumb'.DIRECTORY_SEPARATOR.$this->img_defecto['solo_nombre'].'_thumb'.$this->img_defecto['ext']);
+			}else {
+				$data['thumb_img'] = img(base_url().$tc->imagen->get()->rutaImagen.'thumb'.DIRECTORY_SEPARATOR.$tc->imagen->get()->soloNombre.'_thumb'.$tc->imagen->get()->extension);
+			}			
 			echo json_encode($data);
 		}				
 	}

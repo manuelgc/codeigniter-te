@@ -52,7 +52,7 @@
 						<ul class="subnavegador">
 							<li><?php echo anchor('admin/c_tienda_com_admin','Tienda de comida');?>
 							</li>
-							<li><a href="#" title="Platos">Platos</a>
+							<li><?php echo anchor('admin/c_plato_admin','Platos');?>
 							</li>
 							<li><a href="#" title="Extras">Extras</a>
 							</li>
