@@ -448,6 +448,14 @@ form p.error {
 	margin: 0 0 5px;
 }
 
+form label.error {
+	clear: both;
+	color: red;
+	font-size: 10px;
+	font-weight: 700;
+	margin: 0 0 5px;
+}
+
 form .required {
 	color: red;
 	float: none;
