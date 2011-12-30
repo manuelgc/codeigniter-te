@@ -1,9 +1,9 @@
-	<li id="li_ext_detalle_<?php echo $id_extra_detalle;?>" class="li_ext_detalle">
+	<li id="li_ext_detalle_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>" class="li_ext_detalle">
 		<div style="width: 50%;">
-		<label class="description" for="nombre_extra_detalle_<?php echo $id_extra_detalle;?>">Nombre
+		<label class="description" for="e_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>_nombre_detalle">Nombre
 			extra detalle <?php echo $id_extra_detalle;?></label>
-			<input id="nombre_extra_detalle_<?php echo $id_extra_detalle;?>"
-				name="nombre_extra_detalle_<?php echo $id_extra_detalle;?>"
+			<input id="e_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>_nombre_detalle"
+				name="e_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>_nombre_detalle"
 				class="element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="255"
 				value="" />											
 		</div>
@@ -12,10 +12,10 @@
 		</p>
 				
 		<div style="width: 50%;">
-		<label class="description" for="precio_extra_detalle_<?php echo $id_extra_detalle;?>">Precio
+		<label class="description" for="e_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>_precio_detalle">Precio
 			extra detalle <?php echo $id_extra_detalle;?></label>
-			<input id="precio_extra_detalle_<?php echo $id_extra_detalle;?>"
-				name="precio_extra_detalle_<?php echo $id_extra_detalle;?>"
+			<input id="e_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>_precio_detalle"
+				name="e_<?php echo $id_extra;?>_<?php echo $id_extra_detalle;?>_precio_detalle"
 				class="element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="255"
 				value="" />												
 		</div>

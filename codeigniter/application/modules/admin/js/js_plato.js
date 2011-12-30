@@ -14,6 +14,7 @@ $(document).ready(function(){
 	var id_opcion_detalle_boton = 1;
 	var id_extra_boton = 1;
 	var id_extra_detalle_boton = 1;
+	var opciones = new Array();
 	
 	$('fieldset').collapse();
 	
@@ -26,9 +27,7 @@ $(document).ready(function(){
 		var id_boton = $(this).attr('id');
 		var opcion_extra = id_boton.substr(0,1);
 		var general_detalle = id_boton.substr(2,1);
-		var digit_boton = id_boton.substr(4);
-		console.log('digito: '+digit_boton);
-		console.log(opcion_extra+' '+general_detalle);
+		var digit_boton = id_boton.substr(4);		
 		
 		if(opcion_extra == 'o' && general_detalle == 'g'){
 			id_opcion_boton++;			
@@ -55,13 +54,12 @@ $(document).ready(function(){
 				}
 			});					
 		}else if(opcion_extra == 'o' && general_detalle == 'd'){
-			console.log(id_opcion_detalle_boton);
-			console.log(id_boton);
+			
 			$.ajax({
 				url: 'c_plato_admin/mostrarFormOpcion',
 				type:'POST',
 				dataType : 'json',
-				data : {id_opcion_detalle : id_opcion_detalle_boton,es_opcion : '0'},			
+				data : {id_opcion_detalle : id_opcion_detalle_boton,es_opcion : '0', id_opcion : digit_boton},			
 				success:function(data){				
 					$('fieldset#content_'+digit_boton+' ul').append(data.item_opcion_detalle);
 					$('.guidelines').hide();
@@ -106,7 +104,7 @@ $(document).ready(function(){
 				url: 'c_plato_admin/mostrarFormExtra',
 				type:'POST',
 				dataType : 'json',
-				data : {id_extra_detalle : id_extra_detalle_boton,es_extra : '0'},			
+				data : {id_extra_detalle : id_extra_detalle_boton,es_extra : '0', id_extra : digit_boton},			
 				success:function(data){				
 					$('fieldset#content_extra_'+digit_boton+' ul').append(data.item_extra_detalle);
 					$('.guidelines').hide();
@@ -154,7 +152,7 @@ $(document).ready(function(){
 		var id_ciudad = $(this).val();	
 		
 		if(id_ciudad != ''){
-			$.post("<?php echo base_url();?>index.php/admin/c_tienda_com_admin/cargarZona",
+			$.post("c_tienda_com_admin/cargarZona",
 					{'id_ciudad':id_ciudad},
 					function(data){
 						if(data.zona!='0'){
@@ -211,7 +209,8 @@ $(document).ready(function(){
 				$('#id_tienda').val(data.id);
 				$('#nombre_tienda').html(data.nombre);				
 				$('#razon_social').html(data.razonsocial);
-				$('#ci_rif').html(data.ci_rif);				
+				$('#ci_rif').html(data.ci_rif);		
+				$('label[for="id_tienda"]').hide();
 			}
 		});
 		$('#popup').dialog('close');
@@ -222,7 +221,7 @@ $(document).ready(function(){
 			this.reset();
 		});
 		$.ajax({
-			url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+			url:'c_tienda_com_admin/catalogoTienda/',
 			dataType:'json',
 			type:'POST',
 			beforeSend:function(data){
@@ -242,7 +241,7 @@ $(document).ready(function(){
 			var id_zona = $('#zona_popup').val(); 
 		}
 		$.ajax({
-			url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+			url:'c_tienda_com_admin/catalogoTienda/',
 			dataType:'json',
 			type:'POST',
 			data:{
@@ -267,7 +266,7 @@ $(document).ready(function(){
 			var id_zona = $('#zona_popup').val(); 
 		}
 		$.ajax({
-			url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+			url:'c_tienda_com_admin/catalogoTienda/',
 			dataType:'json',
 			type:'POST',
 			data:{
@@ -288,7 +287,7 @@ $(document).ready(function(){
 		$(this).autocomplete({
 			source:function(req,resp){
 				$.ajax({
-					url:'<?php base_url()?>c_tienda_com_admin/getNombreTiendas',
+					url:'c_tienda_com_admin/getNombreTiendas',
 					dataType:'json',
 					type:'POST',
 					data:{term : req.term},
@@ -313,7 +312,7 @@ $(document).ready(function(){
 				}
 						
 				$.ajax({
-					url:'<?php base_url()?>c_tienda_com_admin/catalogoTienda/',
+					url:'c_tienda_com_admin/catalogoTienda/',
 					dataType:'json',
 					type:'POST',
 					data: { id_tienda : id_tienda ,
@@ -330,20 +329,12 @@ $(document).ready(function(){
 			}
 		});
 	});
-
+	
 	$("#form_plato_tienda_comida").formwizard({ 
 		textNext : 'Siguiente',
-		textBack : 'Atras',
-	 	formPluginEnabled: true,
+		textBack : 'Atras',	 	
 	 	validationEnabled: true,
-	 	focusFirstInput : true,
-	 	/*formOptions :{
-			success: function(data){
-				alert('success');
-				},			
-			dataType: 'json',
-			resetForm: true
-	 	},*/
+	 	focusFirstInput : true,	 	
 	 	validationOptions : {
 	 		rules: {
 	 			id_tienda : "required",
@@ -360,8 +351,8 @@ $(document).ready(function(){
 	 			tipo_plato : "required",
 	 			impuesto : "required"	 			
 	 		},
-	 		messages : {
-	 			id_tienda : "Debe seleccionar una tienda para asociar el plato.",
+	 		messages : {	 			
+	 			id_tienda : "Debe seleccionar una tienda.",
 	 			nombre_plato : "Indique un nombre para el plato",
 	 			precio : {
 	 				required : "Ingrese un precio para el plato",

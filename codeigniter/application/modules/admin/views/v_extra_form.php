@@ -1,9 +1,9 @@
 <fieldset id="content_extra_<?php echo $id_extra;?>">
 	<legend> Extra <?php echo $id_extra;?> </legend>
 	<ul>
-		<li><label class="description" for="nombre_extra_<?php echo $id_extra;?>">Nombre extra</label>
+		<li><label class="description" for="e_<?php echo $id_extra;?>_nombre">Nombre extra</label>
 			<div>
-				<input id="nombre_extra_<?php echo $id_extra;?>" name="nombre_extra_<?php echo $id_extra;?>"
+				<input id="e_<?php echo $id_extra;?>_nombre" name="e_<?php echo $id_extra;?>_nombre"
 					class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="255"
 					value="" />						
 			</div>
@@ -13,18 +13,18 @@
 		</li>
 
 
-		<li><label class="description" for="extra_requirido_<?php echo $id_extra;?>">Requerido </label>
+		<li><label class="description" for="e_<?php echo $id_extra;?>_requirido">Requerido </label>
 			<div>
 			<?php
-			echo form_dropdown('extra_requerido_'.$id_extra,array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="extra_requirido_'.$id_extra.'"');
+			echo form_dropdown('e_'.$id_extra.'_requerido',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="e_'.$id_extra.'_requerido"');
 			?>
 			</div>
 			<p class="guidelines">
 				<small>Seleccione si es plato principal o secundario.</small>
 			</p></li>
-		<li><label class="description" for="minimo_extra_<?php echo $id_extra;?>">Minimo extra</label>
+		<li><label class="description" for="e_<?php echo $id_extra;?>_minimo">Minimo extra</label>
 			<div>
-				<input id="minimo_extra_<?php echo $id_extra;?>" name="minimo_extra_<?php echo $id_extra;?>"
+				<input id="e_<?php echo $id_extra;?>_minimo" name="e_<?php echo $id_extra;?>_minimo"
 					class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="3"
 					value="" />						
 			</div>
@@ -33,9 +33,9 @@
 					requerido y 0 si no).</small>
 			</p>
 		</li>
-		<li><label class="description" for="maximo_extra_<?php echo $id_extra;?>">Maximo extra</label>
+		<li><label class="description" for="e_<?php echo $id_extra;?>_maximo">Maximo extra</label>
 			<div>
-				<input id="maximo_extra_<?php echo $id_extra;?>" name="maximo_extra_<?php echo $id_extra;?>"
+				<input id="e_<?php echo $id_extra;?>_maximo" name="e_<?php echo $id_extra;?>_maximo"
 					class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="3"
 					value="" />						
 			</div>
