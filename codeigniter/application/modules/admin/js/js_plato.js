@@ -2,6 +2,21 @@
  * Codigo para controlar los eventos en el formulario de platos
  */
 
+function browseServer()
+{
+	var finder = new CKFinder();
+	finder.BasePath = '/imagenes/' ;	
+	finder.selectActionFunction = SetFileField;
+	finder.StartupPath = '/imagenes/';
+	finder.popup();
+}
+ 
+function SetFileField( fileUrl, data )
+{
+	document.getElementById( 'img_plato' ).value = fileUrl ;
+	console.log(data);
+}
+
 function cargarFormulario(html,selector){
 	window.setTimeout(function(){
 		$(selector).html(html.formulario);
@@ -13,8 +28,7 @@ $(document).ready(function(){
 	var id_opcion_boton = 1;
 	var id_opcion_detalle_boton = 1;
 	var id_extra_boton = 1;
-	var id_extra_detalle_boton = 1;
-	var opciones = new Array();
+	var id_extra_detalle_boton = 1;	
 	
 	$('fieldset').collapse();
 	
@@ -30,7 +44,8 @@ $(document).ready(function(){
 		var digit_boton = id_boton.substr(4);		
 		
 		if(opcion_extra == 'o' && general_detalle == 'g'){
-			id_opcion_boton++;			
+			id_opcion_boton++;									
+			
 			$.ajax({
 				url: 'c_plato_admin/mostrarFormOpcion',
 				type:'POST',
@@ -145,7 +160,7 @@ $(document).ready(function(){
 
 	$('#boton-catalogo').live('click',function(e){
 		e.preventDefault();		
-		$('#popup').dialog('open');
+		$('#popup').dialog('open');		
 	});
 
 	$('#ciudad_popup').live('change',function(e){						
@@ -171,18 +186,37 @@ $(document).ready(function(){
 
 	$('ul.link > li a').live('click', function(e){
 		e.preventDefault();
+		var id_ul = $(this).parents('ul').attr('id');		
 		var vinculo = $(this).attr('href');
-		 $.ajax({
-			url: vinculo,
-			type: 'GET',
-			dataType: 'json',
-			beforeSend: function(data){
-				preCargador('.content-tiendas');
-			},				
-			success: function (data) {					
-				cargarTablaTienda(data);
-			}				
-		});			
+		
+		if(id_ul == 'ul-link-tienda'){
+			$.ajax({
+				url: vinculo,
+				type: 'GET',
+				dataType: 'json',
+				beforeSend: function(data){
+					preCargador('.content-tiendas');
+				},				
+				success: function (data) {					
+					cargarTabla(data,'div.content-tiendas','ul.link');
+				}				
+			});
+		}else{
+			var param_offset = vinculo.split('/').pop();
+			var param_id_tienda = $('#id_tienda').val();		
+			 $.ajax({
+				url: vinculo,			
+				type: 'POST',
+				dataType: 'json',
+				data : {offset : param_offset, id_tienda : param_id_tienda},
+				beforeSend: function(data){
+					preCargador('.content-platos');
+				},				
+				success: function (data) {					
+					cargarTablaPlatos(data,'div#popup-plato');
+				}				
+			});		
+		}				 			
 	});
 
 	function preCargador(selector){
@@ -191,10 +225,17 @@ $(document).ready(function(){
 		});
 	}
 
-	function cargarTablaTienda(html){
+	function cargarTabla(html,selector_tabla,selector_link){
 		window.setTimeout( function(){
-			$('div.content-tiendas').html(html.lista_ped);
-			$('ul.link').html(html.link_pag);
+			$(selector_tabla).html(html.lista_ped);
+			$(selector_link).html(html.link_pag);
+		}, 1000);
+	}
+	
+	function cargarTablaPlatos(html,selector_tabla){
+		window.setTimeout( function(){
+			$(selector_tabla).html(html.catalogo_total);
+			//$(selector_link).html(html.link_pag);
 		}, 1000);
 	}
 
@@ -211,6 +252,7 @@ $(document).ready(function(){
 				$('#razon_social').html(data.razonsocial);
 				$('#ci_rif').html(data.ci_rif);		
 				$('label[for="id_tienda"]').hide();
+				$('#boton-catalogo-plato').show();
 			}
 		});
 		$('#popup').dialog('close');
@@ -228,7 +270,7 @@ $(document).ready(function(){
 				preCargador('.content-tiendas');
 			},
 			success:function(data){
-				cargarTablaTienda(data);
+				cargarTabla(data,'div.content-tiendas','ul.link');
 			}
 		});
 	});
@@ -253,7 +295,7 @@ $(document).ready(function(){
 				preCargador('.content-tiendas');
 			},
 			success:function(data){
-				cargarTablaTienda(data);
+				cargarTabla(data,'div.content-tiendas','ul.link');
 			}
 		});
 	});
@@ -278,7 +320,7 @@ $(document).ready(function(){
 				preCargador('.content-tiendas');
 			},
 			success:function(data){
-				cargarTablaTienda(data);
+				cargarTabla(data,'div.content-tiendas','ul.link');
 			}
 		});
 	});
@@ -323,7 +365,7 @@ $(document).ready(function(){
 						preCargador('.content-tiendas');
 					},
 					success:function(data){
-						cargarTablaTienda(data);
+						cargarTabla(data,'div.content-tiendas','ul.link');
 					}
 				});
 			}
@@ -368,6 +410,43 @@ $(document).ready(function(){
 	 		}
 	 	}
 	 }
-	);		
-			
+	);
+	
+	$('#popup-plato').dialog({
+		'autoOpen':false,
+		width:800,
+		title:'Platos',
+		height: 600,
+		modal:true,
+		show:"blind",
+		hide:"explode",
+		buttons:{			
+			'Cerrar' : function(){
+				$(this).dialog('close');
+			}
+		},
+		close: function(){
+			$('#form-filtro-platos').each (function(){
+				this.reset();
+			});
+		}	
+	});
+	
+	$('#boton-catalogo-plato').live('click',function(e){
+		e.preventDefault();		
+		var id_tienda_param = $('#id_tienda').val();
+		$.ajax({
+			url:'c_plato_admin/catalogoPlatos/',
+			dataType:'json',
+			type:'POST',
+			data: { id_tienda : id_tienda_param },
+			beforeSend:function(data){
+				preCargador('.content-platos');
+			},
+			success:function(data){
+				cargarTablaPlatos(data,'div#popup-plato');
+			}
+		});
+		$('#popup-plato').dialog('open');		
+	});				
 });

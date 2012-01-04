@@ -1,9 +1,9 @@
 <fieldset id="content_<?php echo $id_opcion;?>">
 	<legend> Opcion <?php echo $id_opcion;?> </legend>
-	<ul>		 
+	<ul>
 		<li><label class="description" for="o_<?php echo $id_opcion;?>_nombre">Nombre opcion</label>
 			<div>
-				<input id="o_<?php echo $id_opcion;?>_nombre" name="o_<?php echo $id_opcion;?>_nombre"
+				<input id="o_<?php echo $id_opcion;?>_nombre" name="o[<?php echo $id_opcion;?>][nombre]"
 					class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="255"
 					value="" />						
 			</div>
@@ -16,7 +16,7 @@
 		<li><label class="description" for="o_<?php echo $id_opcion;?>_requirido">Requerido </label>
 			<div>
 			<?php
-			echo form_dropdown('o_'.$id_opcion.'_requerido',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="o_'.$id_opcion.'_requerido"');
+			echo form_dropdown('o['.$id_opcion.'][requerido]',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="o_'.$id_opcion.'_requerido"');
 			?>
 			</div>
 			<p class="guidelines">
@@ -24,7 +24,7 @@
 			</p></li>
 		<li><label class="description" for="o_<?php echo $id_opcion;?>_minimo">Minimo opcion</label>
 			<div>
-				<input id="o_<?php echo $id_opcion;?>_minimo" name="o_<?php echo $id_opcion;?>_minimo"
+				<input id="o_<?php echo $id_opcion;?>_minimo" name="o[<?php echo $id_opcion;?>][minimo]"
 					class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="3"
 					value="" />						
 			</div>
@@ -35,7 +35,7 @@
 		</li>
 		<li><label class="description" for="o_<?php echo $id_opcion;?>_maximo">Maximo opcion</label>
 			<div>
-				<input id="o_<?php echo $id_opcion;?>_maximo" name="o_<?php echo $id_opcion;?>_maximo"
+				<input id="o_<?php echo $id_opcion;?>_maximo" name="o[<?php echo $id_opcion;?>][maximo]"
 					class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="3"
 					value="" />						
 			</div>
