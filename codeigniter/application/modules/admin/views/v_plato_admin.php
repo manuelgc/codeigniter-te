@@ -1,6 +1,14 @@
 <?php if (isset($mensaje)):?>
 <div class="message">
-<?php echo $mensaje;?>
+<?php 
+echo $mensaje['plato'].'<br>';
+foreach ($mensaje['o'] as $item) {
+	echo $item.'<br>';
+}
+foreach ($mensaje['e'] as $item) {
+	echo $item.'<br>';
+}
+?>
 </div>
 <?php endif;?>
 
@@ -14,7 +22,9 @@
 			<h2>Platos</h2>
 			<div>
 				<input id="boton-catalogo" class="button_text art-button"
-					type="button" name="boton-catalogo" value="Buscar" />
+					type="button" name="boton-catalogo" value="Buscar Tienda" />
+				<input id="boton-catalogo-plato" class="button_text art-button" 
+				type="button" name="boton-catalogo-plato" value="Buscar Plato" style="display:none"/>
 			</div>
 			<div id="content-thumb"></div>
 			<p>Ingresa la informancion a continuacion para registrar un plato de
@@ -96,8 +106,10 @@
 				</div></li>
 
 			<li id="li_9"><label class="description" for="img_tienda">Imagen:</label>
-				<span> <input id="img_tienda" name="img_tienda"
-					class="element text " size="20" type="file" /> </span>
+				<span> <input id="img_plato" name="img_plato"
+					class="element text " size="20" type="text" /> 
+					<input type="button" value="Ver servidor" onclick="browseServer();" />	
+				</span>
 				<p class="guidelines" id="guide_11">
 					<small>Ingresa una imagen en formato JPG/PNG</small>
 				</p></li>
@@ -112,12 +124,11 @@
 		<div id="content_opciones">
 			<fieldset id="content_1">
 				<legend> Opcion 1 </legend>
-				<ul>
-					<li> <input type="hidden" name="oculto_opciones[]" id="oculto_opciones" value=""/></li>
+				<ul>					
 					<li><label class="description" for="o_1_nombre">Nombre opcion</label>
 						<div>
-							<input id="o_1_nombre" name="o_1_nombre"
-								class="element text medium" type="text" maxlength="255" value="" />
+							<input id="o_1_nombre" name="o[1][nombre]" 
+								class="element text medium" type="text" maxlength="255" value="" /><!-- name="o_1_nombre" -->
 						</div>
 						<p class="guidelines" id="guide_10">
 							<small>Ingresa el nombre de la opcion</small>
@@ -127,7 +138,7 @@
 					<li><label class="description" for="o_1_requirido">Requerido </label>
 						<div>
 						<?php
-						echo form_dropdown('o_1_requerido',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="o_1_requirido"');
+						echo form_dropdown('o[1][requerido]',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="o_1_requirido"');//o_1_requerido
 						?>
 						</div>
 						<p class="guidelines" id="guide_11">
@@ -137,8 +148,8 @@
 					<li><label class="description" for="o_1_minimo">Descripcion
 							del plato</label>
 						<div>
-							<input id="o_1_minimo" name="o_1_minimo"
-								class="element text medium" type="text" maxlength="3" value="" />
+							<input id="o_1_minimo" name="o[1][minimo]"
+								class="element text medium" type="text" maxlength="3" value="" /><!-- name="o_1_minimo" -->
 						</div>
 						<p class="guidelines" id="guide_12">
 							<small>Ingresa la cantidad minima de opcion (mayor o igual a 1 si
@@ -146,8 +157,8 @@
 						</p></li>
 					<li><label class="description" for="o_maximo_1">Maximo opcion</label>
 						<div>
-							<input id="o_1_maximo" name="o_1_maximo"
-								class="element text medium" type="text" maxlength="3" value="" />
+							<input id="o_1_maximo" name="o[1][maximo]"
+								class="element text medium" type="text" maxlength="3" value="" /><!-- name="o_1_maximo" -->
 						</div>
 						<p class="guidelines" id="guide_13">
 							<small>Ingresa la cantidad maxima de opcion (0 sin limite).</small>
@@ -169,7 +180,7 @@
 				<ul>
 					<li><label class="description" for="e_1_nombre">Nombre extra</label>
 						<div>
-							<input id="e_1_nombre" name="e_1_nombre"
+							<input id="e_1_nombre" name="e[1][nombre]"
 								class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default"
 								type="text" maxlength="255" value="" />
 						</div>
@@ -182,7 +193,7 @@
 					<li><label class="description" for="e_1_requirido">Requerido </label>
 						<div>
 						<?php
-						echo form_dropdown('e_1_requerido',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="e_1_requirido"');
+						echo form_dropdown('e[1][requerido]',array('0'=>'Opcional','1'=>'Obligatorio'),'','class="element select medium" id="e_1_requirido"');
 						?>
 						</div>
 						<p class="guidelines">
@@ -191,7 +202,7 @@
 					</li>
 					<li><label class="description" for="e_1_minimo">Minimo extra</label>
 						<div>
-							<input id="e_1_minimo" name="e_1_minimo"
+							<input id="e_1_minimo" name="e[1][minimo]"
 								class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default"
 								type="text" maxlength="3" value="" />
 						</div>
@@ -202,7 +213,7 @@
 					</li>
 					<li><label class="description" for="e_1_maximo">Maximo extra</label>
 						<div>
-							<input id="e_1_maximo" name="e_1_maximo"
+							<input id="e_1_maximo" name="e[1][maximo]"
 								class="element text medium element text medium ui-wizard-content ui-helper-reset ui-state-default"
 								type="text" maxlength="3" value="" />
 						</div>
@@ -227,4 +238,6 @@
 						<?php echo form_close();?>
 <div id="popup">
 <?php echo $catalogo_default;?>
+</div>
+<div id="popup-plato">
 </div>

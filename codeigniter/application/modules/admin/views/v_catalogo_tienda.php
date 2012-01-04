@@ -31,6 +31,6 @@
 			<div class="content-tiendas">
 			<?php echo $lista_ped;?>
 			</div>
-			<ul class="link">
+			<ul class="link" id="ul-link-tienda">
 			<?php echo (!empty($link_pag)) ? $link_pag : '';?>
 			</ul>

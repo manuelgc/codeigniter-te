@@ -1,7 +1,7 @@
-<?php 
+<?php
 class Plato extends DataMapper {
 	var $table = 'platos';
-	
+
 	var $has_one= array(
 	'tiendascomida'=> array(
             'class' => 'tiendascomida',
@@ -18,8 +18,8 @@ class Plato extends DataMapper {
             'other_field' => 'plato',
 			'join_other_as' => 'impuesto',
 			'join_self_as' => 'plato')
-	); 
-	
+	);
+
 	var $has_many = array(
 	'promocion'=> array(
             'class' => 'promocion',
@@ -49,7 +49,7 @@ class Plato extends DataMapper {
 			            'join_other_as' => 'pedido',	
 			            'join_table' => 'pedidos_platos')
 	);
-	
+
 	function __construct($id = NULL) {
 		parent::__construct($id);
 	}
@@ -62,7 +62,7 @@ class Plato extends DataMapper {
 			return false;
 		}
 	}
-	
+
 	function getExtras(){
 		$extra= $this->extra->where('estatus',1)->get();
 		if ($extra->exists()) {
@@ -75,7 +75,7 @@ class Plato extends DataMapper {
 	function getExtrasbyId($id_plato){
 		$plato= new Plato();
 		$plato->where('estatus',1)->get_by_id($id_plato);
-		
+
 		if ($plato->exists()) {
 			$extra= $plato->extra->where('estatus',1)->get();
 			if ($extra->exists()) {
@@ -88,7 +88,7 @@ class Plato extends DataMapper {
 		}
 
 	}
-	
+
 	function getOpciones(){
 		$opciones= $this->opcionesplato->where('estatus',1)->get();
 		if ($opciones->exists()) {
@@ -101,7 +101,7 @@ class Plato extends DataMapper {
 	function getOpcionesbyId($id_plato){
 		$plato= new Plato();
 		$plato->where('estatus',1)->get_by_id($id_plato);
-		
+
 		if ($plato->exists()) {
 			$opciones= $plato->opcionesplato->where('estatus',1)->get();
 			if ($opciones->exists()) {
@@ -114,7 +114,7 @@ class Plato extends DataMapper {
 		}
 
 	}
-	
+
 	function getImpuesto() {
 		$impuesto = $this->impuesto->where('estatus',1)->get();
 		if($impuesto->exists()){
@@ -123,7 +123,34 @@ class Plato extends DataMapper {
 			return false;
 		}
 	}
+
+	function getPlatosByTienda($limit = '',$offset = '',$id_tienda = '', $ordenacion = 'nombre asc') {
+		$tc = new Tiendascomida();
+		$arr_p = array();
+		$contador = 0;
+
+		$tc->where('estatus',1);
+		if (!empty($id_tienda)) {
+			$tc->where('id',$id_tienda);
+		}
+		$tc->get();		
+		$tc->platos->where('estatus',1)->get($limit,$offset);
+		foreach ($tc->platos as $fila) {
+			$arr_p[$contador]['nombre'] = $fila->nombre;
+			$arr_p[$contador]['descripcion'] = $fila->descripcion;
+			$arr_p[$contador]['precio'] = $fila->precio;
+			$arr_p[$contador]['seleccionar'] = form_radio('seleccionar',$fila->id);
+			$contador++;
+		}
+		return $arr_p;
+	}
 	
+	function getCantPlatoByTienda($id_tienda) {
+		$tc = new Tiendascomida();
+		$tc->where('id',$id_tienda)->where('estatus',1)->get();
+		return $tc->platos->where('estatus',1)->count();		
+	}
+
 }
 
 ?>

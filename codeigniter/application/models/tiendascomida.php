@@ -23,7 +23,7 @@ class Tiendascomida extends DataMapper{
             'other_field' => 'tiendascomida'),
 	'plato'=> array(
             'class' => 'plato',
-            'other_field' => 'tiendascomida',
+            'other_field' => 'tiendascomida',			
 			'join_self_as' => 'tiendacomida'),
 	'imagen' => array(
             'class' => 'imagen',

@@ -4,7 +4,7 @@
 			opcion detalle <?php echo $id_opcion_detalle;?></label>
 		<div>
 			<input id="o_<?php echo $id_opcion;?>_<?php echo $id_opcion_detalle;?>_nombre_detalle"
-				name="o_<?php echo $id_opcion;?>_<?php echo $id_opcion_detalle;?>_nombre_detalle"
+				name="o[<?php echo $id_opcion;?>][nombre_detalle][]"
 				class="element text medium ui-wizard-content ui-helper-reset ui-state-default" type="text" maxlength="255"
 				value="" />
 						<?php echo img(array(
